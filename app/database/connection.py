@@ -1,84 +1,64 @@
 # connection.py
-from contextlib import contextmanager
-from typing import Any, Iterator, List, Optional
-
-from flask_sqlalchemy import SQLAlchemy
+from typing import Any, List, Optional
 from sqlalchemy import text
 from ..extensions import db
+from ..models.models import Usuario  # Ajusta la ruta según tu proyecto
+
+# ============================================================
+# Funciones ORM (recomendadas para la mayoría de casos)
+# ============================================================
 
 
-from extensions import db
+def obtener_usuario_por_email(email: str) -> Optional[Usuario]:
+    """Retorna un objeto Usuario o None."""
+    return Usuario.query.filter_by(email=email).first()
 
 
-@contextmanager
-def __get_session() -> Iterator:
-    """
-    Contexto que proporciona una sesión de SQLAlchemy.
-    - Si todo sale bien, se hace commit.
-    - Si hay excepción, se hace rollback.
-    - Siempre se cierra la sesión al final.
-    """
-    session = db.session
+def obtener_usuario_por_id(user_id: int) -> Optional[Usuario]:
+    """Retorna un usuario por su ID."""
+    return Usuario.query.get(user_id)
+
+
+def listar_usuarios() -> List[Usuario]:
+    """Retorna todos los usuarios."""
+    return Usuario.query.all()
+
+
+def guardar_usuario(usuario: Usuario) -> None:
+    """Guarda (inserta o actualiza) un usuario en la BD."""
     try:
-        yield session
-        session.commit()
-    except Exception:
-        session.rollback()
-        raise
-    finally:
-        session.close()
+        db.session.add(usuario)
+        db.session.commit()
+        return True
+    except:
+        db.session.rollback()
+        return False
 
 
-def _fetch_one(query: str, parameters: Optional[List[Any]] = None) -> Any:
-    """
-    Ejecuta una consulta SQL y retorna una sola fila.
-    """
-    if parameters is None:
-        parameters = []
-
-    with __get_session() as session:
-        result = session.execute(text(query), parameters)
-        row = result.fetchone()
-        return row
+def eliminar_usuario(usuario: Usuario) -> None:
+    """Elimina un usuario de la BD."""
+    db.session.delete(usuario)
 
 
-def _fetch_all(query: str, parameters: Optional[List[Any]] = None) -> List:
-    """
-    Ejecuta una consulta SQL y retorna todas las filas.
-    """
-    if parameters is None:
-        parameters = []
-
-    with __get_session() as session:
-        result = session.execute(text(query), parameters)
-        return result.fetchall()
+def eliminar_usuario_por_email(email: str) -> bool:
+    """Elimina un usuario por email. Retorna True si existía."""
+    usuario = Usuario.query.filter_by(email=email).first()
+    if usuario:
+        db.session.delete(usuario)
+        return True
+    return False
 
 
-def _fetch_none(query: str, parameters: Optional[List[Any]] = None) -> None:
-    """
-    Ejecuta una consulta SQL que no retorna filas (INSERT, UPDATE, DELETE).
-    """
-    if parameters is None:
-        parameters = []
-
-    with __get_session() as session:
-        session.execute(text(query), parameters)
+def buscar_una_fila() -> bool:
+    """Busca una fila en la tabla usuario devuelve false si no encuentra nada"""
+    return Usuario.query.first() is None
 
 
-def _fetch_lastrow_id(query: str, parameters: Optional[List[Any]] = None) -> int:
-    """
-    Ejecuta un INSERT que debe tener la cláusula 'RETURNING id' (o el nombre de tu PK).
-    Retorna el valor de la columna retornada.
-    """
-    if parameters is None:
-        parameters = []
-
-    with __get_session() as session:
-        result = session.execute(text(query), parameters)
-
-        row = result.fetchone()
-        if row is None:
-            raise ValueError(
-                "La consulta no retornó ningún id. Asegúrate de usar 'RETURNING id'."
-            )
-        return row[0]
+def guardar_datos() -> bool:
+    """Permite hacer un comit"""
+    try:
+        db.session.commit()
+        return True
+    except:
+        db.session.rollback()
+        return False

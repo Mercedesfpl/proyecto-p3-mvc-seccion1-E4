@@ -10,3 +10,4 @@ flask-migrate      4.1.0
 python-dotenv      1.2.2
 psycopg2-binary    2.9.12
 flask-jwt-extended 4.7.1
+Flask-Mail         0.10.0

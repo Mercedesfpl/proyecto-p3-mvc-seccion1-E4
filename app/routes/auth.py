@@ -37,3 +37,32 @@ def register():
     nombre = data.get("nombre")
     usuario = UserSession(email=email, nombre=nombre, password=password)
     return userControllers.register(usuario)
+
+
+@auth_scope.route("/forgot-password", methods=["POST"])
+def forgot_password():
+    """Punto 1: Solicitar código de recuperación."""
+    data = request.get_json()
+    usuario = UserSession(email=data.get("email"))
+    return userControllers.request_password_reset(usuario)
+
+
+@auth_scope.route("/verify-reset-code", methods=["POST"])
+def verify_reset_code():
+    """Punto 2: Verificar código de recuperación."""
+    data = request.get_json()
+    usuario = UserSession(email=data.get("email"))
+    code = data.get("code")
+    print("-----El codigo en rootus----", code)
+
+    return userControllers.verify_reset_code(usuario, code)
+
+
+@auth_scope.route("/reset-password", methods=["POST"])
+def reset_password():
+    """Punto 3: Restablecer contraseña con código válido."""
+    data = request.get_json()
+    usuario = UserSession(email=data.get("email"), password=data.get("new_password"))
+    code = data.get("code")
+
+    return userControllers.reset_password(usuario, code)
