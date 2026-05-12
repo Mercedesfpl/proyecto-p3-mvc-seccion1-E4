@@ -1,0 +1,95 @@
+<!-- frontend/views/partials/header.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alcaldía de Guaicaipuro - {% block title %}Dashboard{% endblock %}</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS Global -->
+    <link rel="stylesheet" href="../../static/css/global.css">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="alcaldia-header">
+        <div class="header-container">
+            <div class="header-logo">
+                <div class="logo-icon"><i class="fas fa-bus"></i></div>
+                <div class="logo-text">
+                    <h1>Movilidad Guaicaipuro</h1>
+                    <span>Alcaldía del Municipio Guaicaipuro</span>
+                </div>
+            </div>
+            
+            <nav class="header-nav">
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="/" class="nav-link {% block active_dashboard %}{% endblock %}"><i class="fas fa-chart-line"></i><span>Dashboard</span></a></li>
+                    <li class="nav-item"><a href="/flota" class="nav-link {% block active_flota %}{% endblock %}"><i class="fas fa-bus"></i><span>Flota</span></a></li>
+                    <li class="nav-item"><a href="/rutas" class="nav-link {% block active_rutas %}{% endblock %}"><i class="fas fa-route"></i><span>Rutas</span></a></li>
+                    <li class="nav-item"><a href="/reportes" class="nav-link {% block active_reportes %}{% endblock %}"><i class="fas fa-chart-bar"></i><span>Reportes</span></a></li>
+                </ul>
+            </nav>
+            
+            <div class="header-user">
+                <div class="notification-btn" id="notificationBtn">
+                    <i class="far fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="user-avatar"><span>AD</span></div>
+                    <div class="user-info">
+                        <span class="user-name">Administrador</span>
+                        <span class="user-role">Dirección de Transporte</span>
+                    </div>
+                    <i class="fas fa-chevron-down dropdown-icon"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- DROPDOWNS -->
+    <div class="dropdown-menu" id="dropdownMenu">
+        <a href="#" class="dropdown-item"><i class="fas fa-user-circle"></i> Mi Perfil</a>
+        <a href="#" class="dropdown-item"><i class="fas fa-cog"></i> Configuración</a>
+        <hr>
+        <a href="#" class="dropdown-item logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+    </div>
+
+    <div class="notifications-panel" id="notificationsPanel">
+        <div class="notifications-header">
+            <h3>Notificaciones</h3>
+            <span class="mark-read">Marcar todas</span>
+        </div>
+        <div class="notifications-list">
+            <div class="notification-item unread">
+                <div class="notification-icon warning"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="notification-content"><p>Bus BUS-023 reporta retraso</p><span class="notification-time">Hace 5 min</span></div>
+            </div>
+            <div class="notification-item unread">
+                <div class="notification-icon danger"><i class="fas fa-bus"></i></div>
+                <div class="notification-content"><p>Avería en unidad BUS-045</p><span class="notification-time">Hace 15 min</span></div>
+            </div>
+        </div>
+        <div class="notifications-footer"><a href="#">Ver todas</a></div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- JavaScript Base (efectos globales) -->
+    <script src="../../static/js/base.js"></script>
+    
+    <!-- JavaScript específico de la página -->
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

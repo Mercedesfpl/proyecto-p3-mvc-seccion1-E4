@@ -1,0 +1,38 @@
+<!-- frontend/views/dashboard.html -->
+{% extends "partials/header.html" %}
+
+{% block title %}Dashboard{% endblock %}
+{% block active_dashboard %}active{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="../assets/css/dashboard.css">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-welcome">
+    <h1>Panel de Control</h1>
+    <p>Resumen general del sistema de transporte público</p>
+</div>
+
+<div class="grid-4">
+    <div class="kpi-card"><div class="kpi-header"><span>Unidades Activas</span><div class="kpi-icon"><i class="fas fa-bus"></i></div></div><div class="kpi-value">86</div><div class="kpi-trend"><i class="fas fa-arrow-up trend-up"></i>+12% vs ayer</div></div>
+    <div class="kpi-card"><div class="kpi-header"><span>Pasajeros Hoy</span><div class="kpi-icon"><i class="fas fa-users"></i></div></div><div class="kpi-value">12,430</div><div class="kpi-trend"><i class="fas fa-arrow-up trend-up"></i>+8% vs ayer</div></div>
+    <div class="kpi-card"><div class="kpi-header"><span>Rutas Activas</span><div class="kpi-icon"><i class="fas fa-route"></i></div></div><div class="kpi-value">23</div><div class="kpi-trend">Sin cambios</div></div>
+    <div class="kpi-card"><div class="kpi-header"><span>Incidencias</span><div class="kpi-icon"><i class="fas fa-exclamation-triangle"></i></div></div><div class="kpi-value" style="color:var(--rojo)">7</div><div class="kpi-trend"><i class="fas fa-arrow-down trend-down"></i>-2 vs ayer</div></div>
+</div>
+
+<div class="grid-2">
+    <div class="card"><div class="card-header"><h3><i class="fas fa-map-marker-alt"></i> Ubicación en tiempo real</h3><a href="#">Ver mapa →</a></div><div class="map-placeholder"><i class="fas fa-map"></i><p>Mapa interactivo</p><span>Actualizado cada 15 seg</span></div></div>
+    <div class="card"><div class="card-header"><h3>Ocupación por ruta</h3><a href="#">Ver detalle →</a></div><div class="occupation-bar"><div class="occupation-info"><span>Ruta Los Teques</span><span>92%</span></div><div class="bar-bg"><div class="bar-fill critical" style="width:92%"></div></div></div><div class="occupation-bar"><div class="occupation-info"><span>Ruta El Tambor</span><span>78%</span></div><div class="bar-bg"><div class="bar-fill" style="width:78%"></div></div></div></div>
+</div>
+
+<div class="grid-2">
+    <div class="card"><div class="card-header"><h3>Incidencias recientes</h3><a href="#">Ver todas →</a></div><div class="incidencia-item"><div class="incidencia-info"><div class="incidencia-badge badge-rojo"></div><div>Avería - BUS-023</div></div><span style="color:var(--rojo)">Crítica</span></div><div class="incidencia-item"><div class="incidencia-info"><div class="incidencia-badge badge-amarillo"></div><div>Retraso - BUS-045</div></div><span>Advertencia</span></div></div>
+    <div class="card"><div class="card-header"><h3>Rutas con más retrasos</h3><a href="#">Ver ranking →</a></div><div class="route-row"><span>Ruta Los Teques</span><span class="route-status">+18 min</span></div><div class="route-row"><span>Ruta El Tambor</span><span class="route-status">+12 min</span></div></div>
+</div>
+
+<div class="card"><div class="card-header"><h3>Cumplimiento de horarios</h3><a href="#">Ver reporte →</a></div><div class="occupation-bar"><div class="occupation-info"><span>Línea 1</span><span>67%</span></div><div class="bar-bg"><div class="bar-fill" style="width:67%"></div></div></div><div class="occupation-bar"><div class="occupation-info"><span>Línea 2</span><span>82%</span></div><div class="bar-bg"><div class="bar-fill warning" style="width:82%"></div></div></div></div>
+{% endblock %}
+{% block extra_js %}
+<script src="../static/js/pages/dashboard.js"></script>
+{% endblock %}
