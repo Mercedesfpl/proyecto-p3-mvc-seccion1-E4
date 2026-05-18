@@ -1,0 +1,291 @@
+/* frontend/static/css/auth.css */
+
+/* ========== FONDO GENERAL ========== */
+.auth-body {
+    background: linear-gradient(135deg, var(--azul) 0%, #5A8FB7 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* ========== TARJETA DE AUTENTICACIÓN ========== */
+.auth-container {
+    width: 100%;
+    max-width: 480px;
+}
+
+.auth-card {
+    background: var(--blanco);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========== HEADER DE LA TARJETA ========== */
+.auth-header {
+    background: linear-gradient(135deg, var(--azul), #5A8FB7);
+    padding: 32px 24px;
+    text-align: center;
+    color: var(--blanco);
+}
+
+.auth-header .logo-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+}
+
+.auth-header .logo-icon i {
+    font-size: 32px;
+    color: var(--blanco);
+}
+
+.auth-header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.auth-header p {
+    font-size: 13px;
+    opacity: 0.85;
+}
+
+/* ========== CUERPO DEL FORMULARIO ========== */
+.auth-body-content {
+    padding: 32px;
+}
+
+.auth-body-content h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--texto-oscuro);
+    margin-bottom: 8px;
+}
+
+.auth-subtitle {
+    color: var(--texto-claro);
+    font-size: 14px;
+    margin-bottom: 28px;
+}
+
+/* ========== FORMULARIO ========== */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    position: relative;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--texto-oscuro);
+    margin-bottom: 8px;
+}
+
+.form-group label i {
+    color: var(--azul);
+    font-size: 14px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--borde);
+    border-radius: 12px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    background: var(--blanco);
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--azul);
+    box-shadow: 0 0 0 3px rgba(116, 169, 211, 0.1);
+}
+
+.form-group input.error {
+    border-color: var(--rojo);
+}
+
+.password-strength {
+    font-size: 11px;
+    margin-top: 6px;
+}
+
+/* ========== OPCIONES DEL FORMULARIO ========== */
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: var(--texto-claro);
+}
+
+.checkbox-label input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--azul);
+}
+
+.forgot-link {
+    color: var(--azul);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.forgot-link:hover {
+    text-decoration: underline;
+}
+
+/* ========== BOTONES ========== */
+.btn-login, .btn-register {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 40px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.2s ease;
+    margin-top: 8px;
+}
+
+.btn-login {
+    background: var(--azul);
+    color: var(--blanco);
+}
+
+.btn-login:hover {
+    background: #5A8FB7;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(116, 169, 211, 0.3);
+}
+
+.btn-register {
+    background: var(--azul);
+    color: var(--blanco);
+}
+
+.btn-register:hover {
+    background: #5A8FB7;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(116, 169, 211, 0.3);
+}
+
+/* ========== FOOTER ========== */
+.auth-footer {
+    text-align: center;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--borde);
+    font-size: 14px;
+    color: var(--texto-claro);
+}
+
+.auth-footer a {
+    color: var(--azul);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+
+/* ========== TOAST MESSAGES ========== */
+.toast-message {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--texto-oscuro);
+    color: var(--blanco);
+    padding: 12px 20px;
+    border-radius: 40px;
+    font-size: 14px;
+    z-index: 1001;
+    display: none;
+    animation: slideInRight 0.3s ease;
+}
+
+.toast-message.show {
+    display: block;
+}
+
+.toast-message.success {
+    background: #10b981;
+}
+
+.toast-message.error {
+    background: var(--rojo);
+}
+
+.toast-message.info {
+    background: var(--azul);
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 480px) {
+    .auth-body-content {
+        padding: 24px;
+    }
+    
+    .auth-header {
+        padding: 24px 20px;
+    }
+    
+    .form-options {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+}
