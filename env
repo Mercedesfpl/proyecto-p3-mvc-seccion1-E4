@@ -1,6 +1,0 @@
-DATABASE_URL=postgresql://postgres:root@localhost/bus_tracker
-DB_TOKEN=una-clave-secreta-aleatoria
-JWT_SECRET_KEY = gshtefsycavbshetchhetdvgsrdretudpsyetrhysrr
-MAIL_USERNAME = centrodecontroldefallas@gmail.com # Tu dirección de correo
-MAIL_PASSWORD = cgsn rzvv wect wpfr  # La contraseña de aplicación
-MAIL_DEFAULT_SENDER = tu_correo@gmail.com  # Remitente por defecto
