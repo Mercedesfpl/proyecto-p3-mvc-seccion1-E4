@@ -1,6 +1,6 @@
 from flask import Flask
 from config import Config
-from .extensions import db, login_manager, migrate, mail
+from .extensions import db, login_manager, migrate, mail, socketIO
 from flask_jwt_extended import JWTManager
 from .models.models import Usuario
 from .routes import auth_scope, errors_scope, admin_scope
@@ -15,7 +15,8 @@ migrate.init_app(app, db)
 login_manager.init_app(app)
 mail.init_app(app)
 jwt = JWTManager(app)
-
+socketIO.init_app(app, cors_allowed_origins="*", async_mode="eventlet")
+app.socketIO = socketIO
 
 @login_manager.user_loader
 def load_user(user_id):

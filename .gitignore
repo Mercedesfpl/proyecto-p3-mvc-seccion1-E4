@@ -12,4 +12,4 @@ env/
 
 # Variables de entorno
 .env
-
+env
