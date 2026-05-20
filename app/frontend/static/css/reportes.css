@@ -1,4 +1,4 @@
-/* frontend/static/css/pages/reportes.css */
+/* frontend/static/css/reportes.css */
 
 /* Filtros de fecha */
 .date-filters {
@@ -18,7 +18,6 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    flex-wrap: wrap;
 }
 
 .date-input {
@@ -37,21 +36,6 @@
     font-size: 14px;
 }
 
-.filter-group {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-.filter-select {
-    padding: 8px 16px;
-    border-radius: 40px;
-    border: 1px solid var(--borde);
-    background: var(--blanco);
-    font-size: 14px;
-    cursor: pointer;
-}
-
 /* Gráficos */
 .charts-grid {
     display: grid;
@@ -67,42 +51,18 @@
     box-shadow: var(--sombra);
 }
 
-.chart-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.chart-header h3 {
-    font-size: 18px;
-    font-weight: 600;
-}
-
 .chart-container {
     height: 280px;
     position: relative;
 }
 
-/* Top rutas */
+/* Ranking de rutas */
 .top-rutas {
     background: var(--blanco);
     border-radius: 20px;
     padding: 24px;
     box-shadow: var(--sombra);
     margin-bottom: 32px;
-}
-
-.top-rutas-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.top-rutas-header h2 {
-    font-size: 18px;
-    font-weight: 600;
 }
 
 .ruta-ranking {
@@ -154,109 +114,7 @@
     color: var(--azul);
 }
 
-/* Tabla de incidencias */
-.incidencias-table-container {
-    background: var(--blanco);
-    border-radius: 20px;
-    padding: 24px;
-    box-shadow: var(--sombra);
-}
-
-.table-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.table-header h2 {
-    font-size: 18px;
-    font-weight: 600;
-}
-
-.export-buttons {
-    display: flex;
-    gap: 8px;
-}
-
-.table-responsive {
-    overflow-x: auto;
-}
-
-.incidencias-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.incidencias-table th {
-    text-align: left;
-    padding: 14px 12px;
-    color: var(--texto-claro);
-    font-weight: 600;
-    font-size: 13px;
-    border-bottom: 1px solid var(--borde);
-}
-
-.incidencias-table td {
-    padding: 12px;
-    border-bottom: 1px solid var(--borde);
-    font-size: 14px;
-}
-
-/* Badges de estado */
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-}
-
-.status-critical {
-    background: rgba(149, 36, 42, 0.1);
-    color: var(--rojo);
-}
-
-.status-warning {
-    background: rgba(243, 176, 1, 0.1);
-    color: var(--amarillo);
-}
-
-.status-resolved {
-    background: rgba(16, 185, 129, 0.1);
-    color: #10b981;
-}
-
-/* Botones */
-.btn-primary {
-    background: var(--azul);
-    color: var(--blanco);
-    border: none;
-    padding: 8px 20px;
-    border-radius: 40px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.btn-secondary {
-    background: var(--blanco);
-    color: var(--azul);
-    border: 1px solid var(--azul);
-    padding: 8px 20px;
-    border-radius: 40px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-/* Responsive */
+/* Responsive reportes */
 @media (max-width: 1024px) {
     .charts-grid {
         grid-template-columns: 1fr;
@@ -268,16 +126,5 @@
     .date-range {
         flex-direction: column;
         align-items: stretch;
-    }
-}
-
-@media (max-width: 768px) {
-    .table-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
-    .kpi-grid {
-        grid-template-columns: repeat(2, 1fr);
     }
 }
