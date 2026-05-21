@@ -67,3 +67,18 @@ def reset_password():
 @auth_scope.route("/vistas", methods=["GET", "POST"])
 def vista():
     return userControllers.show_dashboar()
+
+# ========== NUEVAS RUTAS PARA VER LOS FORMULARIOS ==========
+@auth_scope.route("/login-page", methods=["GET"])
+def login_page():
+    """Muestra el formulario de login"""
+    return render_template("auth/login.html")
+
+@auth_scope.route("/registro-page", methods=["GET"])
+def registro_page():
+    """Muestra el formulario de registro"""
+    return render_template("auth/registro.html")
+
+@auth_scope.route("/forgot-password-page", methods=["GET"])
+def forgot_password_page():
+    return render_template("auth/forgot-password.html")

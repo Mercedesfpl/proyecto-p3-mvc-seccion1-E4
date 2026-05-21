@@ -53,7 +53,7 @@
                             <input type="checkbox" id="remember">
                             <span>Recordarme</span>
                         </label>
-                        <a href="#" id="forgotPasswordBtn" class="forgot-link">¿Olvidaste tu contraseña?</a>
+                        <a href="{{ url_for('auth.forgot_password_page') }}" class="forgot-link">¿Olvidaste tu contraseña?</a>
                     </div>
                     
                     <button type="submit" class="btn-login">
@@ -63,7 +63,7 @@
                 </form>
                 
                 <div class="auth-footer">
-                    <p>¿No tienes una cuenta? <a href="registro.html">Regístrate aquí</a></p>
+                    <p>¿No tienes una cuenta? <a href="{{ url_for('auth.registro_page') }}">Regístrate aquí</a></p>
                 </div>
             </div>
         </div>
