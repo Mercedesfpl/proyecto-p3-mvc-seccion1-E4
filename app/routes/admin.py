@@ -29,3 +29,7 @@ def reportes_show():
 def rutas_show():
 
     return userControllers.show_rutas()
+
+@admin_scope.route("/form-muestra", methods=["GET"])
+def form_muestra():
+    return render_template("pages/form-muestra.html")
