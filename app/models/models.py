@@ -18,6 +18,9 @@ class Usuario(db.Model, UserMixin):
     reset_code = db.Column(db.String(10), nullable=True)
     reset_code_expires = db.Column(db.DateTime, nullable=True)
     timestamp = db.Column(db.DateTime, default=datetime.now, index=True)
+    intentos_fallidos = db.Column(db.Integer, default=0)
+    bloqueado_hasta = db.Column(db.DateTime, nullable=True)
+    # verified = db.Column(db.Boolean, default=False)
 
     def verificar_password(self, passwordPlano):
         """El modelo valida su password."""
@@ -31,9 +34,11 @@ class Usuario(db.Model, UserMixin):
         """devuelve un objeto del tipo userSession"""
         from .userModels import UserSession
 
-        return UserSession(id=self.id, email=self.email, isAdmin=self.isAdmin)
+        return UserSession(
+            id=self.id, email=self.email, isAdmin=self.isAdmin, rol=self.rol
+        )
 
-    def formatPass(self, passwordPlano):
+    def formatPass(passwordPlano):
         """Verifica si el formato cumple con las valdaciones propias del modelo"""
 
         if len(passwordPlano) < 8 or len(passwordPlano) > 15:
@@ -84,3 +89,9 @@ class Usuario(db.Model, UserMixin):
         """Limpia el código de recuperación después de usarlo."""
         self.reset_code = None
         self.reset_code_expires = None
+
+    def esta_bloqueado(self):
+        """Verifica si el usuario tiene un bloqueo activo."""
+        if self.bloqueado_hasta and datetime.now() < self.bloqueado_hasta:
+            return True
+        return False

@@ -27,3 +27,31 @@ def enviar_correo_recuperacion(userData: UserSession, code: str):
         return False
 
     return True
+
+
+def enviar_correo_atenticacion(userData: UserSession, code: str):
+    # Construimos el mensaje del correo
+    print("email en enviar correo------> ", userData.email)
+    msg = Message("Validacion de correo electronico", recipients=[userData.email])
+    msg.body = f"""Hola {userData.nombre},
+
+    Hola, ya casi terminamos, solo falta verificar tu correo.
+    
+    Este es tu codigo de verificacion:
+
+    {code}
+
+    Este código es válido por 10 minutos.
+
+    
+    """
+
+    # # Enviamos el correo
+    try:
+        mail.send(msg)
+    except Exception as e:
+        # En producción, registra el error en un log, pero no reveles detalles al usuario
+        print(f"Error enviando email: {e}")
+        return False
+
+    return True

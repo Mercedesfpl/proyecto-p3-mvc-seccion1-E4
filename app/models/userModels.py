@@ -8,3 +8,4 @@ class UserSession(NamedTuple):
     isAdmin: bool = False
     nombre: Optional[str] = None
     password: Optional[str] = None
+    rol: Optional[str] = "usuario"

@@ -1,9 +1,9 @@
 from flask import Flask
 from config import Config
-from .extensions import db, login_manager, migrate, mail
+from .extensions import db, login_manager, migrate, mail, limiter
 from flask_jwt_extended import JWTManager
 from .models.models import Usuario
-from .routes import auth_scope, errors_scope, admin_scope
+from .routes import auth_scope, errors_scope, admin_scope, user_scope
 
 # Configuracion inicial de la aplicacion
 app = Flask(
@@ -15,6 +15,7 @@ migrate.init_app(app, db)
 login_manager.init_app(app)
 mail.init_app(app)
 jwt = JWTManager(app)
+limiter.init_app(app)
 
 
 @login_manager.user_loader
@@ -26,3 +27,4 @@ def load_user(user_id):
 app.register_blueprint(errors_scope, url_prefix="/")
 app.register_blueprint(auth_scope, url_prefix="/api")
 app.register_blueprint(admin_scope, url_prefix="/admin")
+app.register_blueprint(user_scope, url_prefix="/")

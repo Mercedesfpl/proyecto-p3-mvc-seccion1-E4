@@ -6,10 +6,14 @@ from flask_jwt_extended import (
     unset_jwt_cookies,
 )
 from flask_login import login_user
+from ..models.userModels import UserSession
 
 
-def get_access_token(id_user):
-    access_token = create_access_token(identity=str(id_user))
+def get_access_token(userData: UserSession) -> UserSession:
+    datos_adicionales = {"rol": userData.rol}
+    access_token = create_access_token(
+        identity=str(userData.id), additional_claims=datos_adicionales
+    )
     return access_token
 
 

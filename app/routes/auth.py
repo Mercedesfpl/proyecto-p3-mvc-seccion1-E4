@@ -1,7 +1,5 @@
 from flask import Blueprint, request, url_for, redirect, render_template
-from flask_jwt_extended import (
-    jwt_required,
-)
+from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
 
 
 from ..controllers import userControllers
@@ -45,23 +43,44 @@ def forgot_password():
 
 
 @auth_scope.route("/verify-reset-code", methods=["POST"])
+@jwt_required()
 def verify_reset_code():
     """Punto 2: Verificar código de recuperación."""
-    data = request.get_json()
-    usuario = UserSession(email=data.get("email"))
-    code = data.get("code")
+    data_cliente = request.get_json()
+    id_token = get_jwt_identity()
+    usuario = UserSession(id=id_token)
+    code = data_cliente.get("code")
 
     return userControllers.verify_reset_code(usuario, code)
 
 
 @auth_scope.route("/reset-password", methods=["POST"])
+@jwt_required()
 def reset_password():
     """Punto 3: Restablecer contraseña con código válido."""
+
     data = request.get_json()
-    usuario = UserSession(email=data.get("email"), password=data.get("new_password"))
+    id_token = get_jwt_identity()
+    usuario = UserSession(id=id_token, password=data.get("new_password"))
     code = data.get("code")
 
     return userControllers.reset_password(usuario, code)
+
+
+@auth_scope.route("/verify-email", methods=["POST", "GET"])
+@jwt_required()
+def verify_email():
+    if not request.method == "GET":
+        data_cliente = request.get_json()
+        id_token = get_jwt_identity()
+        usuario = UserSession(id=id_token)
+        code = data_cliente.get("code")
+        return userControllers.verificar_Email(usuario, code)
+
+    if not request.method == "POST":
+        id_token = get_jwt_identity()
+        usuario = UserSession(id=id_token)
+        return userControllers.enviar_codigo_de_verificacion(usuario)
 
 
 @auth_scope.route("/vistas", methods=["GET", "POST"])
