@@ -1,0 +1,206 @@
+<!-- frontend/views/pages/form-muestra.html -->
+{% extends "layouts/base.html" %}
+
+{% block title %}Formulario de Muestra{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <h2><i class="fas fa-edit"></i> Registro de Prueba</h2>
+        <p>Formulario de muestra con todos los tipos de campos</p>
+    </div>
+    
+    <form id="sampleForm" method="POST">
+        
+        <!-- FILA 1: Nombre y Apellido -->
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-user"></i> Nombre
+                    <span class="required">*</span>
+                </label>
+                <input type="text" class="form-input" name="nombre" placeholder="Ej: Juan" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-user-tag"></i> Apellido
+                    <span class="required">*</span>
+                </label>
+                <input type="text" class="form-input" name="apellido" placeholder="Ej: Pérez" required>
+            </div>
+        </div>
+        
+        <!-- FILA 2: Correo y Teléfono -->
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-envelope"></i> Correo Electrónico
+                    <span class="required">*</span>
+                </label>
+                <input type="email" class="form-input" name="email" placeholder="correo@ejemplo.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-phone"></i> Teléfono
+                    <span class="required">*</span>
+                </label>
+                <input type="tel" class="form-input" name="telefono" placeholder="04121234567" data-mask="phone" data-validate="phone">
+                <div class="form-help">Formato: 0412 123 4567</div>
+            </div>
+        </div>
+        
+        <!-- FILA 3: Cédula y Placa -->
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-id-card"></i> Cédula
+                    <span class="required">*</span>
+                </label>
+                <input type="text" class="form-input" name="cedula" placeholder="12345678" data-mask="cedula" data-validate="cedula" required>
+                <div class="form-help">Solo números, 6-8 dígitos</div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-car"></i> Placa (Vehículo)
+                </label>
+                <input type="text" class="form-input" name="placa" placeholder="ABC123" data-mask="plate" data-validate="plate">
+                <div class="form-help">Formato: ABC123 o ABC123D</div>
+            </div>
+        </div>
+        
+        <!-- FILA 4: Select y Número -->
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-bus"></i> Tipo de Vehículo
+                </label>
+                <select class="form-select" name="tipo_vehiculo">
+                    <option value="">Seleccione...</option>
+                    <option value="minibus">Minibús (15-32 puestos)</option>
+                    <option value="autobus">Autobús (>32 puestos)</option>
+                    <option value="microbus">Microbús (8-14 puestos)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-calendar-alt"></i> Año de Fabricación
+                </label>
+                <input type="number" class="form-input" name="anio" placeholder="2020" min="1980" max="2026">
+            </div>
+        </div>
+        
+        <!-- FILA 5: Textarea (descripción) -->
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-align-left"></i> Descripción
+            </label>
+            <textarea class="form-textarea" name="descripcion" placeholder="Escriba aquí información adicional..."></textarea>
+        </div>
+        
+        <!-- FILA 6: Checkboxes (opciones múltiples) -->
+        <div class="form-group">
+            <label class="form-label">Días de Operación</label>
+            <div class="checkbox-group-vertical">
+                <div class="checkbox-group">
+                    <input type="checkbox" name="dias" value="lunes" id="lunes">
+                    <label for="lunes">Lunes</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" name="dias" value="martes" id="martes">
+                    <label for="martes">Martes</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" name="dias" value="miercoles" id="miercoles">
+                    <label for="miercoles">Miércoles</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" name="dias" value="jueves" id="jueves">
+                    <label for="jueves">Jueves</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" name="dias" value="viernes" id="viernes">
+                    <label for="viernes">Viernes</label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FILA 7: Radios -->
+        <div class="form-group">
+            <label class="form-label">Estado del Vehículo</label>
+            <div class="radio-group-vertical">
+                <div class="radio-group">
+                    <input type="radio" name="estado" value="activo" id="activo" checked>
+                    <label for="activo">Activo</label>
+                </div>
+                <div class="radio-group">
+                    <input type="radio" name="estado" value="taller" id="taller">
+                    <label for="taller">En taller</label>
+                </div>
+                <div class="radio-group">
+                    <input type="radio" name="estado" value="inactivo" id="inactivo">
+                    <label for="inactivo">Inactivo</label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FILA 8: Toggle Switch -->
+        <div class="form-group">
+            <label class="form-label">¿Tiene ESP32 instalado?</label>
+            <label class="toggle-switch">
+                <input type="checkbox" name="tiene_esp32" id="tiene_esp32">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+        
+        <!-- FILA 9: File Input -->
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-file-pdf"></i> Documento (PDF)
+            </label>
+            <div class="file-input">
+                <input type="file" name="documento" id="documento" accept=".pdf,.jpg,.png" onchange="updateFileName(this, 'fileNameDisplay')">
+                <div class="file-input-label">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span>Seleccionar archivo</span>
+                    <span id="fileNameDisplay" class="file-name">Ningún archivo seleccionado</span>
+                </div>
+            </div>
+            <div class="form-help">Formatos permitidos: PDF, JPG, PNG. Máx. 5MB</div>
+        </div>
+        
+        <!-- BOTONES -->
+        <div class="form-actions">
+            <button type="button" class="btn-cancel" onclick="window.history.back()">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-save"></i> Guardar
+            </button>
+        </div>
+        
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/forms.js') }}"></script>
+<script>
+    // Manejo del envío del formulario (demo)
+    document.getElementById('sampleForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        showFormToast('Formulario enviado correctamente (demo)', 'success');
+        setTimeout(() => {
+            this.reset();
+            clearAllErrors(this);
+        }, 1500);
+    });
+</script>
+{% endblock %}

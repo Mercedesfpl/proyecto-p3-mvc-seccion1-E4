@@ -1,113 +1,5 @@
-/* frontend/static/css/pages/flota.css */
-
-/* Filtros y búsqueda */
-.filters-bar {
-    background: var(--blanco);
-    border-radius: 16px;
-    padding: 20px 24px;
-    margin-bottom: 32px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
-    box-shadow: var(--sombra);
-}
-
-.search-box {
-    display: flex;
-    align-items: center;
-    background: var(--gris);
-    border-radius: 40px;
-    padding: 8px 16px;
-    gap: 8px;
-    flex: 1;
-    max-width: 320px;
-}
-
-.search-box input {
-    border: none;
-    background: none;
-    outline: none;
-    font-size: 14px;
-    width: 100%;
-}
-
-.filter-group {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-.filter-select {
-    padding: 8px 16px;
-    border-radius: 40px;
-    border: 1px solid var(--borde);
-    background: var(--blanco);
-    font-size: 14px;
-    cursor: pointer;
-}
-
-/* Tabla de unidades */
-.unidades-table-container {
-    background: var(--blanco);
-    border-radius: 20px;
-    padding: 24px;
-    box-shadow: var(--sombra);
-}
-
-.table-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.table-header h2 {
-    font-size: 18px;
-    font-weight: 600;
-}
-
-.export-btn {
-    background: none;
-    border: 1px solid var(--borde);
-    padding: 8px 16px;
-    border-radius: 40px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    transition: var(--transition);
-}
-
-.export-btn:hover {
-    background: var(--gris);
-}
-
-.table-responsive {
-    overflow-x: auto;
-}
-
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.data-table th {
-    text-align: left;
-    padding: 16px 12px;
-    color: var(--texto-claro);
-    font-weight: 600;
-    font-size: 13px;
-    border-bottom: 1px solid var(--borde);
-}
-
-.data-table td {
-    padding: 14px 12px;
-    border-bottom: 1px solid var(--borde);
-    font-size: 14px;
-}
+/* frontend/static/css/flota.css */
+/* Solo estilos específicos de la página de flota */
 
 /* Badges de estado */
 .status-badge {
@@ -135,7 +27,7 @@
     color: var(--amarillo);
 }
 
-/* Botones de acción */
+/* Botones de acción en tabla */
 .action-buttons {
     display: flex;
     gap: 8px;
@@ -157,59 +49,4 @@
 
 .action-btn.delete:hover {
     color: var(--rojo);
-}
-
-/* Paginación */
-.pagination {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    margin-top: 20px;
-    flex-wrap: wrap;
-}
-
-.page-item {
-    padding: 8px 12px;
-    border-radius: 8px;
-    background: var(--gris);
-    cursor: pointer;
-    font-size: 14px;
-    transition: var(--transition);
-}
-
-.page-item:hover {
-    background: rgba(116, 169, 211, 0.1);
-}
-
-.page-item.active {
-    background: var(--azul);
-    color: var(--blanco);
-}
-
-/* Responsive */
-@media (max-width: 1024px) {
-    .filters-bar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .search-box {
-        max-width: none;
-    }
-    .filter-group {
-        justify-content: space-between;
-    }
-    .table-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
-}
-
-@media (max-width: 768px) {
-    .filter-group {
-        flex-direction: column;
-    }
-    .pagination {
-        justify-content: center;
-    }
 }
