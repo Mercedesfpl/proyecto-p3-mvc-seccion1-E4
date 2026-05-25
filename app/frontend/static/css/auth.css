@@ -1,6 +1,6 @@
 /* frontend/static/css/auth.css */
 
-/* ========== FONDO GENERAL ========== */
+/* ========== FONDO Y CONTENEDOR ========== */
 .auth-body {
     background: linear-gradient(135deg, var(--azul) 0%, #5A8FB7 100%);
     min-height: 100vh;
@@ -10,10 +10,9 @@
     padding: 20px;
 }
 
-/* ========== TARJETA DE AUTENTICACIÓN ========== */
 .auth-container {
     width: 100%;
-    max-width: 480px;
+    max-width: 550px;
 }
 
 .auth-card {
@@ -35,7 +34,7 @@
     }
 }
 
-/* ========== HEADER DE LA TARJETA ========== */
+/* ========== HEADER ========== */
 .auth-header {
     background: linear-gradient(135deg, var(--azul), #5A8FB7);
     padding: 32px 24px;
@@ -56,7 +55,6 @@
 
 .auth-header .logo-icon i {
     font-size: 32px;
-    color: var(--blanco);
 }
 
 .auth-header h1 {
@@ -70,7 +68,7 @@
     opacity: 0.85;
 }
 
-/* ========== CUERPO DEL FORMULARIO ========== */
+/* ========== CUERPO ========== */
 .auth-body-content {
     padding: 32px;
 }
@@ -78,7 +76,6 @@
 .auth-body-content h2 {
     font-size: 24px;
     font-weight: 700;
-    color: var(--texto-oscuro);
     margin-bottom: 8px;
 }
 
@@ -95,17 +92,12 @@
     gap: 20px;
 }
 
-.form-group {
-    position: relative;
-}
-
 .form-group label {
     display: flex;
     align-items: center;
     gap: 8px;
     font-size: 13px;
     font-weight: 500;
-    color: var(--texto-oscuro);
     margin-bottom: 8px;
 }
 
@@ -120,8 +112,8 @@
     border: 1px solid var(--borde);
     border-radius: 12px;
     font-size: 14px;
-    transition: all 0.2s ease;
     background: var(--blanco);
+    transition: all 0.2s ease;
 }
 
 .form-group input:focus {
@@ -130,16 +122,23 @@
     box-shadow: 0 0 0 3px rgba(116, 169, 211, 0.1);
 }
 
-.form-group input.error {
-    border-color: var(--rojo);
-}
-
 .password-strength {
     font-size: 11px;
     margin-top: 6px;
 }
 
-/* ========== OPCIONES DEL FORMULARIO ========== */
+/* ========== FILAS DE 2 COLUMNAS ========== */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.form-full-width {
+    grid-column: span 2;
+}
+
+/* ========== OPCIONES (CHECKBOX, LINKS) ========== */
 .form-options {
     display: flex;
     justify-content: space-between;
@@ -176,6 +175,8 @@
 .btn-login, .btn-register {
     width: 100%;
     padding: 14px;
+    background: var(--azul);
+    color: var(--blanco);
     border: none;
     border-radius: 40px;
     font-size: 16px;
@@ -189,23 +190,7 @@
     margin-top: 8px;
 }
 
-.btn-login {
-    background: var(--azul);
-    color: var(--blanco);
-}
-
-.btn-login:hover {
-    background: #5A8FB7;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(116, 169, 211, 0.3);
-}
-
-.btn-register {
-    background: var(--azul);
-    color: var(--blanco);
-}
-
-.btn-register:hover {
+.btn-login:hover, .btn-register:hover {
     background: #5A8FB7;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(116, 169, 211, 0.3);
@@ -231,7 +216,7 @@
     text-decoration: underline;
 }
 
-/* ========== TOAST MESSAGES ========== */
+/* ========== TOAST ========== */
 .toast-message {
     position: fixed;
     bottom: 20px;
@@ -250,17 +235,9 @@
     display: block;
 }
 
-.toast-message.success {
-    background: #10b981;
-}
-
-.toast-message.error {
-    background: var(--rojo);
-}
-
-.toast-message.info {
-    background: var(--azul);
-}
+.toast-message.success { background: #10b981; }
+.toast-message.error { background: var(--rojo); }
+.toast-message.info { background: var(--azul); }
 
 @keyframes slideInRight {
     from {
@@ -274,13 +251,31 @@
 }
 
 /* ========== RESPONSIVE ========== */
-@media (max-width: 480px) {
+@media (max-width: 550px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .form-full-width {
+        grid-column: span 1;
+    }
+    
     .auth-body-content {
         padding: 24px;
     }
     
     .auth-header {
         padding: 24px 20px;
+    }
+    
+    .auth-header .logo-icon {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .auth-header .logo-icon i {
+        font-size: 24px;
     }
     
     .form-options {

@@ -1,4 +1,6 @@
-/* Rutas específico */
+/* frontend/static/css/rutas.css */
+
+/* Header de rutas */
 .rutas-header {
     margin-bottom: 24px;
 }
@@ -6,13 +8,6 @@
 .rutas-header h1 {
     font-size: 28px;
     font-weight: 700;
-    color: var(--texto-oscuro);
-}
-
-.rutas-header p {
-    color: var(--texto-claro);
-    font-size: 14px;
-    margin-top: 4px;
 }
 
 /* Grid de tarjetas */
@@ -62,56 +57,12 @@
     font-weight: 600;
 }
 
-.status-badge {
-    font-size: 12px;
-    padding: 4px 12px;
-    border-radius: 20px;
-}
-
-.status-badge.active {
-    background: rgba(16, 185, 129, 0.1);
-    color: #10b981;
-}
-
-.status-badge.inactive {
-    background: rgba(149, 36, 42, 0.1);
-    color: var(--rojo);
-}
-
-.ruta-info {
-    margin-bottom: 16px;
-}
-
-.info-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    font-size: 14px;
-    border-bottom: 1px solid var(--borde);
-}
-
-.info-label {
-    color: var(--texto-claro);
-    font-weight: 500;
-}
-
-.info-value {
-    font-weight: 600;
-    color: var(--texto-oscuro);
-}
-
 /* Paradas */
 .paradas-list {
     margin: 16px 0;
     padding: 12px;
     background: var(--gris);
     border-radius: var(--radius-sm);
-}
-
-.paradas-list h4 {
-    font-size: 13px;
-    color: var(--texto-claro);
-    margin-bottom: 8px;
 }
 
 .parada-item {
@@ -127,99 +78,7 @@
     color: var(--azul);
 }
 
-/* Footer de tarjeta */
-.ruta-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 16px;
-    padding-top: 12px;
-    border-top: 1px solid var(--borde);
-}
-
-.unidades-asignadas {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    color: var(--texto-claro);
-}
-
-.btn-ver {
-    background: none;
-    border: none;
-    color: var(--azul);
-    cursor: pointer;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 14px;
-    transition: var(--transition);
-}
-
-.btn-ver:hover {
-    gap: 10px;
-}
-
-/* Tabla de puntos */
-.puntos-table-container {
-    background: var(--blanco);
-    border-radius: var(--radius-lg);
-    padding: 24px;
-    box-shadow: var(--sombra);
-}
-
-.table-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.table-header h2 {
-    font-size: 18px;
-    font-weight: 600;
-}
-
-.table-responsive {
-    overflow-x: auto;
-}
-
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.data-table th {
-    text-align: left;
-    padding: 14px 12px;
-    color: var(--texto-claro);
-    font-weight: 600;
-    font-size: 13px;
-    border-bottom: 1px solid var(--borde);
-}
-
-.data-table td {
-    padding: 12px;
-    border-bottom: 1px solid var(--borde);
-    font-size: 14px;
-}
-
-.action-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--texto-claro);
-    font-size: 18px;
-    transition: var(--transition);
-}
-
-.action-btn:hover {
-    color: var(--azul);
-}
-
-/* Botón de expandir */
+/* Botón expandir */
 .ruta-header-right {
     display: flex;
     align-items: center;
@@ -232,51 +91,30 @@
     cursor: pointer;
     color: var(--texto-claro);
     font-size: 16px;
-    transition: transform 0.3s ease;
     padding: 4px 8px;
-}
-
-.btn-expand:hover {
-    color: var(--azul);
-}
-
-.btn-expand.rotated i {
-    transform: rotate(180deg);
 }
 
 .btn-expand i {
     transition: transform 0.3s ease;
 }
 
-/* El contenido expandible */
+.btn-expand.rotated i {
+    transform: rotate(180deg);
+}
+
 .ruta-expandable {
     margin-top: 16px;
     padding-top: 16px;
     border-top: 1px solid var(--borde);
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
-    .rutas-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 768px) {
-    .table-header {
-        flex-direction: column;
-        gap: 12px;
-        align-items: flex-start;
-    }
-}
-/* Pantallas medianas (tablets) */
+/* Responsive rutas */
 @media (max-width: 1024px) {
     .rutas-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-/* Pantallas pequeñas (móviles) */
 @media (max-width: 768px) {
     .rutas-grid {
         grid-template-columns: 1fr;

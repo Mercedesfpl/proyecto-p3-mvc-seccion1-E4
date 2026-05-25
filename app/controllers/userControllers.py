@@ -210,15 +210,15 @@ def verificar_Email(user_data: UserSession, code):
 
 
 def show_dashboar():
-    return render_template("dashboard.html")
+    return render_template("pages/dashboard.html")
 
 
 def show_rutas():
-    return render_template("rutas.html")
+    return render_template("pages/rutas.html")
 
 
 def show_flota():
-    return render_template("flota.html")
+    return render_template("pages/flota.html")
 
 
 def show_reportes():
