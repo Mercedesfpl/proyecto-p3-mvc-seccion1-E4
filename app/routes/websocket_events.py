@@ -11,7 +11,7 @@ def handle_disconnect():
     print("f Cliente desconectado: {request.sid}.")
 
 @socketIO.on('ubicacion_bus') 
-def handle_disconnect(data):
+def handle_ubicacion_bus(data):
     #esta función recibe la información de un ESP32 o simulación
     busID = data.get("bus_ID") 
     lat = data.get ("lat")
@@ -20,7 +20,7 @@ def handle_disconnect(data):
     print ("f Autobús {busID} en ({lat}), ({lng}).")
 
     #retrasmitir a todos los clientes en tiempo real
-    emit('nueva ubicación', {
+    emit('nueva_ubicación', {
         'bus_id': busID,
         'latitud': lat,
         'longitud': lng

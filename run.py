@@ -1,7 +1,4 @@
-from app import create_app
-
-app = create_app()
+from app import app
 
 if __name__ == "__main__":
-    app.socketIO.run(app, debug=True, host="0.0.0.0", port=5000)
-    #Cambio está línea ya que app.run(debug=True) no maneja sockets, solo peticiones http
+    app.socketIO.run(app, debug=True, host='0.0.0.0', port=5000)

@@ -15,8 +15,10 @@ migrate.init_app(app, db)
 login_manager.init_app(app)
 mail.init_app(app)
 jwt = JWTManager(app)
-socketIO.init_app(app, cors_allowed_origins="*", async_mode="eventlet")
+socketIO.init_app(app, cors_allowed_origins="*", async_mode="threading")
 app.socketIO = socketIO
+
+from .routes import websocket_events
 
 @login_manager.user_loader
 def load_user(user_id):
