@@ -1,7 +1,6 @@
 from ..models.userModels import UserSession
 from flask_mail import Message
 from app.extensions import mail
-from flask import jsonify
 
 
 def enviar_correo_recuperacion(userData: UserSession, code: str):
@@ -29,29 +28,24 @@ def enviar_correo_recuperacion(userData: UserSession, code: str):
     return True
 
 
-def enviar_correo_atenticacion(userData: UserSession, code: str):
-    # Construimos el mensaje del correo
-    print("email en enviar correo------> ", userData.email)
-    msg = Message("Validacion de correo electronico", recipients=[userData.email])
+def enviar_correo_verificacion(userData: UserSession, code: str):
+    """Envía código de verificación para registro de nueva cuenta"""
+    msg = Message(
+        "Verifica tu cuenta - Movilidad Guaicaipuro", recipients=[userData.email]
+    )
     msg.body = f"""Hola {userData.nombre},
 
-    Hola, ya casi terminamos, solo falta verificar tu correo.
-    
-    Este es tu codigo de verificacion:
+    Gracias por registrarte. Para completar tu registro, ingresa el siguiente código de verificación:
 
     {code}
 
     Este código es válido por 10 minutos.
 
-    
+    Si no solicitaste este registro, ignora este mensaje.
     """
-
-    # # Enviamos el correo
     try:
         mail.send(msg)
+        return True
     except Exception as e:
-        # En producción, registra el error en un log, pero no reveles detalles al usuario
-        print(f"Error enviando email: {e}")
+        print(f"Error enviando email de verificación: {e}")
         return False
-
-    return True

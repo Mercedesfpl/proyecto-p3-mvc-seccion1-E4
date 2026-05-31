@@ -35,7 +35,13 @@ class Usuario(db.Model, UserMixin):
         from .userModels import UserSession
 
         return UserSession(
-            id=self.id, email=self.email, isAdmin=self.isAdmin, rol=self.rol
+            id=self.id,
+            email=self.email,
+            isAdmin=self.isAdmin,
+            rol=self.rol,
+            nombre=self.nombre,
+            intentos_fallidos=self.intentos_fallidos,
+            bloqueado_hasta=self.bloqueado_hasta,
         )
 
     def formatPass(passwordPlano):
@@ -94,4 +100,48 @@ class Usuario(db.Model, UserMixin):
         """Verifica si el usuario tiene un bloqueo activo."""
         if self.bloqueado_hasta and datetime.now() < self.bloqueado_hasta:
             return True
+        return False
+
+
+class PreRegistro(db.Model):
+    __tablename__ = "pre_registros"
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    nombre = db.Column(db.String(50), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+    code = db.Column(db.String(10), nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+
+    def is_expired(self):
+        return datetime.now() > self.expires_at
+
+    def a_session(self):
+        from .userModels import UserSession
+
+        return UserSession(
+            id=self.id, email=self.email, nombre=self.nombre, password=self.password
+        )
+
+    def generateHass(self, passwordPlano):
+        """Genera el hass de la clave"""
+        self.password = generate_password_hash(passwordPlano)
+
+    def generate_reset_code(self):
+        """Genera un código aleatorio único de 6 dígitos."""
+        self.code = f"{random.randint(100000, 999999)}"
+        self.expires_at = datetime.now() + timedelta(minutes=3)
+        return self.code
+
+    def verify_reset_code(self, code):
+        """Verifica si el código proporcionado es válido y no ha expirado."""
+
+        db_code = str(self.code)
+        input_code = str(code)
+        if self.code and self.expires_at:
+            if (
+                secrets.compare_digest(db_code, input_code)
+                and datetime.now() < self.expires_at
+            ):
+                return True
         return False

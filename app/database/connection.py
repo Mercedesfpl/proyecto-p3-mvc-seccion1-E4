@@ -2,7 +2,7 @@
 from typing import Any, List, Optional
 from sqlalchemy import text
 from ..extensions import db
-from ..models.models import Usuario  # Ajusta la ruta según tu proyecto
+from ..models.models import Usuario, PreRegistro  # Ajusta la ruta según tu proyecto
 
 # ============================================================
 # Funciones ORM (recomendadas para la mayoría de casos)
@@ -14,9 +14,13 @@ def obtener_usuario_por_email(email: str) -> Optional[Usuario]:
     return Usuario.query.filter_by(email=email).first()
 
 
-def obtener_usuario_por_id(user_id: int) -> Optional[Usuario]:
-    """Retorna un usuario por su ID."""
-    return Usuario.query.get(user_id)
+def obtener_usuario_por_id(user_id: int, pre_register: bool = False):
+    """Retorna un usuario por su ID.para buscar en pre register Colocar el parametro pre_register en True"""
+    if pre_register:
+
+        return PreRegistro.query.get(user_id)
+    else:
+        return Usuario.query.get(user_id)
 
 
 def listar_usuarios() -> List[Usuario]:
@@ -24,7 +28,7 @@ def listar_usuarios() -> List[Usuario]:
     return Usuario.query.all()
 
 
-def guardar_usuario(usuario: Usuario) -> None:
+def guardar_usuario(usuario) -> None:
     """Guarda (inserta o actualiza) un usuario en la BD."""
     try:
         db.session.add(usuario)
@@ -38,6 +42,11 @@ def guardar_usuario(usuario: Usuario) -> None:
 def eliminar_usuario(usuario: Usuario) -> None:
     """Elimina un usuario de la BD."""
     db.session.delete(usuario)
+
+
+def eliminar_pre_registro(pre_user: PreRegistro) -> None:
+    """Elimina un usuario de la tabla pre_registro"""
+    db.session.delete(pre_user)
 
 
 def eliminar_usuario_por_email(email: str) -> bool:

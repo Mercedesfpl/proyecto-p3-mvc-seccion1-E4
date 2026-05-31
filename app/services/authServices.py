@@ -7,6 +7,7 @@ from flask_jwt_extended import (
 )
 from flask_login import login_user
 from ..models.userModels import UserSession
+from datetime import datetime, timedelta
 
 
 def get_access_token(userData: UserSession) -> UserSession:
@@ -24,3 +25,12 @@ def get_refresh_token(id_user):
 
 def unset_cookiess(response):
     unset_jwt_cookies(response)
+    response.delete_cookie("session")
+    return response
+
+
+def esta_bloqueado(bloqueado_hasta):
+    if bloqueado_hasta and datetime.now() < bloqueado_hasta:
+        return True
+    else:
+        return False

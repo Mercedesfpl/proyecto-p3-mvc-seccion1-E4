@@ -1,6 +1,6 @@
 from flask import Flask
 from config import Config
-from .extensions import db, login_manager, migrate, mail, limiter
+from .extensions import db, login_manager, migrate, mail, limiter, jwt
 from flask_jwt_extended import JWTManager
 from .models.models import Usuario
 from .routes import auth_scope, errors_scope, admin_scope, user_scope
@@ -14,8 +14,8 @@ db.init_app(app)
 migrate.init_app(app, db)
 login_manager.init_app(app)
 mail.init_app(app)
-jwt = JWTManager(app)
 limiter.init_app(app)
+jwt.init_app(app)
 
 
 @login_manager.user_loader

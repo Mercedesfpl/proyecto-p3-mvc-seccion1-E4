@@ -39,6 +39,7 @@ def forgot_password():
     """Punto 1: Solicitar código de recuperación."""
     data = request.get_json()
     usuario = UserSession(email=data.get("email"))
+    print("El email", usuario.email)
     return userControllers.request_password_reset(usuario)
 
 
@@ -83,21 +84,21 @@ def verify_email():
         return userControllers.enviar_codigo_de_verificacion(usuario)
 
 
-@auth_scope.route("/vistas", methods=["GET", "POST"])
-def vista():
-    return userControllers.show_dashboar()
+@auth_scope.route("/pre-register", methods=["POST"])
+def pre_register():
+    data = request.get_json()
+    email = data.get("email")
+    nombre = data.get("nombre")
+    password = data.get("password")
+    usuario = UserSession(email=email, nombre=nombre, password=password)
+    return userControllers.pre_register(usuario)
 
-# ========== NUEVAS RUTAS PARA VER LOS FORMULARIOS ==========
-@auth_scope.route("/login-page", methods=["GET"])
-def login_page():
-    """Muestra el formulario de login"""
-    return render_template("auth/login.html")
 
-@auth_scope.route("/registro-page", methods=["GET"])
-def registro_page():
-    """Muestra el formulario de registro"""
-    return render_template("auth/registro.html")
-
-@auth_scope.route("/forgot-password-page", methods=["GET"])
-def forgot_password_page():
-    return render_template("auth/forgot-password.html")
+@auth_scope.route("/verify-and-register", methods=["POST"])
+@jwt_required()
+def verify_and_register():
+    data_cliente = request.get_json()
+    id_token = get_jwt_identity()
+    usuario = UserSession(id=id_token)
+    code = data_cliente.get("code")
+    return userControllers.register2(usuario, code)

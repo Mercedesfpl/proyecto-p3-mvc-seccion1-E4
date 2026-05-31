@@ -12,3 +12,8 @@ def index():
 @user_scope.route("/register", methods=["GET", "POST"])
 def register():
     return userControllers.show_form_register()
+
+
+@user_scope.route("/forgot-password", methods=["GET"])
+def show_form_forgot_pass():
+    return userControllers.show_form_forgot_pass()
