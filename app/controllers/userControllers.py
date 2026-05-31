@@ -173,3 +173,6 @@ def show_flota():
 
 def show_reportes():
     return render_template("reportes.html")
+
+def show_prueba():
+    return render_template("test_socket.html")

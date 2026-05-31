@@ -1,14 +1,14 @@
 #Eventos de websockets en tiempo real
 from flask_socketio import emit
-from app.extensions import socketIO
+from ..extensions import socketIO
 
 @socketIO.on('connect') 
-def handle_connection():
-    print("f Cliente conectado: {request.sid}.")
+def handle_connection(data):
+    print(f" Cliente conectado: {data}.")
 
 @socketIO.on('disconnect') 
-def handle_disconnect():
-    print("f Cliente desconectado: {request.sid}.")
+def handle_disconnect(data):
+    print(f" Cliente conectado: {data}.")
 
 @socketIO.on('ubicacion_bus') 
 def handle_ubicacion_bus(data):
@@ -17,10 +17,10 @@ def handle_ubicacion_bus(data):
     lat = data.get ("lat")
     lng = data.get("lng")
 
-    print ("f Autobús {busID} en ({lat}), ({lng}).")
+    print (f" Autobús {busID} en ({lat}), ({lng}).")
 
     #retrasmitir a todos los clientes en tiempo real
-    emit('nueva_ubicación', {
+    emit('nueva_ubicacion', {
         'bus_id': busID,
         'latitud': lat,
         'longitud': lng

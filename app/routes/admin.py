@@ -29,3 +29,7 @@ def reportes_show():
 def rutas_show():
 
     return userControllers.show_rutas()
+
+@admin_scope.route("/pruebas-ws")
+def pruebas_ws():
+    return userControllers.show_prueba()
