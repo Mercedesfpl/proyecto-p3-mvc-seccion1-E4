@@ -56,4 +56,9 @@ class ResourceNotValid(ResourceError):
     """Excepción para un recurso invalido"""
 
     def __init__(self, nombre_del_recurso, rason):
-        super().__init__(f"{nombre_del_recurso} inválido: {rason}")
+        super().__init__(f"{rason}")
+
+
+class Unauthorized(ResourceError):
+    def __init__(self, nombre_del_recurso, rason):
+        super().__init__(f"{rason}")

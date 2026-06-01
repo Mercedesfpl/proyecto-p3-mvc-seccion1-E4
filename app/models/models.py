@@ -18,6 +18,9 @@ class Usuario(db.Model, UserMixin):
     reset_code = db.Column(db.String(10), nullable=True)
     reset_code_expires = db.Column(db.DateTime, nullable=True)
     timestamp = db.Column(db.DateTime, default=datetime.now, index=True)
+    intentos_fallidos = db.Column(db.Integer, default=0)
+    bloqueado_hasta = db.Column(db.DateTime, nullable=True)
+    # verified = db.Column(db.Boolean, default=False)
 
     def verificar_password(self, passwordPlano):
         """El modelo valida su password."""
@@ -31,9 +34,17 @@ class Usuario(db.Model, UserMixin):
         """devuelve un objeto del tipo userSession"""
         from .userModels import UserSession
 
-        return UserSession(id=self.id, email=self.email, isAdmin=self.isAdmin)
+        return UserSession(
+            id=self.id,
+            email=self.email,
+            isAdmin=self.isAdmin,
+            rol=self.rol,
+            nombre=self.nombre,
+            intentos_fallidos=self.intentos_fallidos,
+            bloqueado_hasta=self.bloqueado_hasta,
+        )
 
-    def formatPass(self, passwordPlano):
+    def formatPass(passwordPlano):
         """Verifica si el formato cumple con las valdaciones propias del modelo"""
 
         if len(passwordPlano) < 8 or len(passwordPlano) > 15:
@@ -84,3 +95,53 @@ class Usuario(db.Model, UserMixin):
         """Limpia el código de recuperación después de usarlo."""
         self.reset_code = None
         self.reset_code_expires = None
+
+    def esta_bloqueado(self):
+        """Verifica si el usuario tiene un bloqueo activo."""
+        if self.bloqueado_hasta and datetime.now() < self.bloqueado_hasta:
+            return True
+        return False
+
+
+class PreRegistro(db.Model):
+    __tablename__ = "pre_registros"
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    nombre = db.Column(db.String(50), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+    code = db.Column(db.String(10), nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+
+    def is_expired(self):
+        return datetime.now() > self.expires_at
+
+    def a_session(self):
+        from .userModels import UserSession
+
+        return UserSession(
+            id=self.id, email=self.email, nombre=self.nombre, password=self.password
+        )
+
+    def generateHass(self, passwordPlano):
+        """Genera el hass de la clave"""
+        self.password = generate_password_hash(passwordPlano)
+
+    def generate_reset_code(self):
+        """Genera un código aleatorio único de 6 dígitos."""
+        self.code = f"{random.randint(100000, 999999)}"
+        self.expires_at = datetime.now() + timedelta(minutes=3)
+        return self.code
+
+    def verify_reset_code(self, code):
+        """Verifica si el código proporcionado es válido y no ha expirado."""
+
+        db_code = str(self.code)
+        input_code = str(code)
+        if self.code and self.expires_at:
+            if (
+                secrets.compare_digest(db_code, input_code)
+                and datetime.now() < self.expires_at
+            ):
+                return True
+        return False

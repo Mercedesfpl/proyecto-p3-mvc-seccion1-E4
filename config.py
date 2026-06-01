@@ -19,7 +19,7 @@ class Config:
     # --- Configuración de JWT y Cookies ---
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 
-    JWT_TOKEN_LOCATION = ["cookies"]
+    JWT_TOKEN_LOCATION = ["cookies", "headers"]
     # 2. Hacer que la cookie sea HttpOnly
     JWT_COOKIE_SECURE = False
     JWT_COOKIE_CSRF_PROTECT = False
@@ -40,3 +40,8 @@ class Config:
     MAIL_USERNAME = os.getenv("MAIL_USERNAME")  # Tu dirección de correo
     MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")  # La contraseña de aplicación
     MAIL_DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER")  # Remitente por defecto
+
+    # -------------Configuracion de flask Limited------
+    RATELIMIT_DEFAULT_LIMITS = ["200 per day", "50 per hour"]
+    RATELIMIT_STORAGE_URI = os.environ.get("REDIS_URL", "memory://")
+    RATELIMIT_STRATEGY = "moving-window"  # Estrategia más segura contra ráfagas
