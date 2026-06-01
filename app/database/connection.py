@@ -49,6 +49,15 @@ def eliminar_pre_registro(pre_user: PreRegistro) -> None:
     db.session.delete(pre_user)
 
 
+def eliminar_pre_usuario_por_email(email: str) -> bool:
+    """Elimina un usuario pre registrado por email. Retorna True si existía."""
+    usuario = PreRegistro.query.filter_by(email=email).first()
+    if usuario:
+        db.session.delete(usuario)
+        return True
+    return False
+
+
 def eliminar_usuario_por_email(email: str) -> bool:
     """Elimina un usuario por email. Retorna True si existía."""
     usuario = Usuario.query.filter_by(email=email).first()

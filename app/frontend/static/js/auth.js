@@ -307,24 +307,6 @@ if (loginForm) {
   });
 }
 
-// ========== LOGOUT ==========
-const logoutBtn = document.getElementById("btn-logout");
-if (logoutBtn) {
-  logoutBtn.addEventListener("click", async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch("/api/logout", { method: "POST" });
-      if (response.ok) {
-        window.location.href = "/";
-      } else {
-        console.error("Error al cerrar sesión");
-      }
-    } catch (error) {
-      console.error("Error de red:", error);
-    }
-  });
-}
-
 // ========== REGISTRO CON VERIFICACIÓN POR CORREO ==========
 let preRegisterToken = null;
 

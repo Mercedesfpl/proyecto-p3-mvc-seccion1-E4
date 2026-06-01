@@ -20,6 +20,7 @@ from ..database.connection import (
     eliminar_pre_registro,
     guardar_usuario,
     guardar_datos,
+    eliminar_pre_usuario_por_email,
 )
 
 from datetime import datetime, timedelta
@@ -251,6 +252,7 @@ def pre_register(user_data: UserSession):
         raise ResourceNotValid(
             rason="Datos no validos, contraseña y usuario son requeridos"
         )
+
     existing_user = obtener_usuario_por_email(user_data.email)
 
     if existing_user:
@@ -266,6 +268,12 @@ def pre_register(user_data: UserSession):
         email=user_data.email,
         nombre=user_data.nombre,
     )
+    if not eliminar_pre_usuario_por_email(pre.email):
+        raise ResourceNotValid(
+            nombre_del_recurso="Usuario", rason="HA ocurrido un error inesperado"
+        )
+    if not guardar_datos():
+        raise UserNotValid(message="HA ocurrido un error unesperado")
     code = pre.generate_reset_code()
     pre.generateHass(user_data.password)
     if not guardar_usuario(pre):
@@ -278,10 +286,6 @@ def pre_register(user_data: UserSession):
         )
     else:
         raise UserNotValid(message="No se ha logrado enviar el correo")
-    # token = get_access_token(userData=user_data)
-    # return success_response(
-    #     message=f"Usuario logueado{user_data.nombre}", cookies=token
-    # )
 
 
 def register2(userData: UserSession, code) -> UserSession:
@@ -316,7 +320,7 @@ def register2(userData: UserSession, code) -> UserSession:
 
     user_ = newUser.a_sesion()
     token = get_access_token(userData=user_)
-    eliminar_pre_registro(user_)
+    eliminar_pre_registro(pre_user=pre_register_user)
     guardar_datos()
 
     response = success_response(message="Registro exitoso", cookies=token)
