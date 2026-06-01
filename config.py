@@ -2,22 +2,22 @@ import os
 from dotenv import load_dotenv
 from datetime import timedelta
 
-load_dotenv()
+load_dotenv() #carga de varibales del archivo .env
 
 
 class Config:
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL") #para la dirección de la BD
+    SQLALCHEMY_TRACK_MODIFICATIONS = False #para desactivar notificaciones de los objetos en la BD
     SECRET_KEY = os.environ.get("DB_TOKEN", "")  # Para Encriptar la DB
 
-    DEBUG = True
-    ENCRYPT_DB = True
+    DEBUG = True #activa el modo depuración de FLask
+    ENCRYPT_DB = True #indica que la conexión a la BD debe ser cifrada (SSL), activa la encriptación de ciertos campos
 
-    TEMPLATE_FOLDER = "views/templates/"
-    STATIC_FOLDER = "views/static/"
+    TEMPLATE_FOLDER = "views/templates/" #buscará todas las plantillas (JINJA2) en está dirección 
+    STATIC_FOLDER = "views/static/" #buscará los archivos estaticos en está dirección 
 
     # --- Configuración de JWT y Cookies ---
-    JWT_SECRET_KEY = "una-clave-muy-segura-para-jwt"  # ¡Cámbiala!
+    JWT_SECRET_KEY = "una-clave-muy-segura-para-jwt"  # ¡Cámbiala! nota de Jeremy: realmente debes cambiarla
     # 1. Decirle a la extensión que busque los tokens en las cookies
     JWT_TOKEN_LOCATION = ["cookies"]
     # 2. Hacer que la cookie sea HttpOnly e insegura en desarrollo (cambiar en producción)
