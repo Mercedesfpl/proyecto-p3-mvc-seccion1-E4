@@ -268,10 +268,10 @@ def pre_register(user_data: UserSession):
         email=user_data.email,
         nombre=user_data.nombre,
     )
-    if not eliminar_pre_usuario_por_email(pre.email):
-        raise ResourceNotValid(
-            nombre_del_recurso="Usuario", rason="HA ocurrido un error inesperado"
-        )
+ #   if not eliminar_pre_usuario_por_email(pre.email):
+  #      raise ResourceNotValid(
+   #         nombre_del_recurso="Usuario", rason="HA ocurrido un error inesperado"
+    #    )
     if not guardar_datos():
         raise UserNotValid(message="HA ocurrido un error unesperado")
     code = pre.generate_reset_code()
