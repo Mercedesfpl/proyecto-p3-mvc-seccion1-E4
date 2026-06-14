@@ -1,6 +1,6 @@
 /* frontend/static/css/auth.css */
 
-/* ========== FONDO Y CONTENEDOR ========== */
+/*  FONDO Y CONTENEDOR  */
 .auth-body {
     background: linear-gradient(135deg, var(--azul) 0%, #5A8FB7 100%);
     min-height: 100vh;
@@ -34,7 +34,7 @@
     }
 }
 
-/* ========== HEADER ========== */
+/*  HEADER  */
 .auth-header {
     background: linear-gradient(135deg, var(--azul), #5A8FB7);
     padding: 32px 24px;
@@ -68,7 +68,7 @@
     opacity: 0.85;
 }
 
-/* ========== CUERPO ========== */
+/*  CUERPO  */
 .auth-body-content {
     padding: 32px;
 }
@@ -85,7 +85,7 @@
     margin-bottom: 28px;
 }
 
-/* ========== FORMULARIO ========== */
+/*  FORMULARIO  */
 .auth-form {
     display: flex;
     flex-direction: column;
@@ -127,7 +127,7 @@
     margin-top: 6px;
 }
 
-/* ========== FILAS DE 2 COLUMNAS ========== */
+/*  FILAS DE 2 COLUMNAS  */
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -138,7 +138,7 @@
     grid-column: span 2;
 }
 
-/* ========== OPCIONES (CHECKBOX, LINKS) ========== */
+/*  OPCIONES (CHECKBOX, LINKS)  */
 .form-options {
     display: flex;
     justify-content: space-between;
@@ -171,7 +171,7 @@
     text-decoration: underline;
 }
 
-/* ========== BOTONES ========== */
+/*  BOTONES  */
 .btn-login, .btn-register {
     width: 100%;
     padding: 14px;
@@ -196,7 +196,7 @@
     box-shadow: 0 4px 12px rgba(116, 169, 211, 0.3);
 }
 
-/* ========== FOOTER ========== */
+/*  FOOTER  */
 .auth-footer {
     text-align: center;
     margin-top: 24px;
@@ -216,7 +216,7 @@
     text-decoration: underline;
 }
 
-/* ========== TOAST ========== */
+/*  TOAST  */
 .toast-message {
     position: fixed;
     bottom: 20px;
@@ -250,7 +250,7 @@
     }
 }
 
-/* ========== RESPONSIVE ========== */
+/*  RESPONSIVE  */
 @media (max-width: 550px) {
     .form-row {
         grid-template-columns: 1fr;

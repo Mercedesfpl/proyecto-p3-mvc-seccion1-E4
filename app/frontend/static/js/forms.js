@@ -2,7 +2,7 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     
-    // ========== VALIDACIÓN DE CÉDULA (Venezuela) ==========
+    //  VALIDACIÓN DE CÉDULA (Venezuela) 
     window.validateVenezuelanId = function(cedula) {
         const cleanId = cedula.toString().replace(/\D/g, '');
         if (cleanId.length < 6 || cleanId.length > 8) {
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return { valid: true, message: '' };
     };
     
-    // ========== VALIDACIÓN DE PLACA (Venezuela) ==========
+    //  VALIDACIÓN DE PLACA (Venezuela) 
     window.validatePlate = function(plate) {
         const plateRegex = /^[A-Z]{3}[0-9]{3}[A-Z]?$/;
         if (!plateRegex.test(plate.toUpperCase())) {
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return { valid: true, message: '' };
     };
     
-    // ========== VALIDACIÓN DE TELÉFONO (Venezuela) ==========
+    //  VALIDACIÓN DE TELÉFONO (Venezuela) 
     window.validatePhone = function(phone) {
         const cleanPhone = phone.toString().replace(/\D/g, '');
         if (cleanPhone.length < 10 || cleanPhone.length > 11) {
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return { valid: true, message: '' };
     };
     
-    // ========== MOSTRAR ERROR EN INPUT ==========
+    //  MOSTRAR ERROR EN INPUT 
     window.showInputError = function(inputElement, message) {
         inputElement.classList.add('error');
         let errorDiv = inputElement.parentElement.querySelector('.form-message.error');
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
     
-    // ========== LIMPIAR TODOS LOS ERRORES ==========
+    //  LIMPIAR TODOS LOS ERRORES 
     window.clearAllErrors = function(formElement) {
         formElement.querySelectorAll('.form-input, .form-select, .form-textarea').forEach(input => {
             input.classList.remove('error');
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     };
     
-    // ========== MOSTRAR TOAST ==========
+    //  MOSTRAR TOAST 
     window.showFormToast = function(message, type = 'success') {
         let toast = document.getElementById('formToast');
         if (!toast) {
@@ -90,26 +90,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     };
     
-    // ========== MASK PARA CÉDULA (formato) ==========
+    //  MASK PARA CÉDULA (formato) 
     window.maskVenezuelanId = function(input) {
         let value = input.value.replace(/\D/g, '');
         if (value.length > 8) value = value.slice(0, 8);
         input.value = value;
     };
     
-    // ========== MASK PARA TELÉFONO ==========
+    //  MASK PARA TELÉFONO 
     window.maskPhone = function(input) {
         let value = input.value.replace(/\D/g, '');
         if (value.length > 11) value = value.slice(0, 11);
         input.value = value;
     };
     
-    // ========== MASK PARA PLACA (mayúsculas automático) ==========
+    //  MASK PARA PLACA (mayúsculas automático) 
     window.maskPlate = function(input) {
         input.value = input.value.toUpperCase();
     };
     
-    // ========== MOSTRAR NOMBRE DEL ARCHIVO SELECCIONADO ==========
+    //  MOSTRAR NOMBRE DEL ARCHIVO SELECCIONADO 
     window.updateFileName = function(input, fileNameSpanId) {
         const fileNameSpan = document.getElementById(fileNameSpanId);
         if (fileNameSpan && input.files.length > 0) {
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
     
-    // ========== AUTO-MÁSCARAS EN INPUTS ==========
+    //  AUTO-MÁSCARAS EN INPUTS 
     const cedulaInputs = document.querySelectorAll('[data-mask="cedula"]');
     cedulaInputs.forEach(input => {
         input.addEventListener('input', function() { maskVenezuelanId(this); });
@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
         input.addEventListener('input', function() { maskPlate(this); });
     });
     
-    // ========== VALIDACIÓN EN TIEMPO REAL ==========
+    //  VALIDACIÓN EN TIEMPO REAL 
     const validateOnBlur = document.querySelectorAll('[data-validate]');
     validateOnBlur.forEach(input => {
         input.addEventListener('blur', function() {

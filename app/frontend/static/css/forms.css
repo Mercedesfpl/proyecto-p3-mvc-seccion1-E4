@@ -1,6 +1,6 @@
 /* frontend/static/css/forms.css */
 
-/* ========== CONTENEDOR DE FORMULARIO ========== */
+/*  CONTENEDOR DE FORMULARIO  */
 .form-container {
     max-width: 800px;
     margin: 0 auto;
@@ -28,7 +28,7 @@
     font-size: 14px;
 }
 
-/* ========== GRUPOS DE FORMULARIO ========== */
+/*  GRUPOS DE FORMULARIO  */
 .form-group {
     margin-bottom: 24px;
 }
@@ -59,7 +59,7 @@
     margin-right: 8px;
 }
 
-/* ========== INPUTS ========== */
+/*  INPUTS  */
 .form-input,
 .form-select,
 .form-textarea {
@@ -92,7 +92,7 @@
     min-height: 100px;
 }
 
-/* ========== CHECKBOX Y RADIO ========== */
+/*  CHECKBOX Y RADIO  */
 .checkbox-group,
 .radio-group {
     display: flex;
@@ -123,7 +123,7 @@
     gap: 12px;
 }
 
-/* ========== SELECT ========== */
+/*  SELECT  */
 .form-select {
     cursor: pointer;
     appearance: none;
@@ -132,7 +132,7 @@
     background-position: right 16px center;
 }
 
-/* ========== FILE INPUT ========== */
+/*  FILE INPUT  */
 .file-input {
     position: relative;
     display: inline-block;
@@ -174,7 +174,7 @@
     color: var(--texto-claro);
 }
 
-/* ========== BOTONES ========== */
+/*  BOTONES  */
 .form-actions {
     display: flex;
     justify-content: flex-end;
@@ -240,7 +240,7 @@
     background: rgba(116, 169, 211, 0.1);
 }
 
-/* ========== MENSAJES ========== */
+/*  MENSAJES  */
 .form-message {
     font-size: 12px;
     margin-top: 6px;
@@ -261,7 +261,7 @@
     color: var(--azul);
 }
 
-/* ========== HELP TEXT ========== */
+/*  HELP TEXT  */
 .form-help {
     font-size: 11px;
     color: var(--texto-claro);
@@ -271,7 +271,7 @@
     gap: 6px;
 }
 
-/* ========== TOGGLE SWITCH ========== */
+/*  TOGGLE SWITCH  */
 .toggle-switch {
     position: relative;
     display: inline-block;
@@ -317,7 +317,7 @@ input:checked + .toggle-slider:before {
     transform: translateX(24px);
 }
 
-/* ========== RESPONSIVE ========== */
+/*  RESPONSIVE  */
 @media (max-width: 768px) {
     .form-container {
         padding: 20px;

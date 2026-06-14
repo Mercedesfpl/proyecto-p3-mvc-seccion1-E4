@@ -2,7 +2,7 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     
-    // ========== ANIMACIÓN DE BARRAS DE PROGRESO ==========
+    //  ANIMACIÓN DE BARRAS DE PROGRESO 
     const barras = document.querySelectorAll('.bar-fill');
     barras.forEach(barra => {
         // Guardar el ancho original
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 100);
     });
     
-    // ========== EFECTO HOVER EN INCIDENCIAS ==========
+    //  EFECTO HOVER EN INCIDENCIAS 
     const incidencias = document.querySelectorAll('.incidencia-item');
     incidencias.forEach(item => {
         item.addEventListener('mouseenter', function() {
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // ========== EFECTO HOVER EN FILAS DE RUTAS ==========
+    //  EFECTO HOVER EN FILAS DE RUTAS 
     const routeRows = document.querySelectorAll('.route-row');
     routeRows.forEach(row => {
         row.addEventListener('mouseenter', function() {
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // ========== EFECTO EN EL MAPA PLACEHOLDER ==========
+    //  EFECTO EN EL MAPA PLACEHOLDER 
     const mapPlaceholder = document.querySelector('.map-placeholder');
     if (mapPlaceholder) {
         mapPlaceholder.addEventListener('mouseenter', function() {
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // ========== ACTUALIZAR RELOJ EN CABECERA (opcional) ==========
+    //  ACTUALIZAR RELOJ EN CABECERA 
     function actualizarReloj() {
         const relojElement = document.getElementById('reloj');
         if (relojElement) {

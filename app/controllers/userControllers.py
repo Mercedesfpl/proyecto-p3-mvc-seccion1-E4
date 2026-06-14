@@ -335,7 +335,6 @@ def show_dashboar():
 def show_rutas():
     return render_template("pages/rutas.html")
 
-
 def show_flota():
     return render_template("pages/flota.html")
 
