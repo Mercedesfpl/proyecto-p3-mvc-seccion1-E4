@@ -1,37 +1,34 @@
 from flask import Blueprint, url_for, redirect, render_template, jsonify
-from flask_jwt_extended import (
-    jwt_required,
-)
+from flask_jwt_extended import jwt_required
 from ..controllers import userControllers
+from app.decorators.role_decorator import role_required
 
 admin_scope = Blueprint("admin", __name__)
 
 
+# Solo admin puede ver el dashboard global
 @admin_scope.route("/dashboard", methods=["GET"])
 @jwt_required()
+@role_required('admin')
 def dashboar_show():
-
     return userControllers.show_dashboar()
 
 
 @admin_scope.route("/flota", methods=["GET"])
 @jwt_required()
 def flota_show():
-
     return userControllers.show_flota()
 
 
 @admin_scope.route("/reportes", methods=["GET"])
 @jwt_required()
 def reportes_show():
-
     return userControllers.show_reportes()
 
 
 @admin_scope.route("/rutas", methods=["GET"])
 @jwt_required()
 def rutas_show():
-
     return userControllers.show_rutas()
 
 
@@ -46,16 +43,19 @@ def form_muestra():
 def test_401():
     return jsonify({"msg": "Simulated 401"}), 401
 
+# Solo admin puede gestionar líneas
 @admin_scope.route("/lineas-page", methods=["GET"])
 @jwt_required()
+@role_required('admin')
 def lineas_page():
     return render_template("pages/lineas.html")
 
 # ========== CRUD de Líneas ==========
 
 @admin_scope.route("/lineas", methods=["GET"])
+@jwt_required()
+@role_required('admin')  # ← Solo admin
 def get_lineas():
-    """Obtener todas las líneas"""
     from app.controllers.lineaControllers import get_all_lineas
     return get_all_lineas()
 
