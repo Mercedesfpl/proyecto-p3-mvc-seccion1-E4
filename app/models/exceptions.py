@@ -1,3 +1,4 @@
+# app/models/exceptions.py
 class UserError(Exception):
     """Clase base para excepciones de usuario"""
 

@@ -1,84 +1,146 @@
 # app/controllers/lineaControllers.py
+
 from app.models.linea import Linea
+from app.models.persona import Persona
+from app.models.models import Usuario
 from app.extensions import db
 from app.models.exceptions import ResourceNotValid
 from ..helpers.makeResponse import success_response
+from flask import jsonify
 
 def get_all_lineas():
     """Obtener todas las líneas (no suspendidas)"""
-    lineas = Linea.query.filter_by(suspendido=False).all()
-    return success_response(data=[linea.to_dict() for linea in lineas])
+    try:
+        lineas = Linea.query.filter_by(suspendido=False).all()
+        return success_response(data=[linea.to_dict() for linea in lineas])
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 def get_linea_by_id(id_linea):
     """Obtener una línea por ID"""
-    linea = Linea.query.get(id_linea)
-    if not linea or linea.suspendido:
-        raise ResourceNotValid("Línea", "No encontrada")
-    return success_response(data=linea.to_dict())
+    try:
+        linea = Linea.query.get(id_linea)
+        if not linea or linea.suspendido:
+            return jsonify({"error": "Línea no encontrada"}), 404
+        return success_response(data=linea.to_dict())
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-def create_linea(linea_data):
+def get_personas_disponibles():
+    """Obtener todas las personas para los selects"""
+    try:
+        personas = Persona.query.all()
+        return success_response(data=[p.to_dict() for p in personas])
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+def get_secretarios_disponibles():
+    """Obtener todos los secretarios (usuarios con rol secretario)"""
+    try:
+        secretarios = Usuario.query.filter_by(rol='secretario').all()
+        data = [{
+            "id": s.id,
+            "nombre": s.nombre,
+            "email": s.email
+        } for s in secretarios]
+        return success_response(data=data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+def create_linea(data):
     """Crear una nueva línea"""
-    # Validar campos obligatorios
-    if not linea_data.get('nombre'):
-        raise ResourceNotValid("nombre", "El nombre es obligatorio")
-    if not linea_data.get('presidente_nombre'):
-        raise ResourceNotValid("presidente_nombre", "El nombre del presidente es obligatorio")
-    if not linea_data.get('presidente_cedula'):
-        raise ResourceNotValid("presidente_cedula", "La cédula es obligatoria")
-    if not linea_data.get('telefono'):
-        raise ResourceNotValid("telefono", "El teléfono es obligatorio")
-    if not linea_data.get('rif'):
-        raise ResourceNotValid("rif", "El RIF es obligatorio")
+    try:
+        print("=== DATOS RECIBIDOS EN EL BACKEND ===")
+        print(data)
+        
+        # Validar campos obligatorios
+        if not data.get('nombre'):
+            return jsonify({"error": "El nombre es obligatorio"}), 400
+        if not data.get('rif'):
+            return jsonify({"error": "El RIF es obligatorio"}), 400
+        if not data.get('presidente_id'):
+            return jsonify({"error": "Debes seleccionar un presidente"}), 400
+        
+        # Verificar que no exista una línea con el mismo nombre
+        existing = Linea.query.filter_by(nombre=data['nombre']).first()
+        if existing:
+            return jsonify({"error": "Ya existe una línea con ese nombre"}), 400
+        
+        # Verificar que el presidente existe
+        presidente = Persona.query.get(data['presidente_id'])
+        if not presidente:
+            return jsonify({"error": "El presidente seleccionado no existe"}), 400
+        
+        # Verificar que el secretario existe (si se seleccionó)
+        secretario_id = data.get('secretario_id')
+        if secretario_id:
+            secretario = Usuario.query.get(secretario_id)
+            if not secretario:
+                return jsonify({"error": "El secretario seleccionado no existe"}), 400
+        
+        # Crear la línea
+        nueva_linea = Linea(
+            nombre=data['nombre'].strip(),
+            rif=data['rif'].strip(),
+            presidente_id=data['presidente_id'],
+            secretario_id=secretario_id
+        )
+        
+        db.session.add(nueva_linea)
+        db.session.commit()
+        
+        return success_response(message="Línea creada exitosamente", data=nueva_linea.to_dict())
     
-    # Verificar que no exista una línea con el mismo nombre
-    existing = Linea.query.filter_by(nombre=linea_data['nombre']).first()
-    if existing:
-        raise ResourceNotValid("nombre", "Ya existe una línea con ese nombre")
-    
-    nueva_linea = Linea(
-        nombre=linea_data['nombre'],
-        presidente_nombre=linea_data['presidente_nombre'],
-        presidente_cedula=linea_data['presidente_cedula'],
-        telefono=linea_data['telefono'],
-        rif=linea_data['rif'],
-        secretario_id=linea_data.get('secretario_id')
-    )
-    
-    db.session.add(nueva_linea)
-    db.session.commit()
-    
-    return success_response(message="Línea creada exitosamente", data=nueva_linea.to_dict())
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Error al crear línea: {str(e)}"}), 500
 
-def update_linea(id_linea, linea_data):
+def update_linea(id_linea, data):
     """Actualizar una línea existente"""
-    linea = Linea.query.get(id_linea)
-    if not linea or linea.suspendido:
-        raise ResourceNotValid("Línea", "No encontrada")
+    try:
+        print("Datos recibidos para actualizar:", data)
+        
+        linea = Linea.query.get(id_linea)
+        if not linea or linea.suspendido:
+            return jsonify({"error": "Línea no encontrada"}), 404
+        
+        # Actualizar campos
+        if 'nombre' in data:
+            linea.nombre = data['nombre'].strip()
+        if 'rif' in data:
+            linea.rif = data['rif'].strip()
+        if 'presidente_id' in data:
+            presidente = Persona.query.get(data['presidente_id'])
+            if not presidente:
+                return jsonify({"error": "El presidente seleccionado no existe"}), 400
+            linea.presidente_id = data['presidente_id']
+        if 'secretario_id' in data:
+            if data['secretario_id']:
+                secretario = Usuario.query.get(data['secretario_id'])
+                if not secretario:
+                    return jsonify({"error": "El secretario seleccionado no existe"}), 400
+            linea.secretario_id = data['secretario_id']
+        
+        db.session.commit()
+        
+        return success_response(message="Línea actualizada exitosamente", data=linea.to_dict())
     
-    if 'nombre' in linea_data:
-        linea.nombre = linea_data['nombre']
-    if 'presidente_nombre' in linea_data:
-        linea.presidente_nombre = linea_data['presidente_nombre']
-    if 'presidente_cedula' in linea_data:
-        linea.presidente_cedula = linea_data['presidente_cedula']
-    if 'telefono' in linea_data:
-        linea.telefono = linea_data['telefono']
-    if 'rif' in linea_data:
-        linea.rif = linea_data['rif']
-    if 'secretario_id' in linea_data:
-        linea.secretario_id = linea_data['secretario_id']
-    
-    db.session.commit()
-    
-    return success_response(message="Línea actualizada exitosamente", data=linea.to_dict())
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Error al actualizar línea: {str(e)}"}), 500
 
 def delete_linea(id_linea):
     """Suspender una línea (no se elimina físicamente)"""
-    linea = Linea.query.get(id_linea)
-    if not linea:
-        raise ResourceNotValid("Línea", "No encontrada")
+    try:
+        linea = Linea.query.get(id_linea)
+        if not linea:
+            return jsonify({"error": "Línea no encontrada"}), 404
+        
+        linea.suspendido = True
+        db.session.commit()
+        
+        return success_response(message="Línea suspendida exitosamente")
     
-    linea.suspendido = True
-    db.session.commit()
-    
-    return success_response(message="Línea suspendida exitosamente")
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Error al suspender línea: {str(e)}"}), 500

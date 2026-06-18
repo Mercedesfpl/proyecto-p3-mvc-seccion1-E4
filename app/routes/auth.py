@@ -1,3 +1,4 @@
+# app/routes/auth.py
 from flask import Blueprint, request, url_for, redirect, render_template
 from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
 

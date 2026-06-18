@@ -1,3 +1,4 @@
+# app/models/models.py
 from ..extensions import db
 from datetime import datetime
 from flask_login import UserMixin
@@ -20,7 +21,10 @@ class Usuario(db.Model, UserMixin):
     timestamp = db.Column(db.DateTime, default=datetime.now, index=True)
     intentos_fallidos = db.Column(db.Integer, default=0)
     bloqueado_hasta = db.Column(db.DateTime, nullable=True)
-    # verified = db.Column(db.Boolean, default=False)
+    
+    # NUEVO: Relación con Persona (1:1)
+    persona_id = db.Column(db.Integer, db.ForeignKey("personas.id"), nullable=True)
+    persona = db.relationship("Persona", back_populates="usuario")
 
     def verificar_password(self, passwordPlano):
         """El modelo valida su password."""

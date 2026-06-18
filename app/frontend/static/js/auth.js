@@ -283,28 +283,33 @@ if (resetPasswordForm) {
 // ========== LOGIN  ==========
 const loginForm = document.getElementById("loginForm");
 if (loginForm) {
-  loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+    loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
 
-    try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      const result = await response.json();
-      if (response.ok) {
-        window.location.href = "/admin/dashboard";
-      } else {
-        showToast(result.Message || "Error al iniciar sesión", "error");
-      }
-    } catch (error) {
-      console.error("Error de conexión:", error);
-      showToast("No se pudo conectar con el servidor", "error");
-    }
-  });
+        try {
+            const response = await fetch("/api/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
+            });
+            const data = await response.json(); // Solo una vez
+            
+            if (response.ok) {
+                if (data.data && data.data.rol) {
+                    localStorage.setItem('user_rol', data.data.rol);
+                    document.body.setAttribute('data-user-rol', data.data.rol);
+                }
+                window.location.href = data.data?.redirect || "/admin/dashboard";
+            } else {
+                showToast(data.Message || "Error al iniciar sesión", "error");
+            }
+        } catch (error) {
+            console.error("Error de conexión:", error);
+            showToast("No se pudo conectar con el servidor", "error");
+        }
+    });
 }
 
 // ========== REGISTRO CON VERIFICACIÓN POR CORREO ==========

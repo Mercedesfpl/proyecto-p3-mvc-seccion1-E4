@@ -265,3 +265,31 @@ function renderTable(containerId, columns, data, actions = true) {
     
     container.innerHTML = `<table class="data-table">${thead}${tbody}</table>`;
 }
+
+
+// Obtener el rol del usuario actual (desde el DOM o desde una API)
+function getUserRole() {
+    // Opción 1: Si el rol está en un data attribute del body
+    const body = document.body;
+    if (body.getAttribute('data-user-rol')) {
+        return body.getAttribute('data-user-rol');
+    }
+    return null;
+}
+
+// Mostrar/ocultar elementos según el rol
+function toggleAdminOnlyElements() {
+    const role = getUserRole();
+    const adminElements = document.querySelectorAll('.admin-only');
+    
+    if (role === 'admin') {
+        adminElements.forEach(el => el.style.display = '');
+    } else {
+        adminElements.forEach(el => el.style.display = 'none');
+    }
+}
+
+// Ejecutar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    toggleAdminOnlyElements();
+});

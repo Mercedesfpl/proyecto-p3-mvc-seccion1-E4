@@ -1,3 +1,4 @@
+# app/routes/errors.py
 from flask import jsonify, Blueprint, Response
 from ..models.exceptions import (
     UserAlreadyExists,
