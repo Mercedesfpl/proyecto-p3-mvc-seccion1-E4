@@ -1,75 +1,20 @@
-// frontend/static/js/header.js
-document.addEventListener('DOMContentLoaded', function() {
-    const userDropdown = document.getElementById('userDropdown');
-    const dropdownMenu = document.getElementById('dropdownMenu');
-    const notificationBtn = document.getElementById('notificationBtn');
-    const notificationsPanel = document.getElementById('notificationsPanel');
-
-    if (userDropdown) {
-        userDropdown.addEventListener('click', function(e) {
-            e.stopPropagation();
-            dropdownMenu.classList.toggle('show');
-            if (notificationsPanel) notificationsPanel.classList.remove('show');
-        });
-    }
-
-    if (notificationBtn) {
-        notificationBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            notificationsPanel.classList.toggle('show');
-            if (dropdownMenu) dropdownMenu.classList.remove('show');
-        });
-    }
-
-    document.addEventListener('click', function() {
-        if (dropdownMenu) dropdownMenu.classList.remove('show');
-        if (notificationsPanel) notificationsPanel.classList.remove('show');
-    });
-
-    // Marcar todas como leídas
-    const markReadBtn = document.querySelector('.mark-read');
-    if (markReadBtn) {
-        markReadBtn.addEventListener('click', function() {
-            const unreadItems = document.querySelectorAll('.notification-item.unread');
-            unreadItems.forEach(item => {
-                item.classList.remove('unread');
-            });
-            
-            // Actualizar badge a 0
-            const badge = document.querySelector('.notification-badge');
-            if (badge) {
-                badge.textContent = '0';
-                badge.style.display = 'none';
-            }
-            
-            showToast('Notificaciones marcadas como leídas', 'info');
-        });
-    }
-});
-
-// frontend/static/js/header.js
+// ========================================
+// HEADER - Menu hamburguesa, dropdowns, etc
+// ========================================
 
 document.addEventListener('DOMContentLoaded', function() {
-    //  MENÚ HAMBURGUESA 
+    // ===== MENU HAMBURGUESA =====
     const menuToggle = document.getElementById('menuToggle');
-    const mainNav = document.getElementById('mainNav');
-    
-    // Crear overlay si no existe
-    let overlay = document.querySelector('.menu-overlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.className = 'menu-overlay';
-        document.body.appendChild(overlay);
-    }
-    
-    // Abrir/cerrar menú
-    if (menuToggle && mainNav) {
-        menuToggle.addEventListener('click', function() {
-            mainNav.classList.toggle('active');
-            overlay.classList.toggle('active');
-            // Cambiar ícono del botón
+    const headerNav = document.querySelector('.header-nav');
+
+    if (menuToggle && headerNav) {
+        menuToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            headerNav.classList.toggle('active');
+
+            // Cambiar ícono
             const icon = menuToggle.querySelector('i');
-            if (mainNav.classList.contains('active')) {
+            if (headerNav.classList.contains('active')) {
                 icon.classList.remove('fa-bars');
                 icon.classList.add('fa-times');
             } else {
@@ -77,69 +22,71 @@ document.addEventListener('DOMContentLoaded', function() {
                 icon.classList.add('fa-bars');
             }
         });
-        
-        // Cerrar menú al hacer clic en overlay
-        overlay.addEventListener('click', function() {
-            mainNav.classList.remove('active');
-            overlay.classList.remove('active');
-            const icon = menuToggle.querySelector('i');
-            icon.classList.remove('fa-times');
-            icon.classList.add('fa-bars');
-        });
-        
-        // Cerrar menú al hacer clic en un enlace
-        const navLinks = mainNav.querySelectorAll('.nav-link');
-        navLinks.forEach(link => {
-            link.addEventListener('click', function() {
-                mainNav.classList.remove('active');
-                overlay.classList.remove('active');
+
+        // Cerrar menú al hacer clic fuera
+        document.addEventListener('click', function(e) {
+            if (headerNav.classList.contains('active') &&
+                !headerNav.contains(e.target) &&
+                !menuToggle.contains(e.target)) {
+                headerNav.classList.remove('active');
                 const icon = menuToggle.querySelector('i');
                 icon.classList.remove('fa-times');
                 icon.classList.add('fa-bars');
-            });
+            }
         });
     }
-    
-    //  DROPDOWN DEL USUARIO 
+
+    // ===== DROPDOWN DEL USUARIO =====
     const userDropdown = document.getElementById('userDropdown');
     const dropdownMenu = document.getElementById('dropdownMenu');
-    
+
     if (userDropdown && dropdownMenu) {
         userDropdown.addEventListener('click', function(e) {
             e.stopPropagation();
             dropdownMenu.classList.toggle('show');
+
             // Cerrar notificaciones si están abiertas
-            if (notificationsPanel) notificationsPanel.classList.remove('show');
+            const notificationsPanel = document.getElementById('notificationsPanel');
+            if (notificationsPanel) {
+                notificationsPanel.classList.remove('show');
+            }
         });
     }
-    
-    //  PANEL DE NOTIFICACIONES 
+
+    // ===== PANEL DE NOTIFICACIONES =====
     const notificationBtn = document.getElementById('notificationBtn');
     const notificationsPanel = document.getElementById('notificationsPanel');
-    
+
     if (notificationBtn && notificationsPanel) {
         notificationBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             notificationsPanel.classList.toggle('show');
-            if (dropdownMenu) dropdownMenu.classList.remove('show');
+
+            // Cerrar dropdown si está abierto
+            if (dropdownMenu) {
+                dropdownMenu.classList.remove('show');
+            }
         });
     }
-    
-    // Cerrar al hacer clic fuera
+
+    // ===== CERRAR AL HACER CLIC FUERA =====
     document.addEventListener('click', function(e) {
+        // Cerrar dropdown
         if (dropdownMenu && dropdownMenu.classList.contains('show')) {
             if (!userDropdown.contains(e.target)) {
                 dropdownMenu.classList.remove('show');
             }
         }
+
+        // Cerrar notificaciones
         if (notificationsPanel && notificationsPanel.classList.contains('show')) {
             if (!notificationBtn.contains(e.target)) {
                 notificationsPanel.classList.remove('show');
             }
         }
     });
-    
-    //  MARCAR NOTIFICACIONES COMO LEÍDAS 
+
+    // ===== MARCAR NOTIFICACIONES COMO LEÍDAS =====
     const markReadBtn = document.querySelector('.mark-read');
     if (markReadBtn) {
         markReadBtn.addEventListener('click', function() {
@@ -147,14 +94,18 @@ document.addEventListener('DOMContentLoaded', function() {
             unreadItems.forEach(item => {
                 item.classList.remove('unread');
             });
+
             const badge = document.querySelector('.notification-badge');
             if (badge) {
                 badge.textContent = '0';
+                badge.style.display = 'none';
             }
+
+            showToast('Notificaciones marcadas como leídas', 'info');
         });
     }
-    
-    //  LOGOUT 
+
+    // ===== LOGOUT =====
     const logoutBtn = document.getElementById('btn-logout');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async function(e) {
@@ -162,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 const response = await fetch('/api/logout', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
+                    credentials: 'include'
                 });
                 if (response.ok) {
                     window.location.href = '/';
@@ -175,3 +126,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// ===== FUNCIÓN TOAST GLOBAL =====
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('toastMessage');
+    if (!toast) return;
+
+    toast.textContent = message;
+    toast.className = `toast-message ${type} show`;
+
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(() => {
+        toast.classList.remove('show');
+    }, 4000);
+}
