@@ -1,19 +1,19 @@
 #Eventos de websockets en tiempo real
 from flask_socketio import emit
-from ..extensions import socketIO
+from ..extensions import socketio
 
-@socketIO.on('connect') 
-def handle_connection(data):
-    print(f" Cliente conectado: {data}.")
+@socketio.on('connect') 
+def handle_connection():
+    print(" Cliente conectado.")
 
-@socketIO.on('disconnect') 
-def handle_disconnect(data):
-    print(f" Cliente conectado: {data}.")
+@socketio.on('disconnect') 
+def handle_disconnect():
+    print(" Cliente desconectado.")
 
-@socketIO.on('ubicacion_bus') 
+@socketio.on('ubicacion_bus') 
 def handle_ubicacion_bus(data):
     #esta función recibe la información de un ESP32 o simulación
-    busID = data.get("bus_ID") 
+    busID = data.get("bus_id") or data.get("bus_ID")
     lat = data.get ("lat")
     lng = data.get("lng")
 

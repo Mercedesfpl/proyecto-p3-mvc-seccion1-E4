@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+  <head>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  </head>
+  <body>
+    <button onclick="enviar()">Enviar ubicación</button>
+    <div id="log"></div>
+    <script>
+      const socket = io();
+      socket.on("connect", () => log("✅ Conectado"));
+      socket.on("nueva_ubicacion", (data) =>
+        log("📍 Recibido: " + JSON.stringify(data)),
+      );
+      function enviar() {
+        socket.emit("ubicacion_bus", {
+          bus_id: "PRUEBA",
+          lat: 10.5,
+          lng: -66.9,
+        });
+        log("📤 Enviado");
+      }
+      function log(msg) {
+        document.getElementById("log").innerHTML += "<p>" + msg + "</p>";
+      }
+    </script>
+  </body>
+</html>

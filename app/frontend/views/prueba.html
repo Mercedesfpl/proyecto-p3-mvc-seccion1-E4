@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Simulador de Autobús</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      #map {
+        height: 500px;
+        width: 100%;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+      }
+      .controls {
+        background: #f8f9fb;
+        padding: 15px;
+        border-radius: 8px;
+        display: inline-block;
+      }
+      button {
+        margin: 5px;
+        padding: 8px 15px;
+        cursor: pointer;
+        border: 1px solid #ccc;
+        background: #fff;
+        border-radius: 4px;
+      }
+      button:hover {
+        background: #f0f0f0;
+      }
+      select {
+        margin-left: 8px;
+        padding: 6px;
+      }
+      .status {
+        margin-top: 10px;
+        font-weight: bold;
+      }
+      .log {
+        margin-top: 10px;
+        max-height: 140px;
+        overflow: auto;
+        background: #111;
+        color: #0f0;
+        padding: 8px;
+        border-radius: 6px;
+        font-family: monospace;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🚍 Simulación de Autobús en Tiempo Real</h1>
+
+    <div id="map"></div>
+
+    <div class="controls">
+      <button id="btnIniciar">▶ Iniciar simulación</button>
+      <button id="btnDetener">⏹ Detener</button>
+      <button id="btnManual">📍 Enviar ubicación manual (centro)</button>
+      <button id="btnEmitTest">✉ Emitir prueba</button>
+      <select id="busSelect">
+        <option value="BUS-001">BUS-001</option>
+        <option value="BUS-002">BUS-002</option>
+      </select>
+      <div id="estado" class="status">⚪ Simulación detenida</div>
+      <div class="log" id="logConsole"></div>
+    </div>
+
+    <script>
+      // ---------- Utilidades de logging en pantalla ----------
+      function log(msg, level = "info") {
+        const el = document.getElementById("logConsole");
+        const time = new Date().toLocaleTimeString();
+        const prefix = `[${time}]`;
+        const line = document.createElement("div");
+        line.textContent = `${prefix} ${msg}`;
+        if (level === "error") line.style.color = "#ff6b6b";
+        else if (level === "warn") line.style.color = "#ffd166";
+        el.prepend(line);
+      }
+
+      // ---------- Inicializar mapa ----------
+      const map = L.map("map", { preferCanvas: true }).setView(
+        [10.5, -66.9],
+        13,
+      );
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "© OpenStreetMap contributors",
+      }).addTo(map);
+
+      // Permitir interacción normal (zoom, arrastrar, click)
+      map.scrollWheelZoom.enable();
+      map.dragging.enable();
+
+      // ---------- Estado y marcadores ----------
+      const markers = {};
+      let intervalo = null;
+      let latActual = 10.5,
+        lngActual = -66.9;
+      let pasoLat = 0.002,
+        pasoLng = 0.0015;
+
+      // ---------- Socket.IO ----------
+      // Si la página se sirve desde el mismo servidor, usar io() sin URL evita CORS.
+      const socket = io(); // si necesitas apuntar a otro host: io("http://localhost:5000")
+
+      socket.on("connect", () => {
+        console.log("Conectado al servidor WebSocket");
+        log("Conectado al servidor WebSocket");
+      });
+
+      socket.on("connect_error", (error) => {
+        console.error("Error de conexión:", error);
+        log(
+          "Error de conexión: " +
+            (error && error.message ? error.message : JSON.stringify(error)),
+          "error",
+        );
+        alert(
+          "No se pudo conectar al servidor WebSocket. Revisa que el servidor esté corriendo.",
+        );
+      });
+
+      socket.on("disconnect", (reason) => {
+        console.warn("Desconectado del servidor:", reason);
+        log("Desconectado: " + reason, "warn");
+      });
+
+      socket.on("nueva_ubicacion", (data) => {
+        // Esperamos { bus_id, lat, lng }
+        const bus_id = data.bus_id || data.bus_ID;
+        const lat = data.lat;
+        const lng = data.lng;
+        if (!bus_id || lat === undefined || lng === undefined) {
+          console.warn("Payload inesperado en 'nueva_ubicacion':", data);
+          log("Payload inesperado: " + JSON.stringify(data), "warn");
+          return;
+        }
+
+        // Actualizar o crear marcador
+        if (markers[bus_id]) {
+          markers[bus_id].setLatLng([lat, lng]);
+        } else {
+          markers[bus_id] = L.marker([lat, lng], { title: bus_id }).addTo(map);
+          markers[bus_id].bindPopup(`Autobús ${bus_id}`);
+          // Asegurar que el popup se abra al hacer click
+          markers[bus_id].on("click", function () {
+            this.openPopup();
+          });
+        }
+        // Abrir popup y centrar ligeramente para visibilidad
+        markers[bus_id].openPopup();
+        document.getElementById("estado").innerHTML =
+          `📡 Recibida ubicación de ${bus_id}: (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+        log(
+          `Recibida ubicación ${bus_id} → ${lat.toFixed(5)}, ${lng.toFixed(5)}`,
+        );
+      });
+
+      // ---------- Funciones de simulación y envío ----------
+      function generarMovimiento() {
+        latActual += pasoLat;
+        lngActual += pasoLng;
+        if (latActual > 10.55 || latActual < 10.45) pasoLat = -pasoLat;
+        if (lngActual > -66.85 || lngActual < -66.95) pasoLng = -pasoLng;
+        return { lat: latActual, lng: lngActual };
+      }
+
+      function enviarUbicacion(bus_id, lat, lng) {
+        // Usar claves consistentes: bus_id, lat, lng
+        const payload = { bus_id, lat, lng };
+        socket.emit("ubicacion_bus", payload);
+        log(
+          `Emitido ubicacion_bus ${bus_id} → ${lat.toFixed(5)}, ${lng.toFixed(5)}`,
+        );
+      }
+
+      function iniciarSimulacion() {
+        if (intervalo) clearInterval(intervalo);
+        const busId = document.getElementById("busSelect").value;
+        intervalo = setInterval(() => {
+          const { lat, lng } = generarMovimiento();
+          enviarUbicacion(busId, lat, lng);
+        }, 2000);
+        document.getElementById("estado").innerHTML =
+          `🟢 Simulación activa (${busId}) cada 2s`;
+        log("Simulación iniciada para " + busId);
+      }
+
+      function detenerSimulacion() {
+        if (intervalo) {
+          clearInterval(intervalo);
+          intervalo = null;
+          document.getElementById("estado").innerHTML = "⏸ Simulación detenida";
+          log("Simulación detenida");
+        }
+      }
+
+      function enviarManual() {
+        const busId = document.getElementById("busSelect").value;
+        enviarUbicacion(busId, 10.5, -66.9);
+        document.getElementById("estado").innerHTML =
+          `📤 Manual enviado para ${busId}`;
+      }
+
+      // Botón para emitir una prueba rápida desde el cliente
+      function emitirPrueba() {
+        const busId = document.getElementById("busSelect").value;
+        const lat = 10.5 + (Math.random() - 0.5) * 0.02;
+        const lng = -66.9 + (Math.random() - 0.5) * 0.02;
+        enviarUbicacion(busId, lat, lng);
+      }
+
+      // ---------- Interacción con el mapa ----------
+      // Al hacer click en el mapa, mostrar coordenadas y permitir enviar manualmente
+      map.on("click", function (e) {
+        const { lat, lng } = e.latlng;
+        const busId = document.getElementById("busSelect").value;
+        document.getElementById("estado").innerHTML =
+          `📍 Click en mapa: (${lat.toFixed(5)}, ${lng.toFixed(5)}) — ${busId}`;
+        log(`Click mapa: ${lat.toFixed(5)}, ${lng.toFixed(5)} (para ${busId})`);
+        // Crear marcador temporal y abrir popup
+        const temp = L.marker([lat, lng]).addTo(map);
+        temp.bindPopup(`Enviar ubicación ${busId}?`).openPopup();
+        setTimeout(() => map.removeLayer(temp), 2500);
+      });
+
+      // ---------- Asignar eventos a botones ----------
+      document.getElementById("btnIniciar").onclick = iniciarSimulacion;
+      document.getElementById("btnDetener").onclick = detenerSimulacion;
+      document.getElementById("btnManual").onclick = enviarManual;
+      document.getElementById("btnEmitTest").onclick = emitirPrueba;
+
+      // ---------- Prueba automática al cargar (opcional, comentada) ----------
+      // setTimeout(() => { emitirPrueba(); }, 1000);
+    </script>
+  </body>
+</html>

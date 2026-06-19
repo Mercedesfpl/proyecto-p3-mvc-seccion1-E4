@@ -30,6 +30,10 @@ def rutas_show():
 
     return userControllers.show_rutas()
 
-@admin_scope.route("/pruebas-ws")
+@admin_scope.route("/prueba", methods=["GET"])
 def pruebas_ws():
     return userControllers.show_prueba()
+
+@admin_scope.route("/minima")
+def pruebas_minima():
+    return userControllers.show_pruebaMinima()

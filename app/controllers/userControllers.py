@@ -175,4 +175,7 @@ def show_reportes():
     return render_template("reportes.html")
 
 def show_prueba():
-    return render_template("test_socket.html")
+    return render_template("prueba.html")
+
+def show_pruebaMinima():
+    return render_template("prueba_minima.html")
