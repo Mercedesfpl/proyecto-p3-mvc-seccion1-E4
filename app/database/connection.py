@@ -2,7 +2,12 @@
 from typing import Any, List, Optional
 from sqlalchemy import text
 from ..extensions import db
-from ..models.models import Usuario, PreRegistro  # Ajusta la ruta según tu proyecto
+from ..models import (
+    Usuario,
+    PreRegistro,
+    Linea,
+    Persona,
+)  # Ajusta la ruta según tu proyecto
 
 # ============================================================
 # Funciones ORM (recomendadas para la mayoría de casos)
@@ -28,14 +33,15 @@ def listar_usuarios() -> List[Usuario]:
     return Usuario.query.all()
 
 
-def guardar_usuario(usuario) -> None:
+def agregar_elemento(elemento) -> None:
     """Guarda (inserta o actualiza) un usuario en la BD."""
     try:
-        db.session.add(usuario)
+        db.session.add(elemento)
         db.session.commit()
         return True
-    except:
+    except Exception as e:
         db.session.rollback()
+        print(f"Error al guardar: {e}")
         return False
 
 
@@ -80,3 +86,34 @@ def guardar_datos() -> bool:
     except:
         db.session.rollback()
         return False
+
+
+def get_all_lineas() -> List[Linea]:
+
+    lineas = Linea.query.filter_by(suspendido=False).all()
+    return lineas
+
+
+def get_linea_by_id(id_linea: int) -> List[Linea]:
+
+    linea = Linea.query.get(id_linea)
+    return linea
+
+
+def get_personas_all() -> List[Persona]:
+    personas = Persona.query.all()
+    return personas
+
+
+def get_persona_by_id(id_persona: int) -> List[Persona]:
+    return Persona.query.get(id_persona)
+
+
+def get_users_by_rol(rol: str) -> List[Usuario]:
+    """Obtener lista de usurio segun su rol"""
+    return Persona.query.filter_by(rol=rol).all()
+
+
+def verificar_existencia_linea(nombre: str):
+
+    Linea.query.filter_by(nombre=nombre).first()

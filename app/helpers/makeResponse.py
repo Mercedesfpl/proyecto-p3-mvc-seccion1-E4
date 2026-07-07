@@ -12,3 +12,14 @@ def success_response(data=None, message="OK", status_code=200, cookies=None):
     if cookies:
         set_access_cookies(response, cookies)
     return response
+
+
+def error_response(
+    data=None, error="", message="Ha ocurrido un error interno", status_code=500
+):
+    """Retorna una respuesta de error. Tiene estatus 500 por defecto"""
+    response = make_response(
+        jsonify({"success": False, "message": message, "error": error, "data": data}),
+        status_code,
+    )
+    return response

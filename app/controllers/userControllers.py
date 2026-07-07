@@ -1,4 +1,4 @@
-#app/controllers/userControllers.py
+# app/controllers/userControllers.py
 from flask import jsonify, render_template
 from flask_mail import Message
 from flask_login import login_user, logout_user
@@ -19,7 +19,7 @@ from ..database.connection import (
     obtener_usuario_por_id,
     buscar_una_fila,
     eliminar_pre_registro,
-    guardar_usuario,
+    agregar_elemento,
     guardar_datos,
     eliminar_pre_usuario_por_email,
 )
@@ -106,7 +106,7 @@ def register(userData: UserSession) -> UserSession:
     )
     newUser.generateHass(userData.password)
 
-    if not guardar_usuario(newUser):
+    if not agregar_elemento(newUser):
         raise UserNotValid("ha ocurrido un error inesperado")
 
     user_ = newUser.a_sesion()
@@ -269,15 +269,15 @@ def pre_register(user_data: UserSession):
         email=user_data.email,
         nombre=user_data.nombre,
     )
-#   if not eliminar_pre_usuario_por_email(pre.email):
-#      raise ResourceNotValid(
-#         nombre_del_recurso="Usuario", rason="HA ocurrido un error inesperado"
-#    )
+    #   if not eliminar_pre_usuario_por_email(pre.email):
+    #      raise ResourceNotValid(
+    #         nombre_del_recurso="Usuario", rason="HA ocurrido un error inesperado"
+    #    )
     if not guardar_datos():
         raise UserNotValid(message="HA ocurrido un error unesperado")
     code = pre.generate_reset_code()
     pre.generateHass(user_data.password)
-    if not guardar_usuario(pre):
+    if not agregar_elemento(pre):
         raise UserNotValid(message="HA ocurrido un error inesperado")
     user_data = pre.a_session()
     if enviar_correo_verificacion(userData=user_data, code=code):
@@ -316,7 +316,7 @@ def register2(userData: UserSession, code) -> UserSession:
         isAdmin=esPrimerUsuario,
         password=pre_register_user.password,
     )
-    if not guardar_usuario(newUser):
+    if not agregar_elemento(newUser):
         raise UserNotValid("ha ocurrido un error inesperado")
 
     user_ = newUser.a_sesion()
@@ -335,6 +335,7 @@ def show_dashboar():
 
 def show_rutas():
     return render_template("pages/rutas.html")
+
 
 def show_flota():
     return render_template("pages/flota.html")
