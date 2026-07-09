@@ -2,7 +2,7 @@
 
 from ..models.persona import Persona
 from ..models.models import Usuario
-from ..extensions import db  # <-- Importar db desde extensions
+from ..extensions import db
 from ..models.exceptions import ResourceNotValid
 from werkzeug.security import generate_password_hash
 import re
@@ -28,23 +28,24 @@ class PersonaFactory:
         if not cedula.isdigit():
             raise ResourceNotValid("Persona", "La cédula solo debe contener números")
         
-        # Verificar cédula única (usando el modelo directamente)
         existing = Persona.query.filter_by(cedula=cedula).first()
         if existing:
             raise ResourceNotValid("Persona", "Ya existe una persona con esa cédula")
         
-        rol = data.get("rol", "")
-        if rol and rol not in ["admin", "presidente", "secretario"]:
+        rol = data.get("rol", "usuario")
+        if rol not in ["admin", "presidente", "secretario", "usuario"]:
             raise ResourceNotValid("Persona", f"Rol inválido: {rol}")
         
         correo = data.get("correo", "").strip()
-        if correo:
-            if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', correo):
-                raise ResourceNotValid("Persona", "Formato de correo inválido")
-            
-            existing_email = Persona.query.filter_by(correo=correo).first()
-            if existing_email:
-                raise ResourceNotValid("Persona", "Ya existe una persona con ese correo")
+        if not correo:
+            raise ResourceNotValid("Persona", "El correo es obligatorio")
+        
+        if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', correo):
+            raise ResourceNotValid("Persona", "Formato de correo inválido")
+        
+        existing_email = Persona.query.filter_by(correo=correo).first()
+        if existing_email:
+            raise ResourceNotValid("Persona", "Ya existe una persona con ese correo")
         
         persona = Persona(
             nombre=nombre.strip(),
@@ -59,22 +60,24 @@ class PersonaFactory:
     
     @staticmethod
     def crear_usuario(persona):
-        """Crea un usuario para un secretario"""
-        if persona.rol != "secretario":
-            return None
+        """Crea un usuario para cualquier persona con rol específico"""
         
         if not persona.correo:
-            raise ResourceNotValid("Persona", "El correo es obligatorio para crear un secretario")
+            raise ResourceNotValid("Persona", "El correo es obligatorio para crear un usuario")
         
         existing_user = Usuario.query.filter_by(email=persona.correo).first()
         if existing_user:
             raise ResourceNotValid("Persona", "Ya existe un usuario con ese correo")
         
+        # Determinar el rol en el sistema de usuarios
+        # presidente y usuario tienen rol "usuario" para el sistema por ahora presi no hace nada
+        rol_usuario = persona.rol if persona.rol in ["admin", "secretario"] else "usuario"
+        
         usuario = Usuario(
             nombre=f"{persona.nombre} {persona.apellido}",
             email=persona.correo,
             password=generate_password_hash(persona.cedula),
-            rol="secretario",
+            rol=rol_usuario,
             persona_id=persona.id
         )
         

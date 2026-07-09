@@ -2,7 +2,7 @@
 
 from ..services.persona_factory import PersonaFactory
 from ..database.connection import (
-    get_all_personas as get_all_personas_db,  # <-- Alias para evitar confusión
+    get_all_personas as get_all_personas_db,
     get_persona_by_id as get_persona_by_id_db,
     get_lineas_by_presidente,
     agregar_elemento,
@@ -38,22 +38,30 @@ def get_persona_by_id(id_persona):
 
 
 def create_persona(data):
-    """Crear una nueva persona"""
+    """Crear una nueva persona con su usuario asociado"""
     try:
+        # Crear persona
         persona = PersonaFactory.crear_persona(data)
         
         if not agregar_elemento(persona):
             return error_response(message="Error al guardar la persona", status_code=503)
         
+        # Crear usuario asociado (SIEMPRE)
         usuario = PersonaFactory.crear_usuario(persona)
-        if usuario:
-            if not agregar_elemento(usuario):
-                db.session.rollback()
-                return error_response(message="Error al crear el usuario", status_code=503)
+        if not agregar_elemento(usuario):
+            db.session.rollback()
+            return error_response(message="Error al crear el usuario", status_code=503)
         
         return success_response(
-            message="Persona creada exitosamente",
-            data=persona.to_dict()
+            message="Persona y usuario creados exitosamente",
+            data={
+                "persona": persona.to_dict(),
+                "usuario": {
+                    "id": usuario.id,
+                    "email": usuario.email,
+                    "rol": usuario.rol
+                }
+            }
         )
     
     except ResourceNotValid as e:
@@ -70,10 +78,7 @@ def update_persona(id_persona, data):
         if not persona:
             raise ResourceNotFound("Persona")
         
-        if "rol" in data and data["rol"]:
-            if data["rol"] not in ["admin", "presidente", "secretario"]:
-                raise ResourceNotValid("Persona", f"Rol inválido: {data['rol']}")
-        
+        # Actualizar campos de persona
         if "nombre" in data:
             persona.nombre = data["nombre"].strip()
         if "apellido" in data:
@@ -98,7 +103,17 @@ def update_persona(id_persona, data):
         if "telefono" in data:
             persona.telefono = data["telefono"].strip()
         if "rol" in data:
+            if data["rol"] not in ["admin", "presidente", "secretario", "usuario"]:
+                raise ResourceNotValid("Persona", f"Rol inválido: {data['rol']}")
             persona.rol = data["rol"]
+            
+            # Actualizar también el rol del usuario asociado
+            usuario = Usuario.query.filter_by(persona_id=persona.id).first()
+            if usuario:
+                if persona.rol in ["admin", "secretario"]:
+                    usuario.rol = persona.rol
+                else:
+                    usuario.rol = "usuario"
         
         if guardar_datos():
             return success_response(
