@@ -1,167 +1,172 @@
 # app/controllers/personaControllers.py
 
-from app.models.persona import Persona
-from app.models.models import Usuario
-from app.extensions import db
-from app.models.exceptions import ResourceNotValid
-from ..helpers.makeResponse import success_response
-from werkzeug.security import generate_password_hash
-from flask import jsonify
-import re
+from ..services.persona_factory import PersonaFactory
+from ..database.connection import (
+    get_all_personas as get_all_personas_db,  # <-- Alias para evitar confusión
+    get_persona_by_id as get_persona_by_id_db,
+    get_lineas_by_presidente,
+    agregar_elemento,
+    guardar_datos
+)
+from ..models.exceptions import ResourceNotFound, ResourceNotValid
+from ..helpers.makeResponse import success_response, error_response
+from ..extensions import db
+from ..models.models import Usuario
+from ..models.persona import Persona
 
-# Roles válidos
-ROLES_VALIDOS = ['administrador', 'secretario', 'presidente']
 
 def get_all_personas():
     """Obtener todas las personas"""
     try:
-        personas = Persona.query.all()
-        data = [p.to_dict() for p in personas]
-        return success_response(data=data)
+        personas = get_all_personas_db()
+        return success_response(data=[p.to_dict() for p in personas])
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return error_response(error=str(e), message="Error al obtener personas", status_code=500)
 
-def get_persona_by_id(id):
+
+def get_persona_by_id(id_persona):
     """Obtener una persona por ID"""
     try:
-        persona = Persona.query.get(id)
+        persona = get_persona_by_id_db(id_persona)
         if not persona:
-            return jsonify({"error": "Persona no encontrada"}), 404
+            raise ResourceNotFound("Persona")
         return success_response(data=persona.to_dict())
+    except ResourceNotFound as e:
+        return error_response(error=str(e), message="Persona no encontrada", status_code=404)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return error_response(error=str(e), message="Error al obtener persona", status_code=500)
+
 
 def create_persona(data):
     """Crear una nueva persona"""
     try:
-        # Validar campos obligatorios
-        if not data.get('nombre') or not data.get('apellido') or not data.get('cedula'):
-            return jsonify({"error": "Nombre, apellido y cédula son obligatorios"}), 400
+        persona = PersonaFactory.crear_persona(data)
         
-        # Validar rol
-        rol = data.get('rol', '')
-        if rol and rol not in ROLES_VALIDOS:
-            return jsonify({"error": f"Rol inválido. Debe ser: {', '.join(ROLES_VALIDOS)}"}), 400
+        if not agregar_elemento(persona):
+            return error_response(message="Error al guardar la persona", status_code=503)
         
-        # Validar formato de cédula (solo números)
-        if not data['cedula'].isdigit():
-            return jsonify({"error": "La cédula solo debe contener números"}), 400
+        usuario = PersonaFactory.crear_usuario(persona)
+        if usuario:
+            if not agregar_elemento(usuario):
+                db.session.rollback()
+                return error_response(message="Error al crear el usuario", status_code=503)
         
-        # Verificar cédula única
-        if Persona.query.filter_by(cedula=data['cedula']).first():
-            return jsonify({"error": "Ya existe una persona con esa cédula"}), 400
-        
-        # Verificar correo único si se proporciona
-        correo = data.get('correo', '').strip()
-        if correo:
-            if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', correo):
-                return jsonify({"error": "Formato de correo inválido"}), 400
-            if Persona.query.filter_by(correo=correo).first():
-                return jsonify({"error": "Ya existe una persona con ese correo"}), 400
-        
-        # Crear persona
-        persona = Persona(
-            nombre=data['nombre'].strip(),
-            apellido=data['apellido'].strip(),
-            cedula=data['cedula'].strip(),
-            correo=correo,
-            telefono=data.get('telefono', '').strip(),
-            rol=rol
+        return success_response(
+            message="Persona creada exitosamente",
+            data=persona.to_dict()
         )
-        db.session.add(persona)
-        db.session.flush()
-        
-        # Si es secretario, crear usuario automáticamente
-        if rol == 'secretario':
-            if not correo:
-                return jsonify({"error": "El correo es obligatorio para crear un secretario"}), 400
-            if Usuario.query.filter_by(email=correo).first():
-                return jsonify({"error": "Ya existe un usuario con ese correo"}), 400
-            
-            # Crear usuario con contraseña = cédula (hash)
-            usuario = Usuario(
-                nombre=f"{data['nombre']} {data['apellido']}",
-                email=correo,
-                password=generate_password_hash(data['cedula']),
-                rol='secretario',
-                persona_id=persona.id
-            )
-            db.session.add(usuario)
-        
-        db.session.commit()
-        return success_response(message="Persona creada exitosamente", data=persona.to_dict())
     
+    except ResourceNotValid as e:
+        return error_response(error=str(e), message=str(e), status_code=400)
     except Exception as e:
         db.session.rollback()
-        return jsonify({"error": f"Error al crear persona: {str(e)}"}), 500
+        return error_response(error=str(e), message="Error al crear persona", status_code=500)
 
-def update_persona(id, data):
+
+def update_persona(id_persona, data):
     """Actualizar una persona existente"""
     try:
-        persona = Persona.query.get(id)
+        persona = get_persona_by_id_db(id_persona)
         if not persona:
-            return jsonify({"error": "Persona no encontrada"}), 404
+            raise ResourceNotFound("Persona")
         
-        # Validar rol si se proporciona
-        if 'rol' in data and data['rol']:
-            if data['rol'] not in ROLES_VALIDOS:
-                return jsonify({"error": f"Rol inválido. Debe ser: {', '.join(ROLES_VALIDOS)}"}), 400
+        if "rol" in data and data["rol"]:
+            if data["rol"] not in ["admin", "presidente", "secretario"]:
+                raise ResourceNotValid("Persona", f"Rol inválido: {data['rol']}")
         
-        # Actualizar campos
-        if 'nombre' in data:
-            persona.nombre = data['nombre'].strip()
-        if 'apellido' in data:
-            persona.apellido = data['apellido'].strip()
-        if 'cedula' in data:
-            if not data['cedula'].isdigit():
-                return jsonify({"error": "La cédula solo debe contener números"}), 400
-            existing = Persona.query.filter(Persona.cedula == data['cedula'], Persona.id != id).first()
+        if "nombre" in data:
+            persona.nombre = data["nombre"].strip()
+        if "apellido" in data:
+            persona.apellido = data["apellido"].strip()
+        if "cedula" in data:
+            if not data["cedula"].isdigit():
+                raise ResourceNotValid("Persona", "La cédula solo debe contener números")
+            existing = Persona.query.filter(Persona.cedula == data["cedula"], Persona.id != id_persona).first()
             if existing:
-                return jsonify({"error": "Ya existe otra persona con esa cédula"}), 400
-            persona.cedula = data['cedula'].strip()
-        if 'correo' in data:
-            correo = data['correo'].strip()
+                raise ResourceNotValid("Persona", "Ya existe otra persona con esa cédula")
+            persona.cedula = data["cedula"].strip()
+        if "correo" in data:
+            correo = data["correo"].strip()
             if correo:
+                import re
                 if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', correo):
-                    return jsonify({"error": "Formato de correo inválido"}), 400
-                existing = Persona.query.filter(Persona.correo == correo, Persona.id != id).first()
+                    raise ResourceNotValid("Persona", "Formato de correo inválido")
+                existing = Persona.query.filter(Persona.correo == correo, Persona.id != id_persona).first()
                 if existing:
-                    return jsonify({"error": "Ya existe otra persona con ese correo"}), 400
+                    raise ResourceNotValid("Persona", "Ya existe otra persona con ese correo")
             persona.correo = correo
-        if 'telefono' in data:
-            persona.telefono = data['telefono'].strip()
-        if 'rol' in data:
-            persona.rol = data['rol']
+        if "telefono" in data:
+            persona.telefono = data["telefono"].strip()
+        if "rol" in data:
+            persona.rol = data["rol"]
         
-        db.session.commit()
-        return success_response(message="Persona actualizada exitosamente", data=persona.to_dict())
+        if guardar_datos():
+            return success_response(
+                message="Persona actualizada exitosamente",
+                data=persona.to_dict()
+            )
+        return error_response(message="Error al actualizar persona", status_code=503)
     
+    except ResourceNotFound as e:
+        return error_response(error=str(e), message="Persona no encontrada", status_code=404)
+    except ResourceNotValid as e:
+        return error_response(error=str(e), message=str(e), status_code=400)
     except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": f"Error al actualizar persona: {str(e)}"}), 500
+        return error_response(error=str(e), message="Error al actualizar persona", status_code=500)
 
-def delete_persona(id):
+
+def delete_persona(id_persona):
     """Eliminar una persona"""
     try:
-        persona = Persona.query.get(id)
+        persona = get_persona_by_id_db(id_persona)
         if not persona:
-            return jsonify({"error": "Persona no encontrada"}), 404
+            raise ResourceNotFound("Persona")
         
-        # Verificar si es el presidente de alguna línea
-        from app.models.linea import Linea
-        lineas_como_presidente = Linea.query.filter_by(presidente_id=persona.id).first()
-        if lineas_como_presidente:
-            return jsonify({"error": "No se puede eliminar porque es presidente de una línea"}), 400
+        lineas = get_lineas_by_presidente(id_persona)
+        if lineas:
+            raise ResourceNotValid("Persona", "No se puede eliminar porque es presidente de una línea")
         
-        # Verificar si tiene usuario asociado
         usuario = Usuario.query.filter_by(persona_id=persona.id).first()
         if usuario:
             db.session.delete(usuario)
         
         db.session.delete(persona)
-        db.session.commit()
-        return success_response(message="Persona eliminada exitosamente")
+        if guardar_datos():
+            return success_response(message="Persona eliminada exitosamente")
+        return error_response(message="Error al eliminar persona", status_code=503)
     
+    except ResourceNotFound as e:
+        return error_response(error=str(e), message="Persona no encontrada", status_code=404)
+    except ResourceNotValid as e:
+        return error_response(error=str(e), message=str(e), status_code=400)
     except Exception as e:
         db.session.rollback()
-        return jsonify({"error": f"Error al eliminar persona: {str(e)}"}), 500
+        return error_response(error=str(e), message="Error al eliminar persona", status_code=500)
+
+
+# ========== FUNCIONES PARA SELECTORES ==========
+
+def get_personas_select():
+    """Obtener personas con rol 'presidente' para selectores"""
+    try:
+        presidentes = Persona.query.filter_by(rol="presidente").all()
+        resultado = [
+            {"id": p.id, "nombre_completo": f"{p.nombre} {p.apellido}", "cedula": p.cedula}
+            for p in presidentes
+        ]
+        return success_response(data=resultado)
+    except Exception as e:
+        return error_response(error=str(e), message="Error al obtener presidentes", status_code=500)
+
+
+def get_secretarios_select():
+    """Obtener usuarios con rol 'secretario' para selectores"""
+    try:
+        secretarios = Usuario.query.filter_by(rol="secretario").all()
+        resultado = [
+            {"id": s.id, "nombre": s.nombre, "email": s.email}
+            for s in secretarios
+        ]
+        return success_response(data=resultado)
+    except Exception as e:
+        return error_response(error=str(e), message="Error al obtener secretarios", status_code=500)
