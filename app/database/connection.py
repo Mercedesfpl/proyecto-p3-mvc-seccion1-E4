@@ -3,7 +3,7 @@
 from typing import List, Optional
 from sqlalchemy import text
 from ..extensions import db
-from ..models import Usuario, PreRegistro, Linea, Persona
+from ..models import Usuario, PreRegistro, Linea, Persona, Parada
 
 
 # ============================================================
@@ -144,3 +144,31 @@ def guardar_datos() -> bool:
         db.session.rollback()
         print(f"Error al guardar: {e}")
         return False
+    
+# ============================================================
+# FUNCIONES PARA PARADAS
+# ============================================================
+
+def get_all_paradas() -> List[Parada]:
+    """Retorna todas las paradas"""
+    return Parada.query.all()
+
+
+def get_parada_by_id(id_parada: int) -> Optional[Parada]:
+    """Retorna una parada por ID"""
+    return Parada.query.get(id_parada)
+
+
+def get_parada_by_nombre(nombre: str) -> Optional[Parada]:
+    """Retorna una parada por nombre"""
+    return Parada.query.filter_by(nombre=nombre).first()
+
+
+def get_paradas_activas() -> List[Parada]:
+    """Retorna solo paradas activas"""
+    return Parada.query.filter_by(status="activa").all()
+
+
+def get_paradas_by_ids(ids: List[int]) -> List[Parada]:
+    """Retorna paradas por lista de IDs"""
+    return Parada.query.filter(Parada.id.in_(ids)).all()
