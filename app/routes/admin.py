@@ -177,3 +177,54 @@ def delete_persona(id):
     from app.controllers.personaControllers import delete_persona
 
     return delete_persona(id)
+
+# ========== CRUD de Paradas ==========
+
+@admin_scope.route("/paradas", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_paradas():
+    from app.controllers.paradaControllers import get_all_paradas
+    return get_all_paradas()
+
+
+@admin_scope.route("/paradas/<int:id_parada>", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_parada(id_parada):
+    from app.controllers.paradaControllers import get_parada_by_id
+    return get_parada_by_id(id_parada)
+
+
+@admin_scope.route("/paradas", methods=["POST"])
+@jwt_required()
+@role_required("admin")
+def create_parada():
+    from flask import request
+    from app.controllers.paradaControllers import create_parada
+    data = request.get_json()
+    return create_parada(data)
+
+
+@admin_scope.route("/paradas/<int:id_parada>", methods=["PUT"])
+@jwt_required()
+@role_required("admin")
+def update_parada(id_parada):
+    from flask import request
+    from app.controllers.paradaControllers import update_parada
+    data = request.get_json()
+    return update_parada(id_parada, data)
+
+
+@admin_scope.route("/paradas/<int:id_parada>", methods=["DELETE"])
+@jwt_required()
+@role_required("admin")
+def delete_parada(id_parada):
+    from app.controllers.paradaControllers import delete_parada
+    return delete_parada(id_parada)
+
+@admin_scope.route("/paradas-page", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def paradas_page():
+    return render_template("pages/paradas.html")
