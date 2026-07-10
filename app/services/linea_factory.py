@@ -1,7 +1,6 @@
-from ..models import Linea, Persona, Usuario
+from ..models import Linea
 from ..database.connection import (
     verificar_existencia_linea,
-    obtener_usuario_por_id,
     get_persona_by_id,
     verificar_existencia_linea,
 )
