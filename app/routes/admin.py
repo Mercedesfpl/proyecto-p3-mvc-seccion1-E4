@@ -64,7 +64,7 @@ def lineas_page():
 @role_required("admin")
 def get_lineas():
 
-    return lineaControllers.get_all_lineas()
+    return lineaControllers.get_lineas()
 
 
 @admin_scope.route("/lineas/<int:id_linea>", methods=["GET"])
@@ -178,13 +178,16 @@ def delete_persona(id):
 
     return delete_persona(id)
 
+
 # ========== CRUD de Paradas ==========
+
 
 @admin_scope.route("/paradas", methods=["GET"])
 @jwt_required()
 @role_required("admin")
 def get_paradas():
     from app.controllers.paradaControllers import get_all_paradas
+
     return get_all_paradas()
 
 
@@ -193,6 +196,7 @@ def get_paradas():
 @role_required("admin")
 def get_parada(id_parada):
     from app.controllers.paradaControllers import get_parada_by_id
+
     return get_parada_by_id(id_parada)
 
 
@@ -202,6 +206,7 @@ def get_parada(id_parada):
 def create_parada():
     from flask import request
     from app.controllers.paradaControllers import create_parada
+
     data = request.get_json()
     return create_parada(data)
 
@@ -212,6 +217,7 @@ def create_parada():
 def update_parada(id_parada):
     from flask import request
     from app.controllers.paradaControllers import update_parada
+
     data = request.get_json()
     return update_parada(id_parada, data)
 
@@ -221,7 +227,9 @@ def update_parada(id_parada):
 @role_required("admin")
 def delete_parada(id_parada):
     from app.controllers.paradaControllers import delete_parada
+
     return delete_parada(id_parada)
+
 
 @admin_scope.route("/paradas-page", methods=["GET"])
 @jwt_required()

@@ -5,10 +5,10 @@ from sqlalchemy import text
 from ..extensions import db
 from ..models import Usuario, PreRegistro, Linea, Persona, Parada
 
-
 # ============================================================
 # FUNCIONES PARA USUARIOS
 # ============================================================
+
 
 def obtener_usuario_por_email(email: str) -> Optional[Usuario]:
     """Retorna un objeto Usuario o None."""
@@ -70,9 +70,21 @@ def get_users_by_rol(rol: str) -> List[Persona]:
 # FUNCIONES PARA LÍNEAS
 # ============================================================
 
+
 def get_all_lineas() -> List[Linea]:
-    """Retorna todas las líneas no suspendidas"""
-    return Linea.query.filter_by(suspendido=False).all()
+    """Retorna el id, nombre, rif y los nombres de presidente y secretario de las líneas"""
+    return (
+        db.session.query(
+            Linea.id,
+            Linea.nombre.label("linea_nombre"),
+            Linea.rif.label("rif"),
+            Persona.nombre.label("presidente_nombre"),
+            Usuario.nombre.label("secretario_nombre"),
+        )
+        .join(Persona, Linea.presidente_id == Persona.id)
+        .outerjoin(Usuario, Linea.secretario_id == Usuario.id)
+        .all()
+    )
 
 
 def get_linea_by_id(id_linea: int) -> Optional[Linea]:
@@ -93,6 +105,7 @@ def get_lineas_by_presidente(id_persona: int) -> List[Linea]:
 # ============================================================
 # FUNCIONES PARA PERSONAS
 # ============================================================
+
 
 def get_all_personas() -> List[Persona]:
     """Retorna todas las personas"""
@@ -123,6 +136,7 @@ def get_persona_by_email(email: str) -> Optional[Persona]:
 # FUNCIONES GENÉRICAS (CRUD)
 # ============================================================
 
+
 def agregar_elemento(elemento) -> bool:
     """Guarda un elemento en la BD"""
     try:
@@ -144,10 +158,12 @@ def guardar_datos() -> bool:
         db.session.rollback()
         print(f"Error al guardar: {e}")
         return False
-    
+
+
 # ============================================================
 # FUNCIONES PARA PARADAS
 # ============================================================
+
 
 def get_all_paradas() -> List[Parada]:
     """Retorna todas las paradas"""

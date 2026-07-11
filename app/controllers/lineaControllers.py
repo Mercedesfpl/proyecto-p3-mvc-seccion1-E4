@@ -16,10 +16,20 @@ from ..database.connection import (
 )
 
 
-def get_all_lineas():
+def get_lineas():
     """Obtener todas las líneas (no suspendidas)"""
     lineas = get_all_lineas()
-    return success_response(data=lineas)
+    resultado = [
+        {
+            "id": l.id,
+            "nombre": l.linea_nombre,
+            "presidente": l.presidente_nombre,
+            "secretario_nombre": l.secretario_nombre,
+            "rif": l.rif,
+        }
+        for l in lineas
+    ]
+    return success_response(data=resultado)
 
 
 def get_linea_by_id(id_linea):

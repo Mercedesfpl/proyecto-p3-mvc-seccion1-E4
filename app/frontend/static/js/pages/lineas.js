@@ -136,7 +136,7 @@ async function cargarLineas() {
                         <tr>
                             <td>${linea.id}</td>
                             <td><strong>${linea.nombre}</strong></td>
-                            <td>${linea.presidente ? linea.presidente.nombre_completo : "-"}</td>
+                            <td>${linea.presidente ? linea.presidente : "-"}</td>
                             <td>${linea.secretario_nombre || "-"}</td>
                             <td>${linea.rif}</td>
                             <td>

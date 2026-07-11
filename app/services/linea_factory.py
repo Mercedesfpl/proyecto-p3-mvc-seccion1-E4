@@ -1,9 +1,4 @@
-<<<<<<< HEAD
 from ..models import Linea
-=======
-#services/lineafactory
-from ..models import Linea, Persona, Usuario
->>>>>>> a265412e54556f219bcbb61a2de17cedee5433b7
 from ..database.connection import (
     verificar_existencia_linea,
     get_persona_by_id,
