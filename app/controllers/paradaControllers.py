@@ -1,6 +1,7 @@
 # app/controllers/paradaControllers.py
 
 from ..services.parada_factory import ParadaFactory
+from ..helpers.coordenadas_helper import limpiar_coordenadas, validar_coordenadas
 from ..database.connection import (
     get_all_paradas as get_all_paradas_db,
     get_parada_by_id as get_parada_by_id_db,
@@ -69,7 +70,6 @@ def update_parada(id_parada, data):
         if not parada:
             raise ResourceNotFound("Parada")
         
-        # Actualizar campos
         if "nombre" in data:
             existing = get_parada_by_nombre(data["nombre"])
             if existing and existing.id != id_parada:
@@ -77,18 +77,12 @@ def update_parada(id_parada, data):
             parada.nombre = data["nombre"].strip()
         
         if "coordenadas" in data:
-            # Validar formato
-            try:
-                partes = data["coordenadas"].split(",")
-                if len(partes) != 2:
-                    raise ResourceNotValid("Parada", "Formato de coordenadas inválido")
-                lat = float(partes[0].strip())
-                lng = float(partes[1].strip())
-                if lat < -90 or lat > 90 or lng < -180 or lng > 180:
-                    raise ResourceNotValid("Parada", "Coordenadas fuera de rango")
-            except ValueError:
-                raise ResourceNotValid("Parada", "Coordenadas deben ser números válidos")
-            parada.coordenadas = data["coordenadas"].strip()
+            # Usar el helper para limpiar y validar
+            coordenadas_limpias = limpiar_coordenadas(data["coordenadas"])
+            es_valido, mensaje, lat, lng = validar_coordenadas(coordenadas_limpias)
+            if not es_valido:
+                raise ResourceNotValid("Parada", mensaje)
+            parada.coordenadas = coordenadas_limpias
         
         if "status" in data:
             if data["status"] not in ["activa", "inactiva"]:
