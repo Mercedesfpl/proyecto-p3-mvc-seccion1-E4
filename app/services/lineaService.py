@@ -1,5 +1,5 @@
 from app.repositories.lineaRepository import LineaRepository
-from linea_factory import LineaFactory
+from app.services.linea_factory import LineaFactory
 from app.models.persona import Persona
 from app.models.models import Usuario
 from app.models.exceptions import ResourceNotValid, ResourceNotFound

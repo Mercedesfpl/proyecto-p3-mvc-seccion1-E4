@@ -1,5 +1,5 @@
 from app.models.parada import Parada
-from extensions import db
+from ..extensions import db
 
 class ParadaRepository:
     #Maneja todas las consultas de la base de datos para las paradas

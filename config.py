@@ -45,3 +45,4 @@ class Config:
     RATELIMIT_DEFAULT_LIMITS = ["200 per day", "50 per hour"]
     RATELIMIT_STORAGE_URI = os.environ.get("REDIS_URL", "memory://")
     RATELIMIT_STRATEGY = "moving-window"  # Estrategia más segura contra ráfagas
+

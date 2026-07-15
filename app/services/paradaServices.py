@@ -1,5 +1,5 @@
 from app.repositories.paradaRepository import ParadaRepository
-from parada_factory import ParadaFactory
+from app.services.parada_factory import ParadaFactory
 from app.helpers.coordenadas_helper import limpiar_coordenadas, validar_coordenadas
 from app.models.exceptions import ResourceNotFound, ResourceNotValid
 

@@ -13,7 +13,7 @@ admin_scope = Blueprint("admin", __name__)
 @jwt_required()
 @role_required("admin")
 def dashboar_show():
-    return userControllers.show_dashboar()
+    return userControllers.show_dashboard()
 
 
 @admin_scope.route("/flota", methods=["GET"])

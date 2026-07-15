@@ -1,6 +1,6 @@
 from app.models.persona import Persona
 from app.models.models import Usuario
-from extensions import db
+from ..extensions import db
 
 class PersonaRepository:
     #Maneja todas las consultas de la bd para Personas

@@ -28,3 +28,9 @@ app.register_blueprint(errors_scope, url_prefix="/")
 app.register_blueprint(auth_scope, url_prefix="/api")
 app.register_blueprint(admin_scope, url_prefix="/admin")
 app.register_blueprint(user_scope, url_prefix="/")
+
+with app.app_context():
+    db.create_all()
+
+if __name__ == "__main__":
+    app.run()
