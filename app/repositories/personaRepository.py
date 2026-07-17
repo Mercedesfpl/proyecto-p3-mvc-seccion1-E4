@@ -59,10 +59,8 @@ class PersonaRepository:
     
     @staticmethod
     def save(persona):
-        print("🔍 Repository - save - persona antes de guardar:", persona)
         db.session.add(persona)
         db.session.commit()
-        print("🔍 Repository - save - persona después de guardar:", persona)
         return persona
     
     @staticmethod

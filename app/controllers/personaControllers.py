@@ -40,13 +40,9 @@ def create_persona(data):
 
 def update_persona(id_persona, data):
     #Actualizar una persona existente
-    print("🔍 Controlador update_persona - id:", id_persona)
-    print("🔍 Controlador update_persona - data:", data)
-
     try:
         data = request.get_json()
         persona = PersonaServices.update_persona(id_persona, data)
-        print("🔍 Controlador - persona recibida:", persona)
         return success_response(message="Persona actualizada exitosamente", data=persona.to_dict(include_usuario=True))
     
     except ResourceNotFound as e:

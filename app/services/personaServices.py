@@ -137,8 +137,6 @@ class PersonaServices:
         if 'rol' in data:
             rol = PersonaServices.validar_rol(data['rol'])
             persona.rol = rol
-            print("🔍 Tipo de persona_actualizada:", type(persona.rol))
-            print("🔍 Valor de persona_actualizada:", persona.rol)
             #Actualizar también el rol del usuario asociado
             usuario = PersonaRepository.get_usuario_by_persona(persona.id)
             if usuario:
@@ -147,8 +145,6 @@ class PersonaServices:
                 else:
                     usuario.rol = "usuario"
         resultado = PersonaRepository.save(persona)
-        print("🔍 Service - resultado tipo:", type(resultado))
-        print("🔍 Service - resultado valor:", resultado)
         return resultado
 
     @staticmethod
