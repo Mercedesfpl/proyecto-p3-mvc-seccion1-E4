@@ -29,6 +29,7 @@ class Config:
     # 3. Limitar las rutas donde se envían las cookies
     JWT_ACCESS_COOKIE_PATH = "/"  # Se envía solo a rutas que empiezan con /api/
     JWT_REFRESH_COOKIE_PATH = "/"  # El refresh solo a /token/refresh
+    JWT_ACCESS_COOKIE_NAME = "access_token" #le dice a FLASK-JWT-Extendent que busco el cookie con esté nombre (access_token)
 
     # ---------Configuracion de Flask-Email----------
     # Configuración de Flask-Mail para envío de correos

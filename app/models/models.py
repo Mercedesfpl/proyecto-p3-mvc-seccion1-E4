@@ -21,6 +21,41 @@ class Usuario(db.Model, UserMixin):
     timestamp = db.Column(db.DateTime, default=datetime.now, index=True)
     intentos_fallidos = db.Column(db.Integer, default=0)
     bloqueado_hasta = db.Column(db.DateTime, nullable=True)
+
+    def to_dict(self, include_usuario=False):
+
+        def _iso(dt):
+            if dt is None:
+                return None
+            if isinstance(dt, datetime):
+                return dt.isoformat()
+            return str(dt)
+        
+
+        data = {
+            "id": self.id,
+            "nombre": self.nombre,
+            "email": self.email,
+            "password": self.password,
+            "isadmin": self.isAdmin,
+            "rol": self.rol,
+            "intentos_fallidos": self.intentos_fallidos,
+            "bloqueado_hasta": _iso(self.bloqueado_hasta),
+            "timestamp": _iso(self.timestamp),
+        }
+
+        if include_usuario:
+            try:
+                usuario = getattr(self, "usuario", None)
+                if usuario:
+                    data["usuario"] = usuario.to_dict()
+                else:
+                    # si no hay relación cargada, intentar obtener por persona_id
+                    data["usuario"] = None
+            except Exception:
+                data["usuario"] = None
+        
+        return data
     
     # NUEVO: Relación con Persona (1:1)
     persona_id = db.Column(db.Integer, db.ForeignKey("personas.id"), nullable=True)

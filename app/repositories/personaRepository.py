@@ -50,7 +50,7 @@ class PersonaRepository:
     @staticmethod
     def get_usuario_by_persona(id_persona):
         #Obtiene un usuario a través de una persona
-        return Usuario.query.filter_by(persona_id=id_persona).first() is not None
+        return Usuario.query.filter_by(persona_id=id_persona).first()
     
     @staticmethod
     def get_secretarios():
@@ -59,8 +59,10 @@ class PersonaRepository:
     
     @staticmethod
     def save(persona):
+        print("🔍 Repository - save - persona antes de guardar:", persona)
         db.session.add(persona)
         db.session.commit()
+        print("🔍 Repository - save - persona después de guardar:", persona)
         return persona
     
     @staticmethod

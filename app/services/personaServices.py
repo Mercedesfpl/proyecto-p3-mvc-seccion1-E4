@@ -68,13 +68,13 @@ class PersonaServices:
             raise ResourceNotValid("Persona", "Nombre, apellido y cédula son obligatorios")
 
         cedula = PersonaServices.validar_cedula(data['cedula'])
-        if PersonaRepository.exists_by_cedula(cedula):
+        if PersonaRepository.existePorCedula(cedula):
             raise ResourceNotValid("Persona", "Ya existe una persona con esa cédula")
 
         correo = data.get('correo', '').strip()
         if correo:
             PersonaServices.validar_correo(correo)
-            if PersonaRepository.exists_by_correo(correo):
+            if PersonaRepository.existePorCedula(correo):
                 raise ResourceNotValid("Persona", "Ya existe una persona con ese correo")
 
         if data.get('rol'):
@@ -115,6 +115,9 @@ class PersonaServices:
             persona.apellido= data['apellido'].strip()
 
         if 'cedula' in data: 
+            cedula = data['cedula'].strip()
+            if not cedula.isdigit():
+                raise ResourceNotValid("Persona", "La cédula debe contener números")
             cedula = PersonaServices.validar_cedula(data['cedula'])
             if PersonaRepository.existePorCedula(cedula, exclude_id=id_persona):
                 raise ResourceNotValid("Persona", "Ya existe otra persona con esa cédula")
@@ -134,7 +137,8 @@ class PersonaServices:
         if 'rol' in data:
             rol = PersonaServices.validar_rol(data['rol'])
             persona.rol = rol
-
+            print("🔍 Tipo de persona_actualizada:", type(persona.rol))
+            print("🔍 Valor de persona_actualizada:", persona.rol)
             #Actualizar también el rol del usuario asociado
             usuario = PersonaRepository.get_usuario_by_persona(persona.id)
             if usuario:
@@ -142,7 +146,10 @@ class PersonaServices:
                     usuario.rol = persona.rol
                 else:
                     usuario.rol = "usuario"
-        return PersonaRepository.save(persona)
+        resultado = PersonaRepository.save(persona)
+        print("🔍 Service - resultado tipo:", type(resultado))
+        print("🔍 Service - resultado valor:", resultado)
+        return resultado
 
     @staticmethod
     def delete_persona(id_persona):

@@ -3,6 +3,8 @@ from app.services.linea_factory import LineaFactory
 from app.models.persona import Persona
 from app.models.models import Usuario
 from app.models.exceptions import ResourceNotValid, ResourceNotFound
+from app.repositories.personaRepository import PersonaRepository
+from app.repositories.userRepository import UserRepository
 
 class LineaServices: 
     #Contiene lógica de negocios para líneas
@@ -32,7 +34,7 @@ class LineaServices:
     @staticmethod 
     def get_personas_disponibles():
         #obtiene todas las personas para los selects
-        personas = Persona.query.all()
+        personas = PersonaRepository.get_all()
         if not personas:
             raise ResourceNotFound("Personas")
         return [
@@ -48,7 +50,7 @@ class LineaServices:
     @staticmethod 
     def get_secretarios_disponibles():
         #obtiene todos los usuarios del rol secretario
-        secretarios = Usuario.query.filter_by(rol='secretario').all()
+        secretarios = PersonaRepository.get_secretarios()
         return [
             {
                 "id": s.id,
@@ -75,19 +77,19 @@ class LineaServices:
             raise ResourceNotValid("Línea", "Ya existe una línea con ese nombre")
         
         #Verificar que el presidente exista
-        presidente = Persona.query.get(data['presidente_id'])
+        presidente = UserRepository.get_by_id(data['presidente_id'])
         if not presidente:
-            raise ResourceNotFound("Presidente")
+            raise ResourceNotFound("Presidente no encontrado")
         
         #Verificar que el secretario exista (si se selecciono)
-        secretario_id = data.get(secretario_id)
+        secretario_id = data.get("secretario_id")
         if secretario_id:
-            secretario = Usuario.query.get(secretario_id)
+            secretario = UserRepository.get_by_id(secretario_id)
             if not secretario:
                 raise ResourceNotFound("Secretario")
 
         #Usar la fábrica para crear un objeto
-        nueva_linea = LineaFactory.save(nueva_linea)
+        nueva_linea = LineaFactory.crear_linea(nueva_linea)
 
         #Guardar en la bd
         return LineaRepository.save(nueva_linea)

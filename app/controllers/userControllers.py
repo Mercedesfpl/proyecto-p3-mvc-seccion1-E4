@@ -12,18 +12,37 @@ from app.models.exceptions import (
 )
 from app.helpers.makeResponse import success_response, error_response
 import traceback
+from flask_jwt_extended import create_access_token
 
 # ========== FUNCIONES DE AUTENTICACIÓN ==========
 
 def login(usuario):
-    #Inicia sesión de un usuario
     try:
         result = UserService.login(usuario)
+        #print("📥 2. Resultado de UserService.login:", result)
+        
         user = UserRepository.get_by_email(usuario.email)
+        if not user:
+            raise UserNotFound("Usuario no registrado")
         
-        redirect_url = "/admin/dashboard" if user.rol == "admin" else "/admin/dashboard"
+        #print("📥 3. Usuario obtenido:", user.email if user else "No encontrado")
+        #print("📥 4. Rol del usuario:", user.rol if user else "Sin rol")
+
+        access_token = result.get("access_token")
+        #print("📥 5. Token extraído:", access_token[:20] + "..." if access_token else "None")
         
-        # Construir el cuerpo de la respuesta
+        if not access_token:
+            #print("❌ 6. Token no encontrado en result")
+            raise Exception("No se pudo obtener el token de acceso")
+
+        if user.rol == "admin":
+            redirect_url = "/admin/dashboard"
+        elif user.rol == "secretario":
+            redirect_url = "/admin/dashboard"
+        else:
+            redirect_url = "/home"
+
+        # ✅ 4. Construir response_body ANTES de imprimirlo
         response_body = {
             "success": True,
             "message": "Login exitoso",
@@ -32,17 +51,28 @@ def login(usuario):
                 "rol": user.rol
             }
         }
+        #print("📥 7. Response body:", response_body)  # ✅ Ahora está definido
         
-        # Crear respuesta HTTP
         response = make_response(jsonify(response_body), 200)
+        #print("📥 8. Response creada")
+
+        response.set_cookie(
+            'access_token',
+            access_token,
+            httponly=True,
+            secure=False,
+            samesite='Lax',
+            path='/'
+        )
         
-        # Si el resultado contiene cookies (por ejemplo, access_token), las añadimos
-        if isinstance(result, dict) and 'cookies' in result:
-            # Suponiendo que result['cookies'] es un dict con las cookies
-            for key, value in result['cookies'].items():
-                response.set_cookie(key, value, httponly=True, secure=False, samesite='Lax')
-        
+        print("✅ Cookie establecida con token:", access_token[:20] + "...")
+        print("📥 9. Cookie establecida")
         return response
+
+    except Exception as e:
+        import traceback
+        print("❌ Error inesperado:", traceback.format_exc())
+        return error_response(error=str(e), message="Error al iniciar sesión", status_code=500)
         
     except UserNotFound as e:
         return error_response(error=str(e), message="Usuario no encontrado", status_code=404)

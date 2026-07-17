@@ -43,19 +43,7 @@ class UserService:
                 identity=str(user.id), additional_claims=datos_adicionales
             )
         
-            # ✅ Crear respuesta manual con el token y los datos que el frontend espera
-            response_data = {
-                "success": True,
-                "message": "Login exitoso",
-                "data": {
-                    "redirect": "/admin/dashboard",
-                    "rol": user.rol
-                }
-            }
-            response = make_response(jsonify(response_data), 200)
-            response.set_cookie('access_token', access_token, httponly=True, secure=False, samesite='Lax')
-
-            return response
+            return {"access_token": access_token}
         else:
             user.intentos_fallidos += 1
             UserRepository.update(user)

@@ -167,6 +167,7 @@ def update_persona(id):
     from app.controllers.personaControllers import update_persona
 
     data = request.get_json()
+    print("🔍Datos:", data)
     return update_persona(id, data)
 
 

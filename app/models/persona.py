@@ -16,8 +16,16 @@ class Persona(db.Model):
     
     usuario = db.relationship("Usuario", back_populates="persona", uselist=False)
     
-    def to_dict(self):
-        return {
+    def to_dict(self, include_usuario=False):
+
+        def _iso(dt):
+            if dt is None:
+                return None
+            if isinstance(dt, datetime):
+                return dt.isoformat()
+            return str(dt)
+
+        data =  {
             "id": self.id,
             "nombre": self.nombre,
             "apellido": self.apellido,
@@ -26,5 +34,18 @@ class Persona(db.Model):
             "correo": self.correo,
             "telefono": self.telefono,
             "rol": self.rol,  # <-- Ya incluye 'admin'
-            "fecha_nac": self.fecha_nac.isoformat() if self.fecha_nac else None
+            "fecha_nac": _iso(getattr(self, "fecha_nac", None)),
+            "created_at": _iso(getattr(self, "created_at", None)),
         }
+
+        if include_usuario:
+            try:
+                usuario = getattr(self, "usuario", None)
+                if usuario and hasattr(usuario, "to_dict"):
+                    data["usuario"] = usuario.to_dict()
+                else:
+                    data["usuario"] = None
+            except Exception:
+                data["usuario"] = None
+
+        return data
