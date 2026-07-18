@@ -1,385 +1,89 @@
 <!-- app/frontend/views/pages/rutas.html -->
-{% extends 'layouts/base.html' %} {% block title %}Rutas{% endblock %} {% block styles
-%}
-<!-- CSS  específico -->
 
-<link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='css/rutas.css') }}"
-/>
-{% endblock %} {%block content %}
+{% extends 'layouts/base.html' %}
 
+{% block title %}Gestión de Rutas{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/rutas.css') }}">
+{% endblock %}
+
+{% block content %}
 <div class="rutas-header">
-  <h1>Gestión de Rutas</h1>
-  <p>Administre las rutas de transporte público del municipio</p>
-</div>
-
-<!-- KPIs -->
-<div class="grid-4">
-  <div class="kpi-card">
-    <div class="kpi-header">
-      <span>Total Rutas</span>
-      <div class="kpi-icon"><i class="fas fa-route"></i></div>
-    </div>
-    <div class="kpi-value">23</div>
-  </div>
-  <div class="kpi-card">
-    <div class="kpi-header">
-      <span>Rutas Activas</span>
-      <div class="kpi-icon"><i class="fas fa-check-circle"></i></div>
-    </div>
-    <div class="kpi-value" style="color: #10b981">18</div>
-  </div>
-  <div class="kpi-card">
-    <div class="kpi-header">
-      <span>Puntos de Control</span>
-      <div class="kpi-icon"><i class="fas fa-map-marker-alt"></i></div>
-    </div>
-    <div class="kpi-value">47</div>
-  </div>
-  <div class="kpi-card">
-    <div class="kpi-header">
-      <span>Unidades Asignadas</span>
-      <div class="kpi-icon"><i class="fas fa-bus"></i></div>
-    </div>
-    <div class="kpi-value">124</div>
-  </div>
-</div>
-
-<!-- Filtros -->
-<div class="filters-bar">
-  <div class="search-box">
-    <i class="fas fa-search"></i>
-    <input type="text" id="searchRuta" placeholder="Buscar ruta..." />
-  </div>
-  <div class="filter-group">
-    <select class="filter-select" id="filterLinea">
-      <option>Todas las líneas</option>
-      <option>Línea 1</option>
-      <option>Línea 2</option>
-      <option>Línea 3</option>
-      <option>Línea 4</option>
-    </select>
-    <select class="filter-select" id="filterEstado">
-      <option>Todas</option>
-      <option>Activas</option>
-      <option>Inactivas</option>
-    </select>
-    <button class="btn-primary" id="nuevaRutaBtn">
-      <i class="fas fa-plus"></i> Nueva Ruta
+    <h1>Gestión de Rutas</h1>
+    <button class="btn-add" id="btnNuevaRuta">
+        <i class="fas fa-plus"></i> Nueva Ruta
     </button>
-  </div>
 </div>
 
-<!-- Tarjetas de rutas (GRID 3 COLUMNAS) -->
-<div class="rutas-grid">
-  <!-- Ruta 1 -->
-  <div class="ruta-card">
-    <div class="ruta-header">
-      <div class="ruta-title">
-        <i class="fas fa-route"></i>
-        <h3>Ruta Los Teques - Caracas</h3>
-      </div>
-      <div class="ruta-header-right">
-        <span class="status-badge active">Activa</span>
-        <button class="btn-expand" data-id="1">
-          <i class="fas fa-chevron-down"></i>
-        </button>
-      </div>
-    </div>
-    <div class="ruta-expandable" id="expandable-1" style="display: none">
-      <div class="ruta-info">
-        <div class="info-row">
-          <span class="info-label">Línea</span
-          ><span class="info-value">Línea 1</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Distancia</span
-          ><span class="info-value">42 km</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Tiempo estimado</span
-          ><span class="info-value">65 min</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Unidades</span
-          ><span class="info-value">8 buses</span>
-        </div>
-      </div>
-      <div class="paradas-list">
-        <h4><i class="fas fa-map-pin"></i> Puntos de control (5)</h4>
-        <div class="parada-item">
-          <i class="fas fa-circle"></i> Terminal Los Teques
-        </div>
-        <div class="parada-item">
-          <i class="fas fa-circle"></i> Parada La Trinidad
-        </div>
-        <div class="parada-item">
-          <i class="fas fa-circle"></i> Parada Los Lagos
-        </div>
-        <div class="parada-item">
-          <i class="fas fa-circle"></i> Parada Las Adjuntas
-        </div>
-        <div class="parada-item">
-          <i class="fas fa-flag-checkered"></i> Terminal La Bandera
-        </div>
-      </div>
-      <div class="ruta-footer">
-        <div class="unidades-asignadas">
-          <i class="fas fa-bus"></i> 8 unidades activas
-        </div>
-        <button class="btn-ver" data-id="1">
-          Ver detalle <i class="fas fa-arrow-right"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Ruta 2 -->
-  <div class="ruta-card">
-    <div class="ruta-header">
-      <div class="ruta-title">
-        <i class="fas fa-route"></i>
-        <h3>Ruta El Tambor - La Miel</h3>
-      </div>
-      <div class="ruta-header-right">
-        <span class="status-badge active">Activa</span>
-        <button class="btn-expand" data-id="2">
-          <i class="fas fa-chevron-down"></i>
-        </button>
-      </div>
-    </div>
-    <div class="ruta-expandable" id="expandable-2" style="display: none">
-      <div class="ruta-info">
-        <div class="info-row">
-          <span class="info-label">Línea</span
-          ><span class="info-value">Línea 2</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Distancia</span
-          ><span class="info-value">18 km</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Tiempo estimado</span
-          ><span class="info-value">35 min</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Unidades</span
-          ><span class="info-value">5 buses</span>
-        </div>
-      </div>
-      <div class="paradas-list">
-        <h4><i class="fas fa-map-pin"></i> Puntos de control (4)</h4>
-        <div class="parada-item">
-          <i class="fas fa-circle"></i> Terminal El Tambor
-        </div>
-        <div class="parada-item">
-          <i class="fas fa-circle"></i> Parada San Pedro
-        </div>
-        <div class="parada-item">
-          <i class="fas fa-circle"></i> Parada Los Mangos
-        </div>
-        <div class="parada-item">
-          <i class="fas fa-flag-checkered"></i> Terminal La Miel
-        </div>
-      </div>
-      <div class="ruta-footer">
-        <div class="unidades-asignadas">
-          <i class="fas fa-bus"></i> 5 unidades activas
-        </div>
-        <button class="btn-ver" data-id="2">
-          Ver detalle <i class="fas fa-arrow-right"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Ruta 3 -->
-  <div class="ruta-card">
-    <div class="ruta-header">
-      <div class="ruta-title">
-        <i class="fas fa-route"></i>
-        <h3>Ruta San Antonio - La Mariposa</h3>
-      </div>
-      <div class="ruta-header-right">
-        <span class="status-badge active">Activa</span>
-        <button class="btn-expand" data-id="3">
-          <i class="fas fa-chevron-down"></i>
-        </button>
-      </div>
-    </div>
-    <div class="ruta-expandable" id="expandable-3" style="display: none">
-      <div class="ruta-info">
-        <div class="info-row">
-          <span class="info-label">Línea</span
-          ><span class="info-value">Línea 3</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Distancia</span
-          ><span class="info-value">25 km</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Tiempo estimado</span
-          ><span class="info-value">45 min</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Unidades</span
-          ><span class="info-value">6 buses</span>
-        </div>
-      </div>
-      <div class="paradas-list">
-        <h4><i class="fas fa-map-pin"></i> Puntos de control (5)</h4>
-        <div class="parada-item">
-          <i class="fas fa-circle"></i> Terminal San Antonio
-        </div>
-        <div class="parada-item">
-          <i class="fas fa-circle"></i> Parada El Calvario
-        </div>
-        <div class="parada-item">
-          <i class="fas fa-circle"></i> Parada El Viñedo
-        </div>
-        <div class="parada-item">
-          <i class="fas fa-circle"></i> Parada Las Flores
-        </div>
-        <div class="parada-item">
-          <i class="fas fa-flag-checkered"></i> Terminal La Mariposa
-        </div>
-      </div>
-      <div class="ruta-footer">
-        <div class="unidades-asignadas">
-          <i class="fas fa-bus"></i> 6 unidades activas
-        </div>
-        <button class="btn-ver" data-id="3">
-          Ver detalle <i class="fas fa-arrow-right"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Ruta 4 -->
-  <div class="ruta-card">
-    <div class="ruta-header">
-      <div class="ruta-title">
-        <i class="fas fa-route"></i>
-        <h3>Ruta Altos de Pipe - El Cují</h3>
-      </div>
-      <div class="ruta-header-right">
-        <span class="status-badge inactive">Mantenimiento</span>
-        <button class="btn-expand" data-id="4">
-          <i class="fas fa-chevron-down"></i>
-        </button>
-      </div>
-    </div>
-    <div class="ruta-expandable" id="expandable-4" style="display: none">
-      <div class="ruta-info">
-        <div class="info-row">
-          <span class="info-label">Línea</span
-          ><span class="info-value">Línea 4</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Distancia</span
-          ><span class="info-value">12 km</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Tiempo estimado</span
-          ><span class="info-value">25 min</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Unidades</span
-          ><span class="info-value">3 buses</span>
-        </div>
-      </div>
-      <div class="paradas-list">
-        <h4><i class="fas fa-map-pin"></i> Puntos de control (3)</h4>
-        <div class="parada-item">
-          <i class="fas fa-circle"></i> Terminal Altos de Pipe
-        </div>
-        <div class="parada-item">
-          <i class="fas fa-circle"></i> Parada La Lagunita
-        </div>
-        <div class="parada-item">
-          <i class="fas fa-flag-checkered"></i> Terminal El Cují
-        </div>
-      </div>
-      <div class="ruta-footer">
-        <div class="unidades-asignadas">
-          <i class="fas fa-bus"></i> 3 unidades (2 en taller)
-        </div>
-        <button class="btn-ver" data-id="4">
-          Ver detalle <i class="fas fa-arrow-right"></i>
-        </button>
-      </div>
-    </div>
-  </div>
+<div class="tabla-container">
+    <div id="tablaRutas"></div>
 </div>
 
-<!-- Tabla de puntos de control -->
-<div class="puntos-table-container">
-  <div class="table-header">
-    <h2><i class="fas fa-map-marker-alt"></i> Puntos de Control</h2>
-    <button class="btn-secondary" id="nuevoPuntoBtn">
-      <i class="fas fa-plus"></i> Nuevo Punto
-    </button>
-  </div>
-  <div class="table-responsive">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Ruta asociada</th>
-          <th>Orden</th>
-          <th>ESP32 ID</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Terminal Los Teques</td>
-          <td>Los Teques - Caracas</td>
-          <td>1</td>
-          <td>ESP-001</td>
-          <td><span class="status-badge active">Activo</span></td>
-          <td>
-            <button class="action-btn edit"><i class="fas fa-edit"></i></button>
-          </td>
-        </tr>
-        <tr>
-          <td>Parada La Trinidad</td>
-          <td>Los Teques - Caracas</td>
-          <td>2</td>
-          <td>ESP-002</td>
-          <td><span class="status-badge active">Activo</span></td>
-          <td>
-            <button class="action-btn edit"><i class="fas fa-edit"></i></button>
-          </td>
-        </tr>
-        <tr>
-          <td>Terminal El Tambor</td>
-          <td>El Tambor - La Miel</td>
-          <td>1</td>
-          <td>ESP-004</td>
-          <td><span class="status-badge active">Activo</span></td>
-          <td>
-            <button class="action-btn edit"><i class="fas fa-edit"></i></button>
-          </td>
-        </tr>
-        <tr>
-          <td>Terminal San Antonio</td>
-          <td>San Antonio - La Mariposa</td>
-          <td>1</td>
-          <td>ESP-006</td>
-          <td><span class="status-badge inactive">Mantenimiento</span></td>
-          <td>
-            <button class="action-btn edit"><i class="fas fa-edit"></i></button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+<!-- MODAL -->
+<div id="rutaModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>
+                <i class="fas fa-route"></i>
+                <span id="modalTitle">Nueva Ruta</span>
+            </h2>
+            <span class="modal-close" onclick="cerrarModal()">
+                <i class="fas fa-times"></i>
+            </span>
+        </div>
+
+        <form id="rutaForm">
+            <!-- Nombre -->
+            <div class="form-group">
+                <label>Nombre de la Ruta <span class="required">*</span></label>
+                <input type="text" id="nombre" placeholder="Ej: Ruta Los Teques - Caracas" required>
+            </div>
+
+            <!-- Línea -->
+            <div class="form-group">
+                <label>Línea <span class="required">*</span></label>
+                <select id="id_linea" class="form-select" required>
+                    <option value="">Seleccione una línea...</option>
+                </select>
+            </div>
+
+            <!-- Estado -->
+            <div class="form-group">
+                <label>Estado</label>
+                <select id="status" class="form-select">
+                    <option value="activa">Activa</option>
+                    <option value="inactiva">Inactiva</option>
+                </select>
+            </div>
+
+            <!-- Paradas -->
+            <div class="form-group">
+                <label>Paradas (en orden) <span class="required">*</span></label>
+                <div class="paradas-container" id="paradasContainer">
+                    <div class="parada-item">
+                        <select id="paradas_select" class="form-select" multiple style="height: 150px;">
+                        </select>
+                        <small>Mantén presionada la tecla Ctrl para seleccionar múltiples paradas en orden</small>
+                    </div>
+                    <div class="paradas-orden" id="paradasOrden">
+                        <label>Orden de paradas seleccionadas:</label>
+                        <ul id="paradasList"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-guardar" id="btnGuardar">
+                <i class="fas fa-save"></i> Guardar Ruta
+            </button>
+        </form>
+    </div>
 </div>
 
-{% endblock %} {% block scripts %}
-<!-- JS específico de esta vista -->
+<!-- Toast para notificaciones -->
+<div id="toastMessage" class="toast-message"></div>
+{% endblock %}
+
+{% block scripts %}
 <script src="{{ url_for('static', filename='js/rutas.js') }}"></script>
 {% endblock %}

@@ -52,3 +52,11 @@ class LineaRepository:
         linea.suspendido = True
         db.session.commit()
         return linea
+    
+    @staticmethod
+    def get_by_id(id_linea):
+        return Linea.query.get(id_linea)
+    
+    @staticmethod
+    def get_all_activas():
+        return Linea.query.filter_by(suspendido=False).all()

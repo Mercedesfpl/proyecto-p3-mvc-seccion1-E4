@@ -90,7 +90,7 @@ def create_linea():
 def update_linea(id_linea):
 
     data = request.get_json()
-    return lineaControllers.update_linea(id_linea, data)
+    return lineaControllers.update_linea(id_linea)
 
 
 @admin_scope.route("/lineas/<int:id_linea>", methods=["DELETE"])
@@ -236,3 +236,68 @@ def delete_parada(id_parada):
 @role_required("admin")
 def paradas_page():
     return render_template("pages/paradas.html")
+
+# ========== CRUD de Rutas ==========
+
+@admin_scope.route("/rutas", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_rutas():
+    from app.controllers.rutaControllers import get_all_rutas
+    return get_all_rutas()
+
+
+@admin_scope.route("/rutas/<int:id_ruta>", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_ruta(id_ruta):
+    from app.controllers.rutaControllers import get_ruta_by_id
+    return get_ruta_by_id(id_ruta)
+
+
+@admin_scope.route("/rutas", methods=["POST"])
+@jwt_required()
+@role_required("admin")
+def create_ruta():
+    from app.controllers.rutaControllers import create_ruta
+    return create_ruta()
+
+
+@admin_scope.route("/rutas/<int:id_ruta>", methods=["PUT"])
+@jwt_required()
+@role_required("admin")
+def update_ruta(id_ruta):
+    from app.controllers.rutaControllers import update_ruta
+    return update_ruta(id_ruta)
+
+
+@admin_scope.route("/rutas/<int:id_ruta>", methods=["DELETE"])
+@jwt_required()
+@role_required("admin")
+def delete_ruta(id_ruta):
+    from app.controllers.rutaControllers import delete_ruta
+    return delete_ruta(id_ruta)
+
+
+@admin_scope.route("/rutas-page", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def rutas_page():
+    return render_template("pages/rutas.html")
+
+# ========== SELECTORES PARA RUTAS ==========
+
+@admin_scope.route("/paradas-disponibles", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_paradas_disponibles():
+    from app.controllers.rutaControllers import get_paradas_disponibles
+    return get_paradas_disponibles()
+
+
+@admin_scope.route("/lineas-disponibles", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_lineas_disponibles():
+    from app.controllers.rutaControllers import get_lineas_disponibles
+    return get_lineas_disponibles()

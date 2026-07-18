@@ -61,7 +61,7 @@ def update_linea(id_linea):
 
         try: 
             data = request.get_json()
-            linea = LineaServices.update_linea(id_linea ,data)
+            linea = LineaServices.update_linea(id_linea, data)
             return success_response(message="Línea actualizada exitosamente", data=linea.to_dict())
         except ResourceNotValid as e:
             return error_response(error=str(e), message=str(e), status_code=400)

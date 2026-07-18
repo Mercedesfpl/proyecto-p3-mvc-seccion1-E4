@@ -54,9 +54,10 @@ class PersonaRepository:
     
     @staticmethod
     def get_secretarios():
-        #Obtiene todos los secretarios
-        return Usuario.query.filter_by(rol="secretario").all() is not None
-    
+        """Obtiene todos los secretarios (usuarios con rol 'secretario')"""
+        from app.models.models import Usuario
+        return Usuario.query.filter_by(rol="secretario").all()
+        
     @staticmethod
     def save(persona):
         db.session.add(persona)

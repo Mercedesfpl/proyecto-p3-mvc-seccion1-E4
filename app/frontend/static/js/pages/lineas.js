@@ -216,7 +216,7 @@ async function eliminarLinea(id) {
     const data = await response.json();
 
     if (response.ok) {
-      showToast("✅ Línea suspendida exitosamente", "success");
+      showToast(" Línea suspendida exitosamente", "success");
       cargarLineas();
     } else {
       showToast(data.error || data.message || "Error al suspender", "error");
@@ -251,21 +251,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Validaciones
     if (!datos.nombre) {
-      showToast("⚠️ El nombre es obligatorio", "error");
+      showToast(" El nombre es obligatorio", "error");
       loading = false;
       document.getElementById("btnGuardar").disabled = false;
       return;
     }
 
     if (!datos.rif) {
-      showToast("⚠️ El RIF es obligatorio", "error");
+      showToast(" El RIF es obligatorio", "error");
       loading = false;
       document.getElementById("btnGuardar").disabled = false;
       return;
     }
 
     if (!datos.presidente_id) {
-      showToast("⚠️ Debes seleccionar un presidente", "error");
+      showToast(" Debes seleccionar un presidente", "error");
       loading = false;
       document.getElementById("btnGuardar").disabled = false;
       return;
@@ -289,7 +289,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       if (response.ok) {
         showToast(
-          editandoId ? "✅ Línea actualizada" : "✅ Línea creada exitosamente",
+          editandoId ? " Línea actualizada" : " Línea creada exitosamente",
           "success",
         );
         cerrarModal();

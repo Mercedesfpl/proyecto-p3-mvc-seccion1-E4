@@ -40,3 +40,11 @@ class ParadaRepository:
         db.session.delete(parada)
         db.session.commit()
         return parada
+    
+    @staticmethod
+    def get_by_id(id_parada):
+        return Parada.query.get(id_parada)
+    
+    @staticmethod
+    def get_all_activas():
+        return Parada.query.filter_by(status="activa").all()
