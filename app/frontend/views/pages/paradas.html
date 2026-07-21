@@ -1,0 +1,65 @@
+<!-- app/frontend/views/pages/paradas.html -->
+
+{% extends 'layouts/base.html' %}
+
+{% block title %}Gestión de Paradas{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/paradas.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="paradas-header">
+    <h1>Gestión de Paradas</h1>
+    <button class="btn-add" id="btnNuevaParada">
+        <i class="fas fa-plus"></i> Nueva Parada
+    </button>
+</div>
+
+<div class="tabla-container">
+    <div id="tablaParadas"></div>
+</div>
+
+<!-- MODAL -->
+<div id="paradaModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>
+                <i class="fas fa-map-pin"></i>
+                <span id="modalTitle">Nueva Parada</span>
+            </h2>
+            <span class="modal-close" onclick="cerrarModal()">
+                <i class="fas fa-times"></i>
+            </span>
+        </div>
+        <form id="paradaForm">
+            <div class="form-group">
+                <label>Nombre de la Parada <span class="required">*</span></label>
+                <input type="text" id="nombre" placeholder="Ej: Terminal Los Teques" required>
+            </div>
+
+            <div class="form-group">
+                <label>Coordenadas <span class="required">*</span></label>
+                <input type="text" id="coordenadas" placeholder="Ej: 10.3447,-67.0400" required>
+                <small>Formato: latitud,longitud (ej: 10.3447,-67.0400)</small>
+            </div>
+
+            <div class="form-group">
+                <label>Estado</label>
+                <select id="status" class="form-select">
+                    <option value="activa">Activa</option>
+                    <option value="inactiva">Inactiva</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-guardar" id="btnGuardar">
+                <i class="fas fa-save"></i> Guardar Parada
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/pages/paradas.js') }}"></script>
+{% endblock %}

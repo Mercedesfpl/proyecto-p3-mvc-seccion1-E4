@@ -1,7 +1,6 @@
 from ..models.userModels import UserSession
 from flask_mail import Message
 from app.extensions import mail
-from flask import jsonify
 
 
 def enviar_correo_recuperacion(userData: UserSession, code: str):
@@ -27,3 +26,26 @@ def enviar_correo_recuperacion(userData: UserSession, code: str):
         return False
 
     return True
+
+
+def enviar_correo_verificacion(userData: UserSession, code: str):
+    """Envía código de verificación para registro de nueva cuenta"""
+    msg = Message(
+        "Verifica tu cuenta - Movilidad Guaicaipuro", recipients=[userData.email]
+    )
+    msg.body = f"""Hola {userData.nombre},
+
+    Gracias por registrarte. Para completar tu registro, ingresa el siguiente código de verificación:
+
+    {code}
+
+    Este código es válido por 10 minutos.
+
+    Si no solicitaste este registro, ignora este mensaje.
+    """
+    try:
+        mail.send(msg)
+        return True
+    except Exception as e:
+        print(f"Error enviando email de verificación: {e}")
+        return False

@@ -1,0 +1,29 @@
+<!-- app/frontend/views/pages/dashboard.html -->
+{% extends "layouts/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-welcome">
+    <h1>Panel de Control</h1>
+    <p>Resumen general del sistema de transporte público</p>
+</div>
+
+<div class="grid-4">
+    <div class="kpi-card">
+        <div class="kpi-header"><span>Unidades Activas</span><div class="kpi-icon"><i class="fas fa-bus"></i></div></div>
+        <div class="kpi-value">86</div>
+        <div class="kpi-trend"><i class="fas fa-arrow-up trend-up"></i>+12% vs ayer</div>
+    </div>
+    <!-- más KPIs -->
+</div>
+<!-- más contenido -->
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

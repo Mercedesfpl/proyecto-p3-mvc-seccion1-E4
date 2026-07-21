@@ -1,0 +1,73 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Gestión de Personas{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/personas.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="personas-header">
+    <h1>Gestión de Personas</h1>
+    <button class="btn-add" id="btnNuevaPersona">
+        <i class="fas fa-plus"></i> Nueva Persona
+    </button>
+</div>
+
+<div class="tabla-container" id="tablaPersonas"></div>
+
+<!-- Modal -->
+<div id="personaModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Nueva Persona</h2>
+            <span class="modal-close" onclick="cerrarModal()">&times;</span>
+        </div>
+        <form id="personaForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nombre *</label>
+                    <input type="text" id="nombre" placeholder="Nombre" required>
+                </div>
+                <div class="form-group">
+                    <label>Apellido *</label>
+                    <input type="text" id="apellido" placeholder="Apellido" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Cédula *</label>
+                    <input type="text" id="cedula" placeholder="Ej: 12345678" required>
+                </div>
+                <div class="form-group">
+                    <label>Correo</label>
+                    <input type="email" id="correo" placeholder="correo@ejemplo.com">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Teléfono</label>
+                <input type="text" id="telefono" placeholder="Ej: 04121234567">
+            </div>
+<div class="form-group">
+    <label>Rol *</label>
+    <select id="rol" required>
+        <option value="">Seleccione un rol...</option>
+        <option value="admin">Administrador</option>
+        <option value="presidente">Presidente (solo vista)</option>
+        <option value="secretario">Secretario de Organización</option>
+        <option value="usuario">Usuario (solo mapa)</option>
+    </select>
+    <small>
+        <strong>Nota:</strong> Todos los roles generan un usuario automáticamente.
+        La contraseña inicial es la cédula.
+    </small>
+</div>
+            <button type="submit" class="btn-guardar" id="btnGuardar">Guardar Persona</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/pages/personas.js') }}"></script>
+{% endblock %}

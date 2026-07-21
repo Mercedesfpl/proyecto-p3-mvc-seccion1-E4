@@ -1,9 +1,6 @@
-/* ============================================
-   GLOBAL.CSS - Estilos reutilizables para todas las pantallas
-   Alcaldía de Guaicaipuro - Sistema de Monitoreo de Transporte
-   ============================================ */
+/* frontend/static/css/global.css */
 
-/* ---------- VARIABLES ---------- */
+/* ========== VARIABLES ========== */
 :root {
     --azul: #74A9D3;
     --rojo: #95242A;
@@ -26,7 +23,7 @@
     --transition: all 0.2s ease;
 }
 
-/* ---------- RESET ---------- */
+/* ========== RESET ========== */
 * {
     margin: 0;
     padding: 0;
@@ -55,7 +52,7 @@ button {
     cursor: pointer;
 }
 
-/* ---------- LAYOUT ---------- */
+/* ========== LAYOUT ========== */
 .main-content {
     padding: 32px;
     max-width: 1600px;
@@ -78,7 +75,7 @@ button {
     margin-bottom: 32px;
 }
 
-/* ---------- HEADER ---------- */
+/* ========== HEADER ========== */
 .alcaldia-header {
     background: var(--blanco);
     box-shadow: var(--sombra);
@@ -247,7 +244,7 @@ button {
     color: var(--texto-claro);
 }
 
-.dropdown-menu, .notifications-panel {
+.dropdown-menu  {
     display: none;
     position: absolute;
     background: var(--blanco);
@@ -262,10 +259,179 @@ button {
     top: 80px;
 }
 
+/* ========== PANEL DE NOTIFICACIONES ========== */
 .notifications-panel {
-    width: 350px;
+    position: absolute;
+    top: 70px;
     right: 100px;
-    top: 80px;
+    width: 380px;
+    background: var(--blanco);
+    border-radius: 16px;
+    box-shadow: var(--sombra-lg);
+    z-index: 1001;
+    display: none;
+    overflow: hidden;
+}
+
+.notifications-panel.show {
+    display: block;
+}
+
+/* Header del panel */
+.notifications-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: var(--blanco);
+    border-bottom: 1px solid var(--borde);
+}
+
+.notifications-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    color: var(--texto-oscuro);
+}
+
+.mark-read {
+    font-size: 12px;
+    color: var(--azul);
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.mark-read:hover {
+    text-decoration: underline;
+}
+
+/* Lista de notificaciones */
+.notifications-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Cada notificación individual */
+.notification-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--borde);
+    transition: background 0.2s ease;
+}
+
+.notification-item:hover {
+    background: var(--gris);
+}
+
+/* Notificación no leída */
+.notification-item.unread {
+    background: rgba(116, 169, 211, 0.05);
+    position: relative;
+}
+
+/* Indicador de no leída (punto azul) */
+.notification-item.unread::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    background: var(--azul);
+    border-radius: 50%;
+}
+
+/* Ícono de la notificación */
+.notification-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.notification-icon.warning {
+    background: rgba(243, 176, 1, 0.15);
+    color: var(--amarillo);
+}
+
+.notification-icon.danger {
+    background: rgba(149, 36, 42, 0.15);
+    color: var(--rojo);
+}
+
+.notification-icon.info {
+    background: rgba(116, 169, 211, 0.15);
+    color: var(--azul);
+}
+
+.notification-icon.success {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+/* Contenido de la notificación */
+.notification-content {
+    flex: 1;
+}
+
+.notification-content p {
+    font-size: 13px;
+    font-weight: 500;
+    margin: 0 0 4px 0;
+    color: var(--texto-oscuro);
+    line-height: 1.4;
+}
+
+.notification-time {
+    font-size: 11px;
+    color: var(--texto-claro);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.notification-time i {
+    font-size: 10px;
+}
+
+/* Footer del panel */
+.notifications-footer {
+    padding: 12px 20px;
+    text-align: center;
+    border-top: 1px solid var(--borde);
+    background: var(--blanco);
+}
+
+.notifications-footer a {
+    color: var(--azul);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.notifications-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Scrollbar personalizada */
+.notifications-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.notifications-list::-webkit-scrollbar-track {
+    background: var(--gris);
+    border-radius: 4px;
+}
+
+.notifications-list::-webkit-scrollbar-thumb {
+    background: var(--azul);
+    border-radius: 4px;
 }
 
 .dropdown-menu.show, .notifications-panel.show {
@@ -288,7 +454,7 @@ button {
     color: var(--rojo);
 }
 
-/* ---------- TARJETAS (KPI) ---------- */
+/* ========== TARJETAS KPI ========== */
 .kpi-card {
     background: var(--blanco);
     border-radius: var(--radius-lg);
@@ -346,7 +512,7 @@ button {
 .trend-up { color: var(--verde); }
 .trend-down { color: var(--rojo); }
 
-/* ---------- TARJETAS GENÉRICAS ---------- */
+/* ========== TARJETAS GENÉRICAS ========== */
 .card {
     background: var(--blanco);
     border-radius: var(--radius-lg);
@@ -372,60 +538,7 @@ button {
     font-weight: 500;
 }
 
-/* ---------- TABLAS ---------- */
-.incidencia-item, .route-row, .unidad-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--borde);
-}
-
-.incidencia-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.incidencia-badge {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-}
-
-.badge-rojo { background: var(--rojo); }
-.badge-amarillo { background: var(--amarillo); }
-.badge-verde { background: var(--verde); }
-
-.incidencia-time {
-    font-size: 12px;
-    color: var(--texto-claro);
-}
-
-.route-status, .estado-badge {
-    font-size: 12px;
-    padding: 4px 12px;
-    border-radius: 20px;
-    background: rgba(116, 169, 211, 0.1);
-    color: var(--azul);
-}
-
-.estado-activo {
-    background: rgba(16, 185, 129, 0.1);
-    color: var(--verde);
-}
-
-.estado-inactivo {
-    background: rgba(149, 36, 42, 0.1);
-    color: var(--rojo);
-}
-
-.estado-warning {
-    background: rgba(243, 176, 1, 0.1);
-    color: var(--amarillo);
-}
-
-/* ---------- BOTONES ---------- */
+/* ========== BOTONES ========== */
 .btn-primary {
     background: var(--azul);
     color: var(--blanco);
@@ -459,7 +572,7 @@ button {
     background: rgba(116, 169, 211, 0.1);
 }
 
-/* ---------- BARRAS DE PROGRESO ---------- */
+/* ========== BARRAS DE PROGRESO ========== */
 .occupation-bar {
     margin-bottom: 16px;
 }
@@ -492,7 +605,7 @@ button {
     background: var(--rojo);
 }
 
-/* ---------- MAPA (placeholder) ---------- */
+/* ========== MAPA ========== */
 .map-placeholder {
     background: #e2e8f0;
     height: 280px;
@@ -510,7 +623,32 @@ button {
     color: var(--azul);
 }
 
-/* ---------- FILTROS Y BÚSQUEDA ---------- */
+/* ========== TABLAS ========== */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th {
+    text-align: left;
+    padding: 14px 12px;
+    color: var(--texto-claro);
+    font-weight: 600;
+    font-size: 13px;
+    border-bottom: 1px solid var(--borde);
+}
+
+.data-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--borde);
+    font-size: 14px;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* ========== FILTROS ========== */
 .filters-bar {
     background: var(--blanco);
     border-radius: var(--radius);
@@ -552,12 +690,13 @@ button {
     cursor: pointer;
 }
 
-/* ---------- PAGINACIÓN ---------- */
+/* ========== PAGINACIÓN ========== */
 .pagination {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
     margin-top: 20px;
+    flex-wrap: wrap;
 }
 
 .page-item {
@@ -566,6 +705,11 @@ button {
     background: var(--gris);
     cursor: pointer;
     font-size: 14px;
+    transition: var(--transition);
+}
+
+.page-item:hover {
+    background: rgba(116, 169, 211, 0.1);
 }
 
 .page-item.active {
@@ -573,32 +717,7 @@ button {
     color: var(--blanco);
 }
 
-/* ---------- TABLAS RESPONSIVE ---------- */
-.table-responsive {
-    overflow-x: auto;
-}
-
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.data-table th {
-    text-align: left;
-    padding: 14px 12px;
-    color: var(--texto-claro);
-    font-weight: 600;
-    font-size: 13px;
-    border-bottom: 1px solid var(--borde);
-}
-
-.data-table td {
-    padding: 12px;
-    border-bottom: 1px solid var(--borde);
-    font-size: 14px;
-}
-
-/* ---------- RESPONSIVE GLOBAL ---------- */
+/* ========== RESPONSIVE GLOBAL ========== */
 @media (max-width: 1024px) {
     .grid-4 { grid-template-columns: repeat(2, 1fr); }
     .grid-2 { grid-template-columns: 1fr; }

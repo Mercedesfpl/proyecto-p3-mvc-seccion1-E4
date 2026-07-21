@@ -1,3 +1,4 @@
+# app/routes/errors.py
 from flask import jsonify, Blueprint, Response
 from ..models.exceptions import (
     UserAlreadyExists,
@@ -6,6 +7,7 @@ from ..models.exceptions import (
     ResourceNotFound,
     ResourceAlreadyExists,
     ResourceNotValid,
+    Unauthorized,
 )
 
 errors_scope = Blueprint("errors", __name__)
@@ -13,7 +15,11 @@ errors_scope = Blueprint("errors", __name__)
 
 def __generate_error_response(error: Exception) -> Response:
     # Capturamos el nombre de la clase y el mensaje
-    message = {"ErrorType": type(error).__name__, "Message": str(error)}
+    message = {
+        "success": False,
+        "ErrorType": type(error).__name__,
+        "message": str(error),
+    }
     return jsonify(message)
 
 
@@ -55,3 +61,13 @@ def handle_conflict(error):
 @errors_scope.app_errorhandler(ResourceNotValid)
 def handle_bad_request(error):
     return jsonify({"ErrorType": type(error).__name__, "Message": str(error)}), 400
+
+
+@errors_scope.app_errorhandler(Unauthorized)
+def handle_unauthorized(error):
+    return (
+        jsonify(
+            {"success": False, "ErrorType": type(error).__name__, "Message": str(error)}
+        ),
+        401,
+    )

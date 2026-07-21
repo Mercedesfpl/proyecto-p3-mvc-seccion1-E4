@@ -1,7 +1,7 @@
 // frontend/static/js/pages/reportes.js
 document.addEventListener('DOMContentLoaded', function() {
     
-    // ========== GRÁFICOS (si los canvas existen) ==========
+    //  GRÁFICOS (si los canvas existen) 
     
     // Gráfico 1: Pasajeros por día
     const ctx1 = document.getElementById('pasajerosChart')?.getContext('2d');
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // ========== EFECTOS VISUALES ==========
+    //  EFECTOS VISUALES 
     
     // Animación de entrada para tarjetas KPI
     const kpis = document.querySelectorAll('.kpi-card');
@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // ========== EVENTOS DE BOTONES ==========
+    //  EVENTOS DE BOTONES 
     
     const aplicarFiltros = document.getElementById('aplicarFiltros');
     if (aplicarFiltros) {

@@ -1,0 +1,28 @@
+/* ========================================
+   PÁGINA DE LÍNEAS
+   ======================================== */
+.lineas-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.lineas-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+@media (max-width: 480px) {
+    .lineas-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .lineas-header .btn-add {
+        width: 100%;
+        justify-content: center;
+    }
+}

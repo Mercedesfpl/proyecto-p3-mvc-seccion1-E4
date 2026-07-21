@@ -1,7 +1,7 @@
 // frontend/static/js/pages/flota.js
 document.addEventListener('DOMContentLoaded', function() {
     
-    // ========== FILTROS Y BÚSQUEDA ==========
+    //  FILTROS Y BÚSQUEDA 
     
     // Buscar unidad
     const searchInput = document.getElementById('searchUnidad');
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // ========== BOTONES ==========
+    //  BOTONES 
     
     // Botón Nueva Unidad
     const nuevaUnidadBtn = document.getElementById('nuevaUnidadBtn');
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // ========== EFECTOS VISUALES ==========
+    //  EFECTOS VISUALES 
     
     // Animación de entrada para tarjetas KPI
     const kpis = document.querySelectorAll('.kpi-card');

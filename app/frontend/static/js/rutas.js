@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // js/pages/rutas.js
 document.addEventListener('DOMContentLoaded', function() {
     
-    // ========== ACORDEÓN PARA TARJETAS DE RUTAS ==========
+    //  ACORDEÓN PARA TARJETAS DE RUTAS 
     const accordionCards = document.querySelectorAll('.ruta-card.accordion');
     
     accordionCards.forEach(card => {
@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // ========== RESTO DE FUNCIONALIDADES (filtros, búsqueda, etc.) ==========
+    //  RESTO DE FUNCIONALIDADES (filtros, búsqueda, etc.) 
     
     // Buscar ruta
     const searchInput = document.getElementById('searchRuta');
@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Filtrar por estado (buscando en el header visible)
+    // Filtrar por estado 
     const filterEstado = document.getElementById('filterEstado');
     if (filterEstado) {
         filterEstado.addEventListener('change', function() {

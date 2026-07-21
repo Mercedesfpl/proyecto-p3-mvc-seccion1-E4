@@ -1,0 +1,76 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Líneas de Transporte{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/lineas.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="lineas-header">
+    <h1>Gestión de Líneas</h1>
+    <button class="btn-add" id="btnNuevaLinea">
+        <i class="fas fa-plus"></i> Nueva Línea
+    </button>
+</div>
+
+<div class="tabla-container">
+    <div id="tablaLineas"></div>
+</div>
+
+<!-- MODAL -->
+<div id="lineaModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>
+                <i class="fas fa-route"></i>
+                <span id="modalTitle">Nueva Línea</span>
+            </h2>
+            <span class="modal-close" onclick="cerrarModal()">
+                <i class="fas fa-times"></i>
+            </span>
+        </div>
+        <form id="lineaForm">
+            <div class="form-group">
+                <label>Nombre de la Línea <span class="required">*</span></label>
+                <input type="text" id="nombre" placeholder="Ej: Línea 1 - Los Teques" required>
+            </div>
+
+            <div class="form-group">
+                <label>RIF <span class="required">*</span></label>
+                <input type="text" id="rif" placeholder="Ej: J-12345678-0" required>
+            </div>
+
+            <hr style="margin: 20px 0; border: 1px solid var(--borde);">
+
+            <div class="form-group">
+                <label>Presidente <span class="required">*</span></label>
+                <select id="presidente_id" class="form-select" required>
+                    <option value="">Seleccione un presidente...</option>
+                </select>
+                <small>
+                    <i class="fas fa-info-circle"></i> Solo se muestran personas con rol "Presidente"
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label>Secretario de Organización</label>
+                <select id="secretario_id" class="form-select">
+                    <option value="">Seleccione un secretario (opcional)...</option>
+                </select>
+                <small>
+                    <i class="fas fa-info-circle"></i> Solo se muestran usuarios con rol "Secretario"
+                </small>
+            </div>
+
+            <button type="submit" class="btn-guardar" id="btnGuardar">
+                <i class="fas fa-save"></i> Guardar Línea
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/pages/lineas.js') }}"></script>
+{% endblock %}
