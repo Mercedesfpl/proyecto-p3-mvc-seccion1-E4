@@ -1,0 +1,130 @@
+/* frontend/static/css/reportes.css */
+
+/* Filtros de fecha */
+.date-filters {
+    background: var(--blanco);
+    border-radius: 16px;
+    padding: 20px 24px;
+    margin-bottom: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    box-shadow: var(--sombra);
+}
+
+.date-range {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.date-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--gris);
+    padding: 8px 16px;
+    border-radius: 40px;
+}
+
+.date-input input {
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 14px;
+}
+
+/* Gráficos */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.chart-card {
+    background: var(--blanco);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: var(--sombra);
+}
+
+.chart-container {
+    height: 280px;
+    position: relative;
+}
+
+/* Ranking de rutas */
+.top-rutas {
+    background: var(--blanco);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: var(--sombra);
+    margin-bottom: 32px;
+}
+
+.ruta-ranking {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.ranking-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.ranking-position {
+    width: 32px;
+    height: 32px;
+    background: var(--gris);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.ranking-position.top {
+    background: var(--amarillo);
+    color: var(--texto-oscuro);
+}
+
+.ranking-info {
+    flex: 1;
+}
+
+.ranking-name {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.ranking-stats {
+    font-size: 12px;
+    color: var(--texto-claro);
+}
+
+.ranking-value {
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--azul);
+}
+
+/* Responsive reportes */
+@media (max-width: 1024px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    .date-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .date-range {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

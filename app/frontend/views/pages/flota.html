@@ -1,0 +1,298 @@
+<!-- frontend/views/flota.html -->
+{% extends 'layouts/base.html' %} {% block title %}Flota{% endblock %} {% block styles
+%}
+<!-- flota.html -->
+
+<!-- CSS specífico -->
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/flota.css') }}"
+/>
+{% endblock %} {% block content %}
+
+<!-- KPIs de flota -->
+<div class="grid-4">
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <span>Total de Unidades</span>
+      <div class="kpi-icon"><i class="fas fa-bus"></i></div>
+    </div>
+    <div class="kpi-value">124</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <span>Unidades Activas</span>
+      <div class="kpi-icon"><i class="fas fa-play-circle"></i></div>
+    </div>
+    <div class="kpi-value" style="color: #10b981">86</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <span>Unidades En Servicio</span>
+      <div class="kpi-icon"><i class="fas fa-road"></i></div>
+    </div>
+    <div class="kpi-value" style="color: var(--amarillo)">72</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <span>Unidades Taller</span>
+      <div class="kpi-icon"><i class="fas fa-wrench"></i></div>
+    </div>
+    <div class="kpi-value" style="color: var(--rojo)">8</div>
+  </div>
+</div>
+
+<!-- Filtros -->
+<div class="filters-bar">
+  <div class="search-box">
+    <i class="fas fa-search"></i>
+    <input
+      type="text"
+      id="searchUnidad"
+      placeholder="Buscar por código, placa o conductor..."
+    />
+  </div>
+  <div class="filter-group">
+    <select class="filter-select" id="filterLinea">
+      <option>Todas las líneas</option>
+      <option>Línea 1 (Los Teques - Caracas)</option>
+      <option>Línea 2 (El Tambor - La Miel)</option>
+      <option>Línea 3 (San Antonio)</option>
+    </select>
+    <select class="filter-select" id="filterEstado">
+      <option>Todos los estados</option>
+      <option>Activo</option>
+      <option>En servicio</option>
+      <option>En taller</option>
+    </select>
+    <button class="btn-primary" id="nuevaUnidadBtn">
+      <i class="fas fa-plus"></i> Nueva Unidad
+    </button>
+  </div>
+</div>
+
+<!-- Tabla de unidades -->
+<div class="unidades-table-container">
+  <div class="table-header">
+    <h2><i class="fas fa-list"></i> Listado de Unidades</h2>
+    <button class="export-btn" id="exportarBtn">
+      <i class="fas fa-download"></i> Exportar
+    </button>
+  </div>
+
+  <div class="table-responsive">
+    <table class="data-table" id="unidadesTable">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Placa</th>
+          <th>Línea / Ruta</th>
+          <th>Conductor</th>
+          <th>Estado</th>
+          <th>Ubicación</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="unidadesTableBody">
+        <tr>
+          <td><strong>BUS-001</strong></td>
+          <td>AB123CD</td>
+          <td>Los Teques - Caracas</td>
+          <td>Juan Pérez</td>
+          <td>
+            <span class="status-badge status-active"
+              ><i class="fas fa-circle"></i> Activo</span
+            >
+          </td>
+          <td>Parada Central</td>
+          <td class="action-buttons">
+            <button class="action-btn view" data-id="1">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button class="action-btn edit" data-id="1">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="action-btn delete" data-id="1">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>BUS-002</strong></td>
+          <td>EF456GH</td>
+          <td>Los Teques - Caracas</td>
+          <td>María López</td>
+          <td>
+            <span class="status-badge status-active"
+              ><i class="fas fa-circle"></i> Activo</span
+            >
+          </td>
+          <td>Terminal</td>
+          <td class="action-buttons">
+            <button class="action-btn view" data-id="2">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button class="action-btn edit" data-id="2">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="action-btn delete" data-id="2">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>BUS-003</strong></td>
+          <td>IJ789KL</td>
+          <td>El Tambor - La Miel</td>
+          <td>Carlos Rodríguez</td>
+          <td>
+            <span class="status-badge status-warning"
+              ><i class="fas fa-exclamation-triangle"></i> En servicio</span
+            >
+          </td>
+          <td>Ruta activa</td>
+          <td class="action-buttons">
+            <button class="action-btn view" data-id="3">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button class="action-btn edit" data-id="3">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="action-btn delete" data-id="3">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>BUS-004</strong></td>
+          <td>MN012OP</td>
+          <td>San Antonio</td>
+          <td>Ana Martínez</td>
+          <td>
+            <span class="status-badge status-active"
+              ><i class="fas fa-circle"></i> Activo</span
+            >
+          </td>
+          <td>San Antonio</td>
+          <td class="action-buttons">
+            <button class="action-btn view" data-id="4">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button class="action-btn edit" data-id="4">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="action-btn delete" data-id="4">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>BUS-005</strong></td>
+          <td>PQ345RS</td>
+          <td>Altos de Pipe</td>
+          <td>Luis Fernández</td>
+          <td>
+            <span class="status-badge status-inactive"
+              ><i class="fas fa-circle"></i> En taller</span
+            >
+          </td>
+          <td>Taller Central</td>
+          <td class="action-buttons">
+            <button class="action-btn view" data-id="5">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button class="action-btn edit" data-id="5">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="action-btn delete" data-id="5">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>BUS-006</strong></td>
+          <td>TU678VW</td>
+          <td>Los Teques - Caracas</td>
+          <td>Gabriela Díaz</td>
+          <td>
+            <span class="status-badge status-active"
+              ><i class="fas fa-circle"></i> Activo</span
+            >
+          </td>
+          <td>Parada Norte</td>
+          <td class="action-buttons">
+            <button class="action-btn view" data-id="6">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button class="action-btn edit" data-id="6">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="action-btn delete" data-id="6">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>BUS-007</strong></td>
+          <td>XY901ZA</td>
+          <td>El Tambor - La Miel</td>
+          <td>Ricardo Sánchez</td>
+          <td>
+            <span class="status-badge status-warning"
+              ><i class="fas fa-exclamation-triangle"></i> En servicio</span
+            >
+          </td>
+          <td>Ruta activa</td>
+          <td class="action-buttons">
+            <button class="action-btn view" data-id="7">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button class="action-btn edit" data-id="7">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="action-btn delete" data-id="7">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>BUS-008</strong></td>
+          <td>BC234DE</td>
+          <td>San Antonio</td>
+          <td>Elena Rojas</td>
+          <td>
+            <span class="status-badge status-inactive"
+              ><i class="fas fa-circle"></i> En taller</span
+            >
+          </td>
+          <td>Taller Central</td>
+          <td class="action-buttons">
+            <button class="action-btn view" data-id="8">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button class="action-btn edit" data-id="8">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="action-btn delete" data-id="8">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginación -->
+  <div class="pagination">
+    <div class="page-item prev">Anterior</div>
+    <div class="page-item active">1</div>
+    <div class="page-item">2</div>
+    <div class="page-item">3</div>
+    <div class="page-item">4</div>
+    <div class="page-item next">Siguiente</div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<!-- JS específico de esta vista -->
+<script src="{{ url_for('static', filename='js/flota.js') }}"></script>
+{% endblock %}

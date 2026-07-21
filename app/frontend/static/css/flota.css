@@ -1,0 +1,52 @@
+/* frontend/static/css/flota.css */
+/* Solo estilos específicos de la página de flota */
+
+/* Badges de estado */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-active {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.status-inactive {
+    background: rgba(149, 36, 42, 0.1);
+    color: var(--rojo);
+}
+
+.status-warning {
+    background: rgba(243, 176, 1, 0.1);
+    color: var(--amarillo);
+}
+
+/* Botones de acción en tabla */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--texto-claro);
+    font-size: 16px;
+    transition: color 0.2s;
+    padding: 4px;
+}
+
+.action-btn:hover {
+    color: var(--azul);
+}
+
+.action-btn.delete:hover {
+    color: var(--rojo);
+}

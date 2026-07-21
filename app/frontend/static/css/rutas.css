@@ -1,0 +1,122 @@
+/* frontend/static/css/rutas.css */
+
+/* Header de rutas */
+.rutas-header {
+    margin-bottom: 24px;
+}
+
+.rutas-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+/* Grid de tarjetas */
+.rutas-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+/* Tarjeta de ruta */
+.ruta-card {
+    background: var(--blanco);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--sombra);
+    transition: var(--transition);
+}
+
+.ruta-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sombra-md);
+}
+
+.ruta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--borde);
+}
+
+.ruta-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ruta-title i {
+    font-size: 22px;
+    color: var(--azul);
+}
+
+.ruta-title h3 {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* Paradas */
+.paradas-list {
+    margin: 16px 0;
+    padding: 12px;
+    background: var(--gris);
+    border-radius: var(--radius-sm);
+}
+
+.parada-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    padding: 6px 0;
+}
+
+.parada-item i {
+    font-size: 10px;
+    color: var(--azul);
+}
+
+/* Botón expandir */
+.ruta-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-expand {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--texto-claro);
+    font-size: 16px;
+    padding: 4px 8px;
+}
+
+.btn-expand i {
+    transition: transform 0.3s ease;
+}
+
+.btn-expand.rotated i {
+    transform: rotate(180deg);
+}
+
+.ruta-expandable {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--borde);
+}
+
+/* Responsive rutas */
+@media (max-width: 1024px) {
+    .rutas-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .rutas-grid {
+        grid-template-columns: 1fr;
+    }
+}

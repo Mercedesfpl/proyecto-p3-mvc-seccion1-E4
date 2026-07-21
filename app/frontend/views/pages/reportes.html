@@ -1,0 +1,257 @@
+<!-- app/frontend/views/pages/reportes.html -->
+{% extends 'layouts/base.html' %} {% block title %}Reportes{% endblock %}
+<!-- reportes.html -->
+
+{% block CDN %}
+<!-- Chart.js para gráficos -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %} {% block styles %}
+<!-- CSS  específico -->
+
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/reportes.css') }}"
+/>
+{% endblock %} {% block content %}
+
+<!-- KPIs -->
+<div class="grid-4">
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <span>Pasajeros transportados</span>
+      <div class="kpi-icon"><i class="fas fa-users"></i></div>
+    </div>
+    <div class="kpi-value">124,580</div>
+    <div class="kpi-trend">
+      <i class="fas fa-arrow-up trend-up"></i>+12% vs ayer
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <span>Unidades activas</span>
+      <div class="kpi-icon"><i class="fas fa-bus"></i></div>
+    </div>
+    <div class="kpi-value" style="color: #10b981">86</div>
+    <div class="kpi-trend">
+      <i class="fas fa-arrow-up trend-up"></i>+8% vs ayer
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <span>Incidencias registradas</span>
+      <div class="kpi-icon"><i class="fas fa-exclamation-triangle"></i></div>
+    </div>
+    <div class="kpi-value" style="color: var(--rojo)">12</div>
+    <div class="kpi-trend">
+      <i class="fas fa-arrow-up trend-up"></i>+2% vs ayer
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <span>Kilómetros recorridos</span>
+      <div class="kpi-icon"><i class="fas fa-road"></i></div>
+    </div>
+    <div class="kpi-value">18,432 km</div>
+    <div class="kpi-trend">
+      <i class="fas fa-arrow-up trend-up"></i>+5% vs ayer
+    </div>
+  </div>
+</div>
+
+<!-- Filtros de fecha -->
+<div class="date-filters">
+  <div class="date-range">
+    <div class="date-input">
+      <i class="fas fa-calendar-alt"></i>
+      <input type="date" id="fechaInicio" value="2025-05-01" />
+    </div>
+    <span>a</span>
+    <div class="date-input">
+      <i class="fas fa-calendar-alt"></i>
+      <input type="date" id="fechaFin" value="2025-05-10" />
+    </div>
+  </div>
+  <div class="filter-group">
+    <select class="filter-select" id="filterLinea">
+      <option>Todas las líneas</option>
+      <option>Línea 1 (Los Teques - Caracas)</option>
+      <option>Línea 2 (El Tambor - La Miel)</option>
+      <option>Línea 3 (San Antonio)</option>
+    </select>
+    <button class="btn-primary" id="aplicarFiltros">
+      <i class="fas fa-chart-line"></i> Aplicar filtros
+    </button>
+    <button class="btn-secondary" id="exportarTodo">
+      <i class="fas fa-download"></i> Exportar todo
+    </button>
+  </div>
+</div>
+
+<!-- Gráficos -->
+<div class="charts-grid">
+  <div class="chart-card">
+    <div class="chart-header">
+      <h3><i class="fas fa-chart-line"></i> Pasajeros por día</h3>
+      <span style="font-size: 12px; color: var(--texto-claro)"
+        >últimos 7 días</span
+      >
+    </div>
+    <div class="chart-container">
+      <canvas id="pasajerosChart"></canvas>
+    </div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-header">
+      <h3><i class="fas fa-chart-pie"></i> Distribución por ruta</h3>
+      <span style="font-size: 12px; color: var(--texto-claro)"
+        >pasajeros totales</span
+      >
+    </div>
+    <div class="chart-container">
+      <canvas id="rutaPieChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="charts-grid">
+  <div class="chart-card">
+    <div class="chart-header">
+      <h3><i class="fas fa-clock"></i> Cumplimiento de horarios</h3>
+      <span style="font-size: 12px; color: var(--texto-claro)"
+        >vs tiempo estimado</span
+      >
+    </div>
+    <div class="chart-container">
+      <canvas id="cumplimientoChart"></canvas>
+    </div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-header">
+      <h3><i class="fas fa-exclamation-triangle"></i> Incidencias por tipo</h3>
+      <span style="font-size: 12px; color: var(--texto-claro)"
+        >últimos 30 días</span
+      >
+    </div>
+    <div class="chart-container">
+      <canvas id="incidenciasTipoChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Top rutas con más retrasos -->
+<div class="top-rutas">
+  <div class="top-rutas-header">
+    <h2><i class="fas fa-tachometer-alt"></i> Rutas con más retrasos</h2>
+    <button class="btn-secondary ver-detalle-btn">Ver detalle</button>
+  </div>
+  <div class="ruta-ranking" id="rankingRetrasos">
+    <div class="ranking-item">
+      <div class="ranking-position top">1</div>
+      <div class="ranking-info">
+        <div class="ranking-name">Ruta Los Teques - Caracas</div>
+        <div class="ranking-stats">+18 min promedio | 67% puntualidad</div>
+      </div>
+      <div class="ranking-value">18 min</div>
+    </div>
+    <div class="ranking-item">
+      <div class="ranking-position top">2</div>
+      <div class="ranking-info">
+        <div class="ranking-name">Ruta El Tambor - La Miel</div>
+        <div class="ranking-stats">+12 min promedio | 82% puntualidad</div>
+      </div>
+      <div class="ranking-value">12 min</div>
+    </div>
+    <div class="ranking-item">
+      <div class="ranking-position">3</div>
+      <div class="ranking-info">
+        <div class="ranking-name">Ruta Altos de Pipe</div>
+        <div class="ranking-stats">+8 min promedio | 73% puntualidad</div>
+      </div>
+      <div class="ranking-value">8 min</div>
+    </div>
+    <div class="ranking-item">
+      <div class="ranking-position">4</div>
+      <div class="ranking-info">
+        <div class="ranking-name">Ruta San Antonio</div>
+        <div class="ranking-stats">+5 min promedio | 91% puntualidad</div>
+      </div>
+      <div class="ranking-value">5 min</div>
+    </div>
+  </div>
+</div>
+
+<!-- Tabla de incidencias -->
+<div class="incidencias-table-container">
+  <div class="table-header">
+    <h2><i class="fas fa-list"></i> Incidencias recientes</h2>
+    <div class="export-buttons">
+      <button class="btn-secondary export-pdf">
+        <i class="fas fa-file-pdf"></i> PDF
+      </button>
+      <button class="btn-secondary export-excel">
+        <i class="fas fa-file-excel"></i> Excel
+      </button>
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table class="incidencias-table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Ruta</th>
+          <th>Unidad</th>
+          <th>Tipo</th>
+          <th>Descripción</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody id="incidenciasTableBody">
+        <tr>
+          <td>2025-05-10 08:30</td>
+          <td>Los Teques - Caracas</td>
+          <td>BUS-023</td>
+          <td>Avería mecánica</td>
+          <td>Fallo en el sistema de frenos</td>
+          <td><span class="status-badge status-critical">Crítica</span></td>
+        </tr>
+        <tr>
+          <td>2025-05-10 10:15</td>
+          <td>El Tambor - La Miel</td>
+          <td>BUS-045</td>
+          <td>Retraso</td>
+          <td>Tráfico intenso en hora pico</td>
+          <td><span class="status-badge status-warning">Advertencia</span></td>
+        </tr>
+        <tr>
+          <td>2025-05-09 14:20</td>
+          <td>San Antonio</td>
+          <td>BUS-012</td>
+          <td>Denuncia</td>
+          <td>Conductor agresivo reportado</td>
+          <td><span class="status-badge status-warning">Pendiente</span></td>
+        </tr>
+        <tr>
+          <td>2025-05-09 09:45</td>
+          <td>Los Teques - Caracas</td>
+          <td>BUS-078</td>
+          <td>Accidente</td>
+          <td>Choque leve en la autopista</td>
+          <td><span class="status-badge status-critical">Crítica</span></td>
+        </tr>
+        <tr>
+          <td>2025-05-08 16:30</td>
+          <td>Altos de Pipe</td>
+          <td>BUS-034</td>
+          <td>Avería</td>
+          <td>Problema eléctrico</td>
+          <td><span class="status-badge status-resolved">Resuelta</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<!-- JS específico de esta vista -->
+<script src="{{ url_for('static', filename='js/reportes.js') }}"></script>
+
+{% endblock %}
