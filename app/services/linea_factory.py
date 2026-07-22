@@ -1,5 +1,6 @@
 from ..models import Linea
 from ..models.exceptions import ResourceNotValid
+import re
 
 
 class LineaFactory:
