@@ -12,13 +12,19 @@ class LineaFactory:
         # Validaciones
         nombre = data.get("nombre")
         if not nombre:
-            raise ResourceNotValid("Lineas", "El nombre es requerido")
+            raise ResourceNotValid("Linea", "El nombre es requerido")
+        
         rif = data.get("rif")
         if not rif:
-            raise ResourceNotValid("Lineas", "El rif es requerido")
+            raise ResourceNotValid("Linea", "El RIF es requerido")
+        
+        #Validar formato RIF (ej: J-12345678-9)
+        if not re.match(r'^[JVE]-?\d{1,8}-?\d{1}$', rif):
+            raise ResourceNotValid("Linea", "Formato de RIF inválido. Ej: J-12345678-9")
+        
         presidente_id = data.get("presidente_id")
         if not presidente_id:
-            raise ResourceNotValid("Lineas", "Debes seleccionar un presidente")
+            raise ResourceNotValid("Linea", "Debes seleccionar un presidente")
         
         # Crear instancia de Linea
         return Linea(

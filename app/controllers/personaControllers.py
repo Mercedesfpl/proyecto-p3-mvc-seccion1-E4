@@ -70,7 +70,7 @@ def delete_persona(id_persona):
 def get_personas_select():
     #Obtener personas con rol 'presidente' para selectores
     try:
-        data = PersonaServices.get_personas_select()
+        data = PersonaServices.get_persona_select_presidente()
         return success_response(data=data)
     except Exception as e:
         return error_response(error=str(e), message="Error al obtener presidentes", status_code=500)
@@ -78,7 +78,7 @@ def get_personas_select():
 def get_secretarios_select():
     #Obtener usuarios con rol 'secretario' para selectores
     try:
-        data = PersonaServices.get_secretarios_select()
+        data = PersonaServices.get_persona_select_secretario()
         return success_response(data=data)
     except Exception as e:
         return error_response(error=str(e), message="Error al obtener secretarios", status_code=500)

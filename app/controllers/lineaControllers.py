@@ -42,11 +42,9 @@ def get_secretarios_disponibles():
     except Exception as e:
         return error_response(error=str(e), message="Error en obtener los secretarios disponibles", status_code=500)
     
-def create_linea():
+def create_linea(data):
     #Crea una línea
-
     try: 
-        data = request.get_json()
         linea = LineaServices.create_linea(data)
         return success_response(message="Línea creada existosamente", data=linea.to_dict())
     except ResourceNotValid as e:

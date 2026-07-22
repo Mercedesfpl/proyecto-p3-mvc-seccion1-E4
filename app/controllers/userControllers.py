@@ -97,25 +97,20 @@ def register(usuario):
 
 # ========== RECUPERACIÓN DE CONTRASEÑA ==========
 
-def request_password_reset():
+def request_password_reset(usuario):
     #Solicita recuperación de contraseña.
     try:
-        data = request.get_json()
-        user_data = UserSession(email=data.get('email'))
-        result = UserService.request_password_reset(user_data)
+        result = UserService.request_password_reset(usuario)
         return result
     except UserNotValid as e:
         return error_response(error=str(e), message=str(e), status_code=400)
     except Exception as e:
         return error_response(error=str(e), message="Error al solicitar recuperación", status_code=500)
 
-def verify_reset_code():
+def verify_reset_code(usuario, code):
     #Verifica el código de recuperación
     try:
-        data = request.get_json()
-        user_data = UserSession(id=data.get('user_id'))
-        code = data.get('code')
-        result = UserService.verify_reset_code(user_data, code)
+        result = UserService.verify_reset_code(usuario, code)
         return result
     except ResourceNotValid as e:
         return error_response(error=str(e), message=str(e), status_code=404)
@@ -126,16 +121,10 @@ def verify_reset_code():
     except Exception as e:
         return error_response(error=str(e), message="Error al verificar código", status_code=500)
 
-def reset_password():
+def reset_password(usuario, code):
     #Restablece la contraseña
     try:
-        data = request.get_json()
-        user_data = UserSession(
-            id=data.get('user_id'),
-            password=data.get('new_password')
-        )
-        code = data.get('code')
-        result = UserService.reset_password(user_data, code)
+        result = UserService.reset_password(usuario, code)
         return result
     except UserNotValid as e:
         return error_response(error=str(e), message=str(e), status_code=400)

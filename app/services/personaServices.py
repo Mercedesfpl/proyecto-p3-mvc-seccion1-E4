@@ -44,7 +44,7 @@ class PersonaServices:
         return persona.to_dict()
     
     @staticmethod
-    def get_persona_selecct():
+    def get_persona_select_presidente():
         #Obtiene persona con rol 'presidente' para selectores
         presidentes = PersonaRepository.get_presidente()
         return [{
@@ -52,7 +52,7 @@ class PersonaServices:
         } for p in presidentes]
     
     @staticmethod
-    def get_persona_selecct():
+    def get_persona_select_secretario():
         #Obtiene persona con rol 'presidente' para selectores
         secretarios = PersonaRepository.get_secretarios()
         return [{

@@ -11,18 +11,22 @@ class LineaServices:
 
     @staticmethod 
     def get_all_lineas():
-        lineas = LineaRepository.get_all()
-        return [
-            {
-                "id": l.id,
-                "nombre": l.nombre,
-                "presidente": l.presidente_nombre,
-                "secretario_nombre": l.secretario_nombre,
-                "rif": l.rif
-            }
-            for l in lineas
-        ]
-    
+        try:
+            lineas = LineaRepository.get_all()
+            return [
+                {
+                    "id": l.id,
+                    "nombre": l.nombre,
+                    "presidente": l.presidente.nombre if l.presidente else None,
+                    "secretario_nombre": l.secretario.nombre if l.secretario else None,
+                    "rif": l.rif
+                }
+                for l in lineas
+            ]
+        except Exception as e:
+            print ("Error en get_all_lineas", e)
+            raise
+
     @staticmethod 
     def get_linea_by_id(id_linea):
         #Obtiene una línea por ID
@@ -82,14 +86,12 @@ class LineaServices:
             raise ResourceNotFound("Presidente no encontrado")
         
         #Verificar que el secretario exista (si se selecciono)
-        secretario_id = data.get("secretario_id")
-        if secretario_id:
-            secretario = UserRepository.get_by_id(secretario_id)
-            if not secretario:
-                raise ResourceNotFound("Secretario")
+        secretario = UserRepository.get_by_id(data['secretario_id'])
+        if not secretario:
+            raise ResourceNotFound("Secretario no encontrado")
 
         #Usar la fábrica para crear un objeto
-        nueva_linea = LineaFactory.crear_linea(nueva_linea)
+        nueva_linea = LineaFactory.crear_linea(data)
 
         #Guardar en la bd
         return LineaRepository.save(nueva_linea)
@@ -114,13 +116,13 @@ class LineaServices:
             linea.rif = data['rif'].strip()
 
         if 'presidente_id' in data:
-            presidente = Persona.query.get(data['presidente_id'])
+            presidente = UserRepository.get_by_id(data['presidente_id'])
             if not presidente: 
                 raise ResourceNotFound("Presidente")
             linea.presidente_id = data['presidente_id']
 
         if 'secretario_id' in data: 
-            secretario = Persona.query.get(data['secretario_id'])
+            secretario = UserRepository.get_by_id(data['secretario_id'])
             if not secretario: 
                 raise ResourceNotFound("Secretario")
             linea.secretario_id = data['secretario_id']
