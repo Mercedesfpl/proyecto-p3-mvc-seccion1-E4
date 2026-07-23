@@ -54,12 +54,13 @@ def create_linea(data):
     except Exception as e:
         return error_response(error=str(e), message="Error en crear una línea", status_code=500)
     
-def update_linea(id_linea):
+def update_linea(id_linea, data):
     #Actualizar linea 
 
         try: 
             data = request.get_json()
-            linea = LineaServices.update_linea(id_linea ,data)
+            id_linea_int = int(id_linea )
+            linea = LineaServices.update_linea(id_linea_int ,data)
             return success_response(message="Línea actualizada exitosamente", data=linea.to_dict())
         except ResourceNotValid as e:
             return error_response(error=str(e), message=str(e), status_code=400)

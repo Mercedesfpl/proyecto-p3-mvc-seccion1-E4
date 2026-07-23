@@ -97,9 +97,14 @@ class LineaServices:
         return LineaRepository.save(nueva_linea)
     
     @staticmethod 
-    def update_linea(data, id_linea):
+    def update_linea(id_linea, data):
         #Actualiza una línea existente
         
+        try:
+            id_linea = int(id_linea)
+        except (TypeError, ValueError):
+            raise ResourceNotValid("Línea", "ID no válido") 
+
         # Validaciones de negocio
         linea = LineaRepository.get_by_id(id_linea)
         if not linea or linea.suspendido:

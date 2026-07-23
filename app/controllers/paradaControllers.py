@@ -13,7 +13,7 @@ def get_all_paradas():
     except Exception as e: 
         return error_response(error=str(e), message="Error en obtener las líneas", status_code=500)
     
-def get_paradas_by_id(id_parada):
+def get_parada_by_id(id_parada):
     #obtener una parada por id
 
     try:
@@ -24,11 +24,10 @@ def get_paradas_by_id(id_parada):
     except Exception as e:
         return error_response(error=str(e), message="Error al obtener la línea", status_code=500)
     
-def create_parada():
+def create_parada(data):
     #Crear una parada
 
     try:
-        data = request.get_json()
 
         #validación básica de entrada
         if not data.get('nombre'):
@@ -42,7 +41,7 @@ def create_parada():
     except Exception as e:
         return error_response(error=str(e), message="Error al obtener la línea", status_code=500)
     
-def update_parada(id_parada):
+def update_parada(id_parada, data):
     #Actualizar una parada
 
     try:
