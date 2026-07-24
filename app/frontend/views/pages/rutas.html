@@ -1,6 +1,6 @@
 <!-- app/frontend/views/pages/rutas.html -->
-{% extends 'layouts/base.html' %} {% block title %}Rutas{% endblock %} {% block styles
-%}
+{% extends 'layouts/base.html' %} {% block title %}Rutas{% endblock %} {% block
+styles %}
 <!-- CSS  específico -->
 
 <link
@@ -21,28 +21,28 @@
       <span>Total Rutas</span>
       <div class="kpi-icon"><i class="fas fa-route"></i></div>
     </div>
-    <div class="kpi-value">23</div>
+    <div class="kpi-value" id="totalRutas">0</div>
   </div>
   <div class="kpi-card">
     <div class="kpi-header">
       <span>Rutas Activas</span>
       <div class="kpi-icon"><i class="fas fa-check-circle"></i></div>
     </div>
-    <div class="kpi-value" style="color: #10b981">18</div>
+    <div class="kpi-value" id="rutasActivas" style="color: #10b981">0</div>
   </div>
   <div class="kpi-card">
     <div class="kpi-header">
       <span>Puntos de Control</span>
       <div class="kpi-icon"><i class="fas fa-map-marker-alt"></i></div>
     </div>
-    <div class="kpi-value">47</div>
+    <div class="kpi-value" id="totalParadas">0</div>
   </div>
   <div class="kpi-card">
     <div class="kpi-header">
       <span>Unidades Asignadas</span>
       <div class="kpi-icon"><i class="fas fa-bus"></i></div>
     </div>
-    <div class="kpi-value">124</div>
+    <div class="kpi-value" id="totalBuses">0</div>
   </div>
 </div>
 
@@ -72,7 +72,7 @@
 </div>
 
 <!-- Tarjetas de rutas (GRID 3 COLUMNAS) -->
-<div class="rutas-grid">
+<div class="rutas-grid" id="rutasGrid">
   <!-- Ruta 1 -->
   <div class="ruta-card">
     <div class="ruta-header">
@@ -376,6 +376,67 @@
         </tr>
       </tbody>
     </table>
+  </div>
+</div>
+
+<!-- MODAL NUEVA RUTA (estilo personas) -->
+<div id="modalNuevaRuta" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2><i class="fas fa-route"></i> Nueva Ruta</h2>
+      <span class="modal-close" onclick="cerrarModalRuta()">&times;</span>
+    </div>
+    <form id="formNuevaRuta">
+      <!-- Fila 1: Nombre + Línea -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nombre *</label>
+          <input
+            type="text"
+            id="nombre_ruta"
+            name="nombre"
+            placeholder="Ej: Ruta Los Teques - Caracas"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label>Línea *</label>
+          <select id="id_linea_ruta" name="id_linea" required>
+            <option value="">Seleccione una línea...</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Fila 2: Estado (solo) -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>Estado</label>
+          <select id="status_ruta" name="status">
+            <option value="activa">Activa</option>
+            <option value="inactiva">Inactiva</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Nota informativa -->
+      <div
+        style="
+          margin-top: 16px;
+          padding: 12px;
+          background: #f0f7ff;
+          border-radius: 6px;
+          font-size: 14px;
+          color: #1a3a5c;
+        "
+      >
+        <i class="fas fa-info-circle" style="color: #1a73e8"></i>
+        El nombre de la ruta debe ser único dentro de la misma línea.
+      </div>
+
+      <button type="submit" class="btn-guardar" id="guardarRutaBtn">
+        <i class="fas fa-save"></i> Guardar Ruta
+      </button>
+    </form>
   </div>
 </div>
 

@@ -1,5 +1,5 @@
 from app.repositories.lineaRepository import LineaRepository
-from app.services.linea_factory import LineaFactory
+from app.factory.linea_factory import LineaFactory
 from app.models.persona import Persona
 from app.models.models import Usuario
 from app.models.exceptions import ResourceNotValid, ResourceNotFound
@@ -59,7 +59,8 @@ class LineaServices:
             {
                 "id": s.id,
                 "nombre": s.nombre,
-                "apellido": s.apellido
+                "rol": s.rol,
+                #"apellido": s.apellido
             }
             for s in secretarios
         ]
@@ -86,12 +87,19 @@ class LineaServices:
             raise ResourceNotFound("Presidente no encontrado")
         
         #Verificar que el secretario exista (si se selecciono)
-        secretario = UserRepository.get_by_id(data['secretario_id'])
-        if not secretario:
-            raise ResourceNotFound("Secretario no encontrado")
+        secretario_id = data.get('secretario_id')
+        if secretario_id:
+            secretario = UserRepository.get_by_id(secretario_id)
+            if not secretario:
+                raise ResourceNotFound("Secretario no encontrado")
+        else:
+            secretario_id = None 
 
         #Usar la fábrica para crear un objeto
         nueva_linea = LineaFactory.crear_linea(data)
+
+        if secretario_id:
+            nueva_linea.secretario_id = secretario_id
 
         #Guardar en la bd
         return LineaRepository.save(nueva_linea)
@@ -127,10 +135,14 @@ class LineaServices:
             linea.presidente_id = data['presidente_id']
 
         if 'secretario_id' in data: 
-            secretario = UserRepository.get_by_id(data['secretario_id'])
-            if not secretario: 
-                raise ResourceNotFound("Secretario")
-            linea.secretario_id = data['secretario_id']
+            secretario_id = data['secretario_id']
+            if secretario_id:
+                secretario = UserRepository.get_by_id(secretario_id)
+                if not secretario: 
+                    raise ResourceNotFound("Secretario")
+                linea.secretario_id = secretario_id
+            else:
+                linea.secretario_id = None
         
         return LineaRepository.update(linea)
         

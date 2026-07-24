@@ -1,5 +1,5 @@
 from app.repositories.personaRepository import PersonaRepository
-from app.services.persona_factory import PersonaFactory
+from app.factory.persona_factory import PersonaFactory
 from app.models.exceptions import ResourceNotFound, ResourceNotValid
 from app.extensions import db
 import re

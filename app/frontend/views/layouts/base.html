@@ -1,28 +1,35 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Sistema de Transporte{% endblock %}</title>
 
     <!-- ====== CSS ====== -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/base/global.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/components.css') }}">
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/base/global.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/components/components.css') }}"
+    />
 
     <!-- ====== ESTILOS DE LA PÁGINA ====== -->
     {% block styles %}{% endblock %}
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
     <!-- Header -->
     {% include 'layouts/header.html' %}
 
     <!-- Contenido principal -->
-    <main class="main-content">
-        {% block content %}{% endblock %}
-    </main>
+    <main class="main-content">{% block content %}{% endblock %}</main>
 
     <!-- Toast para notificaciones -->
     <div id="toastMessage" class="toast-message"></div>
@@ -31,5 +38,5 @@
     <script src="{{ url_for('static', filename='js/base.js') }}"></script>
     <script src="{{ url_for('static', filename='js/header.js') }}"></script>
     {% block scripts %}{% endblock %}
-</body>
+  </body>
 </html>

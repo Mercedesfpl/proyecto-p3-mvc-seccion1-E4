@@ -40,6 +40,7 @@ def get_secretarios_disponibles():
     except ResourceNotFound as e:
         return success_response(data=[]) #Array vacio cuando no hay nada jijiji
     except Exception as e:
+        print(f"ERROR en get_secretarios_disponibles: {e}")  # <-- LOG
         return error_response(error=str(e), message="Error en obtener los secretarios disponibles", status_code=500)
     
 def create_linea(data):
