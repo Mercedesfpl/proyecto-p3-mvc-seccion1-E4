@@ -25,7 +25,7 @@ class ParadaFactory:
         es_valido, mensaje, lat, lng = validar_coordenadas(coordenadas_limpias)
         if not es_valido:
             raise ResourceNotValid("Parada", mensaje)
-        return coordenadas_limpias, lat, lng
+        return coordenadas_limpias
     
     @staticmethod
     def _validar_status(status):

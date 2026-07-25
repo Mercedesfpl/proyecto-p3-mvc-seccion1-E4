@@ -226,7 +226,7 @@ def update_parada(id_parada):
     from app.controllers.paradaControllers import update_parada
 
     data = request.get_json()
-    return update_parada(id_parada, data)
+    return update_parada(id_parada)
 
 
 @admin_scope.route("/paradas/<int:id_parada>", methods=["DELETE"])
