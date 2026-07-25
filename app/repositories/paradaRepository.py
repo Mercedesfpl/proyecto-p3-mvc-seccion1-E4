@@ -7,6 +7,11 @@ class ParadaRepository:
     @staticmethod
     def get_all():
         return Parada.query.all()
+
+    @staticmethod
+    def get_all_activas():
+        """Retorna solo paradas activas"""
+        return Parada.query.filter_by(status="activa").all()
     
     @staticmethod
     def get_by_id(id_parada):

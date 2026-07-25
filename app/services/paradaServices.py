@@ -12,6 +12,12 @@ class ParadaServices:
         #obtiene todas las paradas
         paradas = ParadaRepository.get_all()
         return [p.to_dict() for p in paradas]
+
+    @staticmethod
+    def get_paradas_disponibles():
+        """Obtiene todas las paradas activas para selectores"""
+        paradas = ParadaRepository.get_all_activas()
+        return [p.to_dict() for p in paradas]
     
     @staticmethod
     def get_parada_by_id(id_parada):

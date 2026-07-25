@@ -14,76 +14,283 @@
     font-weight: 700;
 }
 
-.paradas-container {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.paradas-container select[multiple] {
-    min-height: 120px;
-}
-
-.paradas-orden {
-    background: var(--gris);
-    padding: 12px;
-    border-radius: var(--radius-sm);
-}
-
-.paradas-orden label {
-    font-weight: 500;
-    font-size: 13px;
-    display: block;
-    margin-bottom: 8px;
-}
-
-.paradas-orden ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.paradas-orden ul li {
-    padding: 4px 8px;
-    margin-bottom: 4px;
+.mapa-principal-container {
     background: var(--blanco);
-    border-radius: 4px;
-    font-size: 13px;
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    box-shadow: var(--sombra);
+    margin-bottom: 24px;
+}
+
+.mapa-principal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
-.paradas-orden ul li .orden-numero {
-    background: var(--azul);
-    color: white;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
+.mapa-principal-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--texto-oscuro);
     display: flex;
     align-items: center;
+    gap: 8px;
+}
+
+#mapa-rutas-principal {
+    height: 350px;
+    width: 100%;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--borde);
+    background: var(--gris);
+}
+
+/* ===== MODAL DE RUTAS ===== */
+#modalNuevaRuta .modal-content {
+    max-width: 700px;
+}
+
+.paradas-seleccion-container {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+}
+
+.paradas-seleccion-container .paradas-disponibles {
+    flex: 1;
+}
+
+.paradas-seleccion-container .paradas-seleccionadas {
+    flex: 1;
+}
+
+.paradas-seleccion-container select {
+    height: 150px;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--borde);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+}
+
+.paradas-seleccion-container select option {
+    padding: 4px 8px;
+}
+
+.paradas-seleccion-container .btn-mover {
+    display: flex;
+    flex-direction: column;
     justify-content: center;
-    font-size: 11px;
-    font-weight: 600;
-    margin-right: 8px;
+    gap: 8px;
+    padding: 0 8px;
 }
 
-.paradas-orden ul li .btn-remove-parada {
-    color: var(--rojo);
-    cursor: pointer;
-    background: none;
+.paradas-seleccion-container .btn-mover button {
+    background: var(--azul);
+    color: white;
     border: none;
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
     font-size: 14px;
+    transition: var(--transition);
 }
 
-@media (max-width: 480px) {
-    .rutas-header {
+.paradas-seleccion-container .btn-mover button:hover {
+    background: var(--azul-oscuro);
+}
+
+.paradas-seleccion-container .btn-mover button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+
+.paradas-seleccion-container {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+    align-items: stretch;
+}
+
+.paradas-disponibles,
+.paradas-seleccionadas {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+}
+
+.paradas-disponibles label,
+.paradas-seleccionadas label {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--texto-oscuro);
+}
+
+.paradas-seleccion-container select {
+    flex: 1;
+    min-height: 150px;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--borde);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    background: var(--blanco);
+}
+
+.paradas-seleccion-container select option {
+    padding: 6px 10px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.paradas-seleccion-container select option:checked {
+    background: var(--azul);
+    color: white;
+}
+
+.paradas-acciones {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+}
+
+.paradas-acciones button {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.paradas-acciones button i {
+    font-size: 13px;
+}
+
+/* Botones todos en tonos de azul */
+.btn-agregar {
+    background: var(--azul);
+    color: var(--blanco);
+}
+
+.btn-agregar:hover {
+    background: var(--azul-oscuro);
+}
+
+.btn-agregar-todas {
+    background: var(--azul);
+    color: var(--blanco);
+    opacity: 0.85;
+}
+
+.btn-agregar-todas:hover {
+    background: var(--azul-oscuro);
+    opacity: 1;
+}
+
+.btn-quitar {
+    background: var(--azul);
+    color: var(--blanco);
+    opacity: 0.7;
+}
+
+.btn-quitar:hover {
+    background: var(--azul-oscuro);
+    opacity: 1;
+}
+
+.btn-quitar-todas {
+    background: var(--azul);
+    color: var(--blanco);
+    opacity: 0.55;
+}
+
+.btn-quitar-todas:hover {
+    background: var(--azul-oscuro);
+    opacity: 1;
+}
+
+.btn-mover {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 4px;
+    flex: 0 0 40px;
+}
+
+.btn-mover button {
+    background: var(--azul);
+    color: var(--blanco);
+    border: none;
+    border-radius: 6px;
+    padding: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: var(--transition);
+}
+
+.btn-mover button:hover {
+    background: var(--azul-oscuro);
+    transform: scale(1.05);
+}
+
+.btn-mover button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .paradas-seleccion-container {
         flex-direction: column;
-        align-items: stretch;
     }
 
-    .rutas-header .btn-add {
-        width: 100%;
+    .btn-mover {
+        flex-direction: row;
+        flex: 0 0 auto;
         justify-content: center;
+        padding: 8px 0;
+    }
+
+    .paradas-seleccion-container select {
+        min-height: 100px;
+    }
+}
+
+#mapa-rutas-modal {
+    height: 250px;
+    width: 100%;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--borde);
+    margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+    .paradas-seleccion-container {
+        flex-direction: column;
+    }
+    
+    .paradas-seleccion-container .btn-mover {
+        flex-direction: row;
+        justify-content: center;
+    }
+    
+    #mapa-rutas-principal {
+        height: 250px;
+    }
+    
+    #mapa-rutas-modal {
+        height: 200px;
     }
 }

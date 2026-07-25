@@ -197,6 +197,12 @@ def get_paradas():
 
     return get_all_paradas()
 
+@admin_scope.route("/paradas-disponibles", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_paradas_disponibles():
+    from app.controllers.paradaControllers import get_paradas_disponibles
+    return get_paradas_disponibles()
 
 @admin_scope.route("/paradas/<int:id_parada>", methods=["GET"])
 @jwt_required()

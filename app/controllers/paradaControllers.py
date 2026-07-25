@@ -11,6 +11,15 @@ def get_all_paradas():
     except Exception as e: 
         return error_response(error=str(e), message="Error al obtener las paradas", status_code=500)
     
+def get_paradas_disponibles():
+    """Obtener paradas activas para selectores"""
+    try:
+        from app.services.paradaServices import ParadaServices
+        data = ParadaServices.get_paradas_disponibles()
+        return success_response(data=data)
+    except Exception as e:
+        return error_response(error=str(e), message="Error al obtener paradas", status_code=500)
+
 def get_parada_by_id(id_parada):
     try:
         data = ParadaServices.get_parada_by_id(id_parada)

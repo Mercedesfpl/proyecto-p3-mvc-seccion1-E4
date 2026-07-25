@@ -181,4 +181,553 @@
 /* Marcador para paradas inactivas (gris) */
 .custom-marker-inactive {
     background: #95a5a6;
+}/* frontend/static/css/pages/paradas.css */
+
+.paradas-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.paradas-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* ===== MAPA PRINCIPAL ===== */
+.mapa-principal-container {
+    background: var(--blanco);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    box-shadow: var(--sombra);
+    margin-bottom: 24px;
+}
+
+.mapa-principal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.mapa-principal-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--texto-oscuro);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mapa-principal-header h3 i {
+    color: var(--azul);
+}
+
+.contador-paradas {
+    font-size: 13px;
+    background: var(--gris);
+    padding: 4px 14px;
+    border-radius: 20px;
+    color: var(--texto-claro);
+}
+
+#mapa-principal {
+    height: 350px;
+    width: 100%;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--borde);
+    background: var(--gris);
+}
+
+/* ===== MODAL ===== */
+.coordenadas-input-wrapper {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.coordenadas-input-wrapper input {
+    flex: 1;
+}
+
+.btn-mapa {
+    background: var(--azul);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 40px;
+    border: none;
+    font-size: 13px;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-mapa:hover {
+    background: var(--azul-oscuro);
+}
+
+.btn-mapa.active {
+    background: var(--rojo);
+}
+
+.btn-mapa.active:hover {
+    background: #7a1a1e;
+}
+
+#map-container {
+    height: 300px;
+    width: 100%;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--borde);
+    margin-top: 8px;
+}
+
+.mapa-ayuda {
+    font-size: 12px;
+    color: var(--texto-claro);
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ===== TABLA ===== */
+.tabla-container {
+    background: var(--blanco);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--sombra);
+    overflow-x: auto;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+    .paradas-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .paradas-header .btn-add {
+        width: 100%;
+        justify-content: center;
+    }
+
+    #mapa-principal {
+        height: 250px;
+    }
+
+    #map-container {
+        height: 220px;
+    }
+
+    .coordenadas-input-wrapper {
+        flex-direction: column;
+    }
+
+    .coordenadas-input-wrapper .btn-mapa {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ===== ESTILOS PARA MARCADORES EN EL MAPA ===== */
+.custom-marker {
+    background: #ea4335;
+    width: 24px;
+    height: 24px;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    border: 2px solid white;
+    position: relative;
+}
+
+.custom-marker-inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+}
+
+/* Marcador para paradas inactivas (gris) */
+.custom-marker-inactive {
+    background: #95a5a6;
+}/* frontend/static/css/pages/paradas.css */
+
+.paradas-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.paradas-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* ===== MAPA PRINCIPAL ===== */
+.mapa-principal-container {
+    background: var(--blanco);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    box-shadow: var(--sombra);
+    margin-bottom: 24px;
+}
+
+.mapa-principal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.mapa-principal-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--texto-oscuro);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mapa-principal-header h3 i {
+    color: var(--azul);
+}
+
+.contador-paradas {
+    font-size: 13px;
+    background: var(--gris);
+    padding: 4px 14px;
+    border-radius: 20px;
+    color: var(--texto-claro);
+}
+
+#mapa-principal {
+    height: 350px;
+    width: 100%;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--borde);
+    background: var(--gris);
+}
+
+/* ===== MODAL ===== */
+.coordenadas-input-wrapper {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.coordenadas-input-wrapper input {
+    flex: 1;
+}
+
+.btn-mapa {
+    background: var(--azul);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 40px;
+    border: none;
+    font-size: 13px;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-mapa:hover {
+    background: var(--azul-oscuro);
+}
+
+.btn-mapa.active {
+    background: var(--rojo);
+}
+
+.btn-mapa.active:hover {
+    background: #7a1a1e;
+}
+
+#map-container {
+    height: 300px;
+    width: 100%;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--borde);
+    margin-top: 8px;
+}
+
+.mapa-ayuda {
+    font-size: 12px;
+    color: var(--texto-claro);
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ===== TABLA ===== */
+.tabla-container {
+    background: var(--blanco);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--sombra);
+    overflow-x: auto;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+    .paradas-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .paradas-header .btn-add {
+        width: 100%;
+        justify-content: center;
+    }
+
+    #mapa-principal {
+        height: 250px;
+    }
+
+    #map-container {
+        height: 220px;
+    }
+
+    .coordenadas-input-wrapper {
+        flex-direction: column;
+    }
+
+    .coordenadas-input-wrapper .btn-mapa {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ===== ESTILOS PARA MARCADORES EN EL MAPA ===== */
+.custom-marker {
+    background: #ea4335;
+    width: 24px;
+    height: 24px;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    border: 2px solid white;
+    position: relative;
+}
+
+.custom-marker-inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+}
+
+/* Marcador para paradas inactivas (gris) */
+.custom-marker-inactive {
+    background: #95a5a6;
+}/* frontend/static/css/pages/paradas.css */
+
+.paradas-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.paradas-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* ===== MAPA PRINCIPAL ===== */
+.mapa-principal-container {
+    background: var(--blanco);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    box-shadow: var(--sombra);
+    margin-bottom: 24px;
+}
+
+.mapa-principal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.mapa-principal-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--texto-oscuro);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mapa-principal-header h3 i {
+    color: var(--azul);
+}
+
+.contador-paradas {
+    font-size: 13px;
+    background: var(--gris);
+    padding: 4px 14px;
+    border-radius: 20px;
+    color: var(--texto-claro);
+}
+
+#mapa-principal {
+    height: 350px;
+    width: 100%;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--borde);
+    background: var(--gris);
+}
+
+/* ===== MODAL ===== */
+.coordenadas-input-wrapper {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.coordenadas-input-wrapper input {
+    flex: 1;
+}
+
+.btn-mapa {
+    background: var(--azul);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 40px;
+    border: none;
+    font-size: 13px;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-mapa:hover {
+    background: var(--azul-oscuro);
+}
+
+.btn-mapa.active {
+    background: var(--rojo);
+}
+
+.btn-mapa.active:hover {
+    background: #7a1a1e;
+}
+
+#map-container {
+    height: 300px;
+    width: 100%;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--borde);
+    margin-top: 8px;
+}
+
+.mapa-ayuda {
+    font-size: 12px;
+    color: var(--texto-claro);
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ===== TABLA ===== */
+.tabla-container {
+    background: var(--blanco);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--sombra);
+    overflow-x: auto;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+    .paradas-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .paradas-header .btn-add {
+        width: 100%;
+        justify-content: center;
+    }
+
+    #mapa-principal {
+        height: 250px;
+    }
+
+    #map-container {
+        height: 220px;
+    }
+
+    .coordenadas-input-wrapper {
+        flex-direction: column;
+    }
+
+    .coordenadas-input-wrapper .btn-mapa {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ===== ESTILOS PARA MARCADORES EN EL MAPA ===== */
+.custom-marker {
+    background: #ea4335;
+    width: 24px;
+    height: 24px;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    border: 2px solid white;
+    position: relative;
+}
+
+.custom-marker-inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+}
+
+/* Marcador para paradas inactivas (gris) */
+.custom-marker-inactive {
+    background: #95a5a6;
 }
