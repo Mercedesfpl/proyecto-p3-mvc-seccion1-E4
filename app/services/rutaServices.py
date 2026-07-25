@@ -1,112 +1,74 @@
-# app/services/rutaServices.py
-
-from ..models.ruta import Ruta
-from ..models.exceptions import ResourceNotFound, ResourceNotValid
-from ..repositories.rutaRepository import RutaRepository
-from ..repositories.lineaRepository import LineaRepository
-from ..repositories.paradaRepository import ParadaRepository
-from ..services.ruta_factory import RutaFactory
-from ..extensions import db
-
+from app.repositories.rutaRepository import RutaRepository
+from app.repositories.lineaRepository import LineaRepository
+from app.factory.ruta_factory import RutaFactory
+from app.models.exceptions import ResourceNotFound, ResourceNotValid
 
 class RutaServices:
-    """Lógica de negocio para Rutas"""
-
+    
     @staticmethod
     def get_all_rutas():
         rutas = RutaRepository.get_all()
-        return [ruta.to_dict() for ruta in rutas]
-
+        return [r.to_dict() for r in rutas]
+    
     @staticmethod
     def get_ruta_by_id(id_ruta):
         ruta = RutaRepository.get_by_id(id_ruta)
         if not ruta:
             raise ResourceNotFound("Ruta")
         return ruta.to_dict()
-
-    @staticmethod
-    def get_rutas_by_linea(id_linea):
-        linea = LineaRepository.get_by_id(id_linea)
-        if not linea:
-            raise ResourceNotFound("Línea")
-        rutas = RutaRepository.get_by_linea(id_linea)
-        return [ruta.to_dict() for ruta in rutas]
-
+    
     @staticmethod
     def create_ruta(data):
-        # Crear ruta usando el factory
+        # Validar nombre único dentro de la misma línea
+        nombre = data.get('nombre')
+        id_linea = data.get('id_linea')
+        if not nombre or not id_linea:
+            raise ResourceNotValid("Ruta", "Nombre y línea son obligatorios")
+        
+        if RutaRepository.existentePorNombre(nombre, id_linea):
+            raise ResourceNotValid("nombre", "Ya existe una ruta con ese nombre en esta línea")
+        
+        # Validar que la línea exista
+        linea = LineaRepository.get_by_id(id_linea)
+        if not linea:
+            raise ResourceNotFound("Línea no encontrada")
+        
         ruta = RutaFactory.crear_ruta(data)
-        
-        # Guardar ruta
-        RutaRepository.save(ruta)
-        
-        # Crear relaciones con paradas si existen
-        paradas_ids = data.get("paradas_ids", [])
-        if paradas_ids:
-            relaciones = RutaFactory.crear_relaciones_paradas(ruta, paradas_ids)
-            for relacion in relaciones:
-                RutaRepository.save_relacion(relacion)
-        
-        return ruta.to_dict()
-
+        return RutaRepository.save(ruta)
+    
     @staticmethod
     def update_ruta(id_ruta, data):
         ruta = RutaRepository.get_by_id(id_ruta)
         if not ruta:
             raise ResourceNotFound("Ruta")
         
-        # Actualizar campos
-        if "nombre" in data:
-            existing = RutaRepository.get_by_nombre(data["nombre"])
-            if existing and existing.id != id_ruta:
-                raise ResourceNotValid("Ruta", "Ya existe otra ruta con ese nombre")
-            ruta.nombre = data["nombre"].strip()
+        if 'nombre' in data:
+            nombre = data['nombre'].strip()
+            if not nombre:
+                raise ResourceNotValid("nombre", "El nombre es requerido")
+            # Validar que no exista otra ruta con el mismo nombre en la misma línea
+            if RutaRepository.existentePorNombre(nombre, ruta.id_linea, exclude_id=id_ruta):
+                raise ResourceNotValid("nombre", "Ya existe otra ruta con ese nombre en esta línea")
+            ruta.nombre = nombre
         
-        if "status" in data:
-            if data["status"] not in ["activa", "inactiva"]:
-                raise ResourceNotValid("Ruta", f"Status inválido: {data['status']}")
-            ruta.status = data["status"]
+        if 'status' in data:
+            status = data['status']
+            if status not in ["activa", "inactiva"]:
+                raise ResourceNotValid("status", "Status inválido")
+            ruta.status = status
         
-        if "id_linea" in data:
-            linea = LineaRepository.get_by_id(data["id_linea"])
+        if 'id_linea' in data:
+            linea = LineaRepository.get_by_id(data['id_linea'])
             if not linea:
-                raise ResourceNotValid("Ruta", "La línea seleccionada no existe")
-            ruta.id_linea = data["id_linea"]
+                raise ResourceNotFound("Línea no encontrada")
+            ruta.id_linea = data['id_linea']
         
-        # Actualizar paradas si se envían
-        if "paradas_ids" in data:
-            # Eliminar relaciones existentes
-            RutaRepository.delete_relaciones_by_ruta(id_ruta)
-            
-            # Crear nuevas relaciones
-            relaciones = RutaFactory.crear_relaciones_paradas(ruta, data["paradas_ids"])
-            for relacion in relaciones:
-                RutaRepository.save_relacion(relacion)
-        
-        RutaRepository.save(ruta)
-        return ruta.to_dict()
-
+        return RutaRepository.save(ruta)
+    
     @staticmethod
     def delete_ruta(id_ruta):
         ruta = RutaRepository.get_by_id(id_ruta)
         if not ruta:
             raise ResourceNotFound("Ruta")
-        
-        # Verificar si tiene buses asignados
-        from ..models.bus import Bus
-        buses = Bus.query.filter_by(id_ruta=id_ruta).first()
-        if buses:
-            raise ResourceNotValid("Ruta", "No se puede eliminar porque tiene buses asignados")
-        
-        RutaRepository.delete(ruta)
-        return True
-
-    @staticmethod
-    def get_paradas_disponibles():
-        paradas = ParadaRepository.get_all_activas()
-        return [{"id": p.id, "nombre": p.nombre, "coordenadas": p.coordenadas} for p in paradas]
-
-    @staticmethod
-    def get_lineas_disponibles():
-        lineas = LineaRepository.get_all_activas()
-        return [{"id": l.id, "nombre": l.nombre} for l in lineas]
+        # Aquí podrías verificar si la ruta tiene buses asignados (opcional)
+        return RutaRepository.delete(ruta)

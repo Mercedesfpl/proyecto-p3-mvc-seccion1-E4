@@ -40,13 +40,12 @@ def get_secretarios_disponibles():
     except ResourceNotFound as e:
         return success_response(data=[]) #Array vacio cuando no hay nada jijiji
     except Exception as e:
+        print(f"ERROR en get_secretarios_disponibles: {e}")  # <-- LOG
         return error_response(error=str(e), message="Error en obtener los secretarios disponibles", status_code=500)
     
-def create_linea():
+def create_linea(data):
     #Crea una línea
-
     try: 
-        data = request.get_json()
         linea = LineaServices.create_linea(data)
         return success_response(message="Línea creada existosamente", data=linea.to_dict())
     except ResourceNotValid as e:
@@ -56,12 +55,13 @@ def create_linea():
     except Exception as e:
         return error_response(error=str(e), message="Error en crear una línea", status_code=500)
     
-def update_linea(id_linea):
+def update_linea(id_linea, data):
     #Actualizar linea 
 
         try: 
             data = request.get_json()
-            linea = LineaServices.update_linea(id_linea, data)
+            id_linea_int = int(id_linea )
+            linea = LineaServices.update_linea(id_linea_int ,data)
             return success_response(message="Línea actualizada exitosamente", data=linea.to_dict())
         except ResourceNotValid as e:
             return error_response(error=str(e), message=str(e), status_code=400)

@@ -33,10 +33,6 @@ class LineaRepository:
         return Persona.query.get(id_persona)
     
     @staticmethod
-    def get_usuario_by_id(id_usuario):
-        return Usuario.query.get(id_usuario)
-    
-    @staticmethod
     def save(linea):
         db.session.add(linea)
         db.session.commit()

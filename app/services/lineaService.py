@@ -1,7 +1,5 @@
-# app/services/lineaServices.py
-
 from app.repositories.lineaRepository import LineaRepository
-from app.services.linea_factory import LineaFactory
+from app.factory.linea_factory import LineaFactory
 from app.models.persona import Persona
 from app.models.models import Usuario
 from app.models.exceptions import ResourceNotValid, ResourceNotFound
@@ -13,20 +11,25 @@ class LineaServices:
 
     @staticmethod 
     def get_all_lineas():
-        lineas = LineaRepository.get_all()
-        return [
-            {
-                "id": l.id,
-                "nombre": l.nombre,
-                "presidente": l.presidente.nombre if l.presidente else None,
-                "secretario_nombre": l.secretario.nombre if l.secretario else None,
-                "rif": l.rif
-            }
-            for l in lineas
-        ]
-    
+        try:
+            lineas = LineaRepository.get_all()
+            return [
+                {
+                    "id": l.id,
+                    "nombre": l.nombre,
+                    "presidente": l.presidente.nombre if l.presidente else None,
+                    "secretario_nombre": l.secretario.nombre if l.secretario else None,
+                    "rif": l.rif
+                }
+                for l in lineas
+            ]
+        except Exception as e:
+            print ("Error en get_all_lineas", e)
+            raise
+
     @staticmethod 
     def get_linea_by_id(id_linea):
+        #Obtiene una línea por ID
         linea = LineaRepository.get_by_id(id_linea)
         if not linea or linea.suspendido:
             raise ResourceNotFound("Línea")
@@ -34,6 +37,7 @@ class LineaServices:
     
     @staticmethod 
     def get_personas_disponibles():
+        #obtiene todas las personas para los selects
         personas = PersonaRepository.get_all()
         if not personas:
             raise ResourceNotFound("Personas")
@@ -49,18 +53,23 @@ class LineaServices:
     
     @staticmethod 
     def get_secretarios_disponibles():
+        #obtiene todos los usuarios del rol secretario
         secretarios = PersonaRepository.get_secretarios()
         return [
             {
                 "id": s.id,
                 "nombre": s.nombre,
-                "email": s.email
+                "rol": s.rol,
+                #"apellido": s.apellido
             }
             for s in secretarios
         ]
     
     @staticmethod 
     def create_linea(data):
+        #Crea una nueva línea usando la fábrica
+        
+        # Validaciones de negocio
         if not data.get('nombre'):
             raise ResourceNotValid("Línea", "El nombre es obligatorio")
         if not data.get('rif'):
@@ -68,28 +77,48 @@ class LineaServices:
         if not data.get('presidente_id'):
             raise ResourceNotValid("Línea", "Debes seleccionar un presidente")
         
+        #Verificar que no exista otra línea con el mismo nombre
         if LineaRepository.existentePorNombre(data['nombre']):
             raise ResourceNotValid("Línea", "Ya existe una línea con ese nombre")
         
-        presidente = PersonaRepository.get_by_id(data['presidente_id'])
+        #Verificar que el presidente exista
+        presidente = UserRepository.get_by_id(data['presidente_id'])
         if not presidente:
             raise ResourceNotFound("Presidente no encontrado")
         
-        secretario_id = data.get("secretario_id")
+        #Verificar que el secretario exista (si se selecciono)
+        secretario_id = data.get('secretario_id')
         if secretario_id:
-            secretario = PersonaRepository.get_by_id(secretario_id)
+            secretario = UserRepository.get_by_id(secretario_id)
             if not secretario:
-                raise ResourceNotFound("Secretario")
+                raise ResourceNotFound("Secretario no encontrado")
+        else:
+            secretario_id = None 
 
+        #Usar la fábrica para crear un objeto
         nueva_linea = LineaFactory.crear_linea(data)
+
+        if secretario_id:
+            nueva_linea.secretario_id = secretario_id
+
+        #Guardar en la bd
         return LineaRepository.save(nueva_linea)
     
     @staticmethod 
     def update_linea(id_linea, data):
+        #Actualiza una línea existente
+        
+        try:
+            id_linea = int(id_linea)
+        except (TypeError, ValueError):
+            raise ResourceNotValid("Línea", "ID no válido") 
+
+        # Validaciones de negocio
         linea = LineaRepository.get_by_id(id_linea)
         if not linea or linea.suspendido:
             raise ResourceNotFound("Línea")
         
+        #Actualizar campos con validaciones
         if 'nombre' in data:
             nombre = data['nombre'].strip()
             if LineaRepository.existentePorNombre(nombre, exclude_id=id_linea):
@@ -100,21 +129,27 @@ class LineaServices:
             linea.rif = data['rif'].strip()
 
         if 'presidente_id' in data:
-            presidente = PersonaRepository.get_by_id(data['presidente_id'])
+            presidente = UserRepository.get_by_id(data['presidente_id'])
             if not presidente: 
                 raise ResourceNotFound("Presidente")
             linea.presidente_id = data['presidente_id']
 
         if 'secretario_id' in data: 
-            secretario = PersonaRepository.get_by_id(data['secretario_id'])
-            if not secretario: 
-                raise ResourceNotFound("Secretario")
-            linea.secretario_id = data['secretario_id']
+            secretario_id = data['secretario_id']
+            if secretario_id:
+                secretario = UserRepository.get_by_id(secretario_id)
+                if not secretario: 
+                    raise ResourceNotFound("Secretario")
+                linea.secretario_id = secretario_id
+            else:
+                linea.secretario_id = None
         
         return LineaRepository.update(linea)
         
     @staticmethod 
     def delete_linea(id_linea):
+        #"Elimina" (Suspende) una línea existente
+        
         linea = LineaRepository.get_by_id(id_linea)
         if not linea:
             raise ResourceNotFound("Línea")

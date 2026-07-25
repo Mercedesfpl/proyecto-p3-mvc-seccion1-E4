@@ -11,7 +11,10 @@ class UserRepository:
 
     @staticmethod
     def get_by_id(id_usuario):
+        if id_usuario is None:
+            return None
         return Usuario.query.get(id_usuario)
+        
 
     @staticmethod
     def get_pre_register_by_id(id_usuario):

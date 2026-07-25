@@ -1,6 +1,6 @@
 <!-- frontend/views/flota.html -->
-{% extends 'layouts/base.html' %} {% block title %}Flota{% endblock %} {% block styles
-%}
+{% extends 'layouts/base.html' %} {% block title %}Flota{% endblock %} {% block
+styles %}
 <!-- flota.html -->
 
 <!-- CSS specífico -->
@@ -290,6 +290,86 @@
     <div class="page-item">3</div>
     <div class="page-item">4</div>
     <div class="page-item next">Siguiente</div>
+  </div>
+</div>
+
+<!-- MODAL NUEVA UNIDAD (estilo igual al de personas) -->
+<div id="modalNuevaUnidad" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2><i class="fas fa-bus"></i> Nueva Unidad</h2>
+      <span class="modal-close" onclick="cerrarModalUnidad()">&times;</span>
+    </div>
+    <form id="formNuevaUnidad">
+      <!-- Fila 1: Placa + Línea -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>Placa *</label>
+          <input
+            type="text"
+            id="placa"
+            name="placa"
+            placeholder="Ej: ABC123"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label>Línea *</label>
+          <select id="id_linea" name="id_linea" required>
+            <option value="">Seleccione una línea...</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Fila 2: Ruta + Secretario -->
+      <div class="form-row">
+        <div class="form-group">
+          <label
+            >Ruta
+            <span style="color: var(--texto-claro)">(opcional)</span></label
+          >
+          <select id="id_ruta" name="id_ruta">
+            <option value="">Sin ruta asignada</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Secretario *</label>
+          <select id="id_secretario" name="id_secretario" required>
+            <option value="">Seleccione un secretario...</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Fila 3: Estado -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>Estado</label>
+          <select id="status" name="status">
+            <option value="activa">Activa</option>
+            <option value="inactiva">Inactiva</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Nota informativa (opcional) -->
+      <div
+        style="
+          margin-top: 16px;
+          padding: 12px;
+          background: #f0f7ff;
+          border-radius: 6px;
+          font-size: 14px;
+          color: #1a3a5c;
+        "
+      >
+        <i class="fas fa-info-circle" style="color: #1a73e8"></i>
+        La placa debe ser única. La ruta es opcional.
+      </div>
+
+      <button type="submit" class="btn-guardar" id="guardarUnidadBtn">
+        <i class="fas fa-save"></i> Guardar Unidad
+      </button>
+    </form>
   </div>
 </div>
 {% endblock %} {% block scripts %}
