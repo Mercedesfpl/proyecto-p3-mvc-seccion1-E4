@@ -9,6 +9,7 @@ let paradasSeleccionadasIds = [];
 let mapaPrincipal = null;
 let mapaModal = null;
 let paginaActual = 1;
+let controlesRuta = [];
 const registrosPorPagina = 5;
 let rutasFiltradas = [];
 
@@ -62,8 +63,24 @@ function inicializarMapaPrincipal() {
 function actualizarMapaPrincipal(rutasData) {
     if (!mapaPrincipal) return;
 
+    // Limpiar controles de ruta anteriores
+    if (controlesRuta.length > 0) {
+        controlesRuta.forEach(control => {
+            try {
+                mapaPrincipal.removeControl(control);
+            } catch (e) {
+                // Si el control ya fue removido, ignorar
+            }
+        });
+        controlesRuta = [];
+    }
+
+    // Limpiar capas (excepto el tileLayer)
     mapaPrincipal.eachLayer(function(layer) {
-        if (layer instanceof L.Marker || layer instanceof L.Polyline || layer instanceof L.CircleMarker) {
+        // Solo eliminar si es un Marker, Polyline o CircleMarker
+        if (layer instanceof L.Marker || 
+            layer instanceof L.Polyline || 
+            layer instanceof L.CircleMarker) {
             mapaPrincipal.removeLayer(layer);
         }
     });
@@ -79,47 +96,64 @@ function actualizarMapaPrincipal(rutasData) {
     rutasData.forEach((ruta, index) => {
         const color = colores[index % colores.length];
 
-        if (ruta.paradas && ruta.paradas.length > 0) {
-            const coords = ruta.paradas.map(p => {
-                const partes = p.coordenadas ? p.coordenadas.split(',') : [];
-                if (partes.length === 2) {
-                    const lat = parseFloat(partes[0].trim());
-                    const lng = parseFloat(partes[1].trim());
-                    if (!isNaN(lat) && !isNaN(lng)) {
-                        return [lat, lng];
-                    }
-                }
-                return null;
-            }).filter(c => c !== null);
+        if (ruta.paradas && ruta.paradas.length >= 2) {
+            // Ordenar paradas por orden
+            const paradasOrdenadas = [...ruta.paradas].sort((a, b) => a.orden - b.orden);
+            
+            // Convertir paradas a waypoints
+            const waypoints = paradasOrdenadas.map(p => {
+                const coords = p.coordenadas.split(',');
+                return L.latLng(parseFloat(coords[0].trim()), parseFloat(coords[1].trim()));
+            });
 
-            if (coords.length > 0) {
-                L.polyline(coords, {
-                    color: color,
-                    weight: 3,
-                    opacity: 0.8,
-                    dashArray: '5, 10'
-                }).addTo(mapaPrincipal);
-
-                coords.forEach((coord, i) => {
-                    const marker = L.circleMarker(coord, {
-                        radius: 5,
-                        fillColor: color,
-                        color: '#fff',
-                        weight: 2,
-                        opacity: 1,
-                        fillOpacity: 0.8
+            // Si hay Leaflet Routing Machine disponible
+            if (typeof L.Routing !== 'undefined' && waypoints.length >= 2) {
+                try {
+                    const rutaControl = L.Routing.control({
+                        waypoints: waypoints,
+                        routeWhileDragging: false,
+                        showAlternatives: false,
+                        fitSelectedRoutes: false,
+                        lineOptions: {
+                            styles: [{ color: color, weight: 4, opacity: 0.8 }],
+                            extendToWaypoints: false,
+                            missingRouteTolerance: 0
+                        },
+                        router: L.Routing.osrmv1({
+                            serviceUrl: 'https://router.project-osrm.org/route/v1/'
+                        }),
+                        show: false
                     }).addTo(mapaPrincipal);
 
-                    const parada = ruta.paradas[i];
-                    if (parada) {
-                        marker.bindPopup(`
-                            <strong>${parada.nombre}</strong>
-                            <br>Orden: ${i + 1}
-                            <br>Ruta: ${ruta.nombre}
-                        `);
-                    }
-                });
+                    controlesRuta.push(rutaControl);
+                } catch (e) {
+                    console.warn('Error al crear ruta con Routing:', e);
+                    // Fallback: dibujar línea recta
+                    dibujarLineaRecta(mapaPrincipal, waypoints, color);
+                }
+            } else {
+                // Fallback: dibujar línea recta
+                dibujarLineaRecta(mapaPrincipal, waypoints, color);
             }
+
+            // Agregar marcadores en las paradas
+            waypoints.forEach((coord, i) => {
+                const parada = paradasOrdenadas[i];
+                const marker = L.circleMarker(coord, {
+                    radius: 6,
+                    fillColor: color,
+                    color: '#fff',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.9
+                }).addTo(mapaPrincipal);
+
+                marker.bindPopup(`
+                    <strong>${parada.nombre}</strong>
+                    <br>Orden: ${i + 1}
+                    <br>Ruta: ${ruta.nombre}
+                `);
+            });
         }
     });
 
@@ -127,6 +161,18 @@ function actualizarMapaPrincipal(rutasData) {
     if (contador) {
         contador.textContent = `${rutasData.length} rutas`;
     }
+}
+
+// Función fallback para dibujar línea recta
+function dibujarLineaRecta(mapa, waypoints, color) {
+    if (waypoints.length < 2) return;
+    const coords = waypoints.map(w => w);
+    L.polyline(coords, {
+        color: color,
+        weight: 3,
+        opacity: 0.7,
+        dashArray: '5, 10'
+    }).addTo(mapa);
 }
 
 // ========== MAPA EN MODAL ==========
