@@ -12,19 +12,17 @@
 {% endblock %}
 
 {% block content %}
-<div class="paradas-header">
-    <h1>Gestion de Paradas</h1>
+<div class="page-header">
+    <h1>Gestión de Paradas</h1>
     <button class="btn-add" id="btnNuevaParada">
         <i class="fas fa-plus"></i> Nueva Parada
     </button>
 </div>
 
-<!-- Layout con mapa a la derecha -->
-<div class="paradas-layout">
-    <!-- Tabla (izquierda) -->
-    <div class="paradas-tabla-wrapper">
+<div class="layout-mapa-derecha">
+    <!-- Tabla -->
+    <div class="tabla-wrapper">
         <div class="tabla-container">
-            <!-- Buscador -->
             <div class="tabla-toolbar">
                 <div class="tabla-busqueda">
                     <i class="fas fa-search"></i>
@@ -32,12 +30,11 @@
                 </div>
             </div>
             <div id="tablaParadas"></div>
-            <!-- Paginacion -->
             <div class="tabla-paginacion" id="paginacionParadas">
                 <button id="btnAnterior" disabled>
                     <i class="fas fa-chevron-left"></i> Anterior
                 </button>
-                <span class="info-pagina" id="infoPagina">Pagina 1 de 1</span>
+                <span class="info-pagina" id="infoPagina">Página 1 de 1</span>
                 <button id="btnSiguiente" disabled>
                     Siguiente <i class="fas fa-chevron-right"></i>
                 </button>
@@ -45,19 +42,19 @@
         </div>
     </div>
 
-    <!-- Mapa (derecha, mas pequeno) -->
-    <div class="paradas-mapa-wrapper">
-        <div class="mapa-principal-container">
-            <div class="mapa-principal-header">
-                <h3><i class="fas fa-map-marked-alt"></i> Ubicacion de Paradas</h3>
+    <!-- Mapa -->
+    <div class="mapa-wrapper">
+        <div class="mapa-container">
+            <div class="mapa-header">
+                <h3><i class="fas fa-map-marked-alt"></i> Ubicación de Paradas</h3>
                 <div class="mapa-acciones">
-                    <span class="contador-paradas" id="contadorParadas">0 paradas</span>
-                    <button class="btn-expandir-mapa" id="btnExpandirMapa" title="Expandir mapa">
+                    <span class="mapa-contador" id="contadorParadas">0 paradas</span>
+                    <button class="btn-expandir" id="btnExpandirMapa" title="Expandir mapa">
                         <i class="fas fa-expand"></i>
                     </button>
                 </div>
             </div>
-            <div id="mapa-principal"></div>
+            <div class="mapa-principal" id="mapa-principal"></div>
         </div>
     </div>
 </div>
