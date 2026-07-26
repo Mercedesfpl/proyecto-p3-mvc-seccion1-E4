@@ -6,6 +6,11 @@ let mapa = null;
 let marcador = null;
 let mapaPrincipal = null;
 let marcadoresPrincipales = [];
+let todasLasParadas = [];
+let paradasFiltradas = [];
+let paginaActual = 1;
+const registrosPorPagina = 5;
+
 
 // ========== TOAST ==========
 
@@ -63,11 +68,22 @@ function inicializarMapaPrincipal(paradas = []) {
         }
     }
 
-    mapaPrincipal = L.map('mapa-principal').setView([centroLat, centroLng], 12);
+    mapaPrincipal = L.map('mapa-principal', {
+        zoomControl: true,
+        fadeAnimation: true,
+        zoomAnimation: true
+    }).setView([centroLat, centroLng], 12);
 
+    // ===== CAMBIO: Usar servidor de tiles alternativo =====
+    // Usar OpenStreetMap con un User-Agent diferente y más timeout
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
-        attribution: '© OpenStreetMap contributors'
+        minZoom: 8,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        subdomains: 'abc',
+        crossOrigin: true,
+        // Añadir timeout para evitar que se quede cargando
+        errorTileUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
     }).addTo(mapaPrincipal);
 
     paradas.forEach(parada => {
@@ -95,54 +111,53 @@ function agregarMarcadorPrincipal(lat, lng, parada) {
     if (!mapaPrincipal) return;
 
     const esActiva = parada.status === 'activa';
-    const color = esActiva ? '#ea4335' : '#95a5a6';
+    const color = esActiva ? '#74A9D3' : '#95a5a6';
 
     const icono = L.divIcon({
         className: 'custom-marker',
         html: `
             <div style="
                 background: ${color};
-                width: 24px;
-                height: 24px;
-                border-radius: 50% 50% 50% 0;
-                transform: rotate(-45deg);
-                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-                border: 2px solid white;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                border: 3px solid white;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
                 position: relative;
+                cursor: pointer;
             ">
                 <div style="
                     position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%) rotate(45deg);
-                    width: 8px;
-                    height: 8px;
-                    background: white;
+                    top: -4px;
+                    left: -4px;
+                    right: -4px;
+                    bottom: -4px;
                     border-radius: 50%;
+                    background: ${color};
+                    opacity: 0.2;
                 "></div>
             </div>
         `,
-        iconSize: [24, 24],
-        iconAnchor: [12, 24],
-        popupAnchor: [0, -24]
+        iconSize: [20, 20],
+        iconAnchor: [10, 10],
+        popupAnchor: [0, -10]
     });
 
     const marcador = L.marker([lat, lng], { icon: icono }).addTo(mapaPrincipal);
 
     const estadoTexto = esActiva ? 'Activa' : 'Inactiva';
+    const estadoColor = esActiva ? '#10b981' : '#95a5a6';
     const popupContent = `
-        <div style="font-family: 'Inter', sans-serif; padding: 4px;">
+        <div style="font-family: 'Inter', sans-serif; padding: 4px; min-width: 150px;">
             <strong style="font-size: 14px;">${parada.nombre}</strong>
             <br>
             <span style="font-size: 12px; color: #666;">
                 <i class="fas fa-map-pin"></i> ${parada.coordenadas}
             </span>
             <br>
-            <span style="font-size: 12px; color: ${esActiva ? '#10b981' : '#95a5a6'};">
+            <span style="font-size: 12px; color: ${estadoColor};">
                 <i class="fas fa-circle"></i> ${estadoTexto}
             </span>
-            <br>
-            <span style="font-size: 11px; color: #999;">ID: ${parada.id}</span>
         </div>
     `;
     marcador.bindPopup(popupContent);
@@ -180,39 +195,42 @@ function inicializarMapaModal(lat = 10.3447, lng = -67.0400) {
 
     mapa = L.map('map-container').setView([lat, lng], 15);
 
+    // ===== CAMBIO: Usar servidor de tiles alternativo =====
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
-        attribution: '© OpenStreetMap contributors'
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        subdomains: 'abc',
+        crossOrigin: true,
+        errorTileUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
     }).addTo(mapa);
 
     const iconoPersonalizado = L.divIcon({
         className: 'custom-marker',
         html: `
             <div style="
-                background: #ea4335;
+                background: #74A9D3;
                 width: 24px;
                 height: 24px;
-                border-radius: 50% 50% 50% 0;
-                transform: rotate(-45deg);
-                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-                border: 2px solid white;
+                border-radius: 50%;
+                border: 3px solid white;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
                 position: relative;
             ">
                 <div style="
                     position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%) rotate(45deg);
-                    width: 8px;
-                    height: 8px;
-                    background: white;
+                    top: -4px;
+                    left: -4px;
+                    right: -4px;
+                    bottom: -4px;
                     border-radius: 50%;
+                    background: #74A9D3;
+                    opacity: 0.2;
                 "></div>
             </div>
         `,
         iconSize: [24, 24],
-        iconAnchor: [12, 24],
-        popupAnchor: [0, -24]
+        iconAnchor: [12, 12],
+        popupAnchor: [0, -12]
     });
 
     marcador = L.marker([lat, lng], {
@@ -234,8 +252,8 @@ function inicializarMapaModal(lat = 10.3447, lng = -67.0400) {
     if (typeof L.Control.geocoder !== 'undefined') {
         L.Control.geocoder({
             defaultMarkGeocode: false,
-            placeholder: 'Buscar dirección...',
-            errorMessage: 'No se encontró la dirección'
+            placeholder: 'Buscar direccion...',
+            errorMessage: 'No se encontro la direccion'
         }).on('markgeocode', function(e) {
             const center = e.geocode.center;
             marcador.setLatLng(center);
@@ -353,6 +371,111 @@ function cerrarModal() {
     if (btnGuardar) btnGuardar.disabled = false;
 }
 
+// ========== PAGINACION Y BUSQUEDA ==========
+
+function filtrarParadas() {
+    const busqueda = document.getElementById('buscarParada').value.toLowerCase().trim();
+    
+    if (!busqueda) {
+        paradasFiltradas = [...todasLasParadas];
+    } else {
+        paradasFiltradas = todasLasParadas.filter(p => 
+            p.nombre.toLowerCase().includes(busqueda) ||
+            p.coordenadas.includes(busqueda) ||
+            p.id.toString().includes(busqueda)
+        );
+    }
+    
+    paginaActual = 1;
+    renderizarTabla();
+    actualizarPaginacion();
+}
+
+function renderizarTabla() {
+    const inicio = (paginaActual - 1) * registrosPorPagina;
+    const fin = inicio + registrosPorPagina;
+    const paradasPagina = paradasFiltradas.slice(inicio, fin);
+
+    const tablaHtml = `
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Coordenadas</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${paradasPagina.map(p => `
+                    <tr>
+                        <td>${p.id}</td>
+                        <td><strong>${p.nombre}</strong></td>
+                        <td>${p.coordenadas}</td>
+                        <td><span class="status-badge ${p.status === 'activa' ? 'status-active' : 'status-inactive'}">${p.status}</span></td>
+                        <td>
+                            <button class="btn-edit" onclick="editarParada(${p.id})" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-delete" onclick="eliminarParada(${p.id})" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('')}
+                ${paradasPagina.length === 0 ? '<tr><td colspan="5" style="text-align: center; padding: 30px;">No hay paradas que coincidan con la busqueda</td></tr>' : ''}
+            </tbody>
+        </table>
+    `;
+    document.getElementById('tablaParadas').innerHTML = tablaHtml;
+    actualizarPaginacion();
+}
+
+function actualizarPaginacion() {
+    const totalPaginas = Math.ceil(paradasFiltradas.length / registrosPorPagina) || 1;
+    const btnAnterior = document.getElementById('btnAnterior');
+    const btnSiguiente = document.getElementById('btnSiguiente');
+    const infoPagina = document.getElementById('infoPagina');
+
+    btnAnterior.disabled = paginaActual <= 1;
+    btnSiguiente.disabled = paginaActual >= totalPaginas;
+    infoPagina.textContent = `Pagina ${paginaActual} de ${totalPaginas}`;
+}
+
+function irPagina(direccion) {
+    const totalPaginas = Math.ceil(paradasFiltradas.length / registrosPorPagina) || 1;
+    const nuevaPagina = paginaActual + direccion;
+    if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
+        paginaActual = nuevaPagina;
+        renderizarTabla();
+    }
+}
+
+// ========== EXPANDIR MAPA ==========
+
+function toggleExpandirMapa() {
+    const mapa = document.getElementById('mapa-principal');
+    const btn = document.getElementById('btnExpandirMapa');
+    const icono = btn.querySelector('i');
+    
+    mapa.classList.toggle('expanded');
+    
+    if (mapa.classList.contains('expanded')) {
+        icono.classList.remove('fa-expand');
+        icono.classList.add('fa-compress');
+        btn.title = 'Reducir mapa';
+    } else {
+        icono.classList.remove('fa-compress');
+        icono.classList.add('fa-expand');
+        btn.title = 'Expandir mapa';
+    }
+    
+    setTimeout(() => {
+        if (mapaPrincipal) mapaPrincipal.invalidateSize();
+    }, 350);
+}
+
 // ========== CRUD ==========
 
 async function cargarParadas() {
@@ -362,44 +485,12 @@ async function cargarParadas() {
         });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
-        const paradas = data.data || [];
-
-        const tablaHtml = `
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Coordenadas</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${paradas.map(p => `
-                        <tr>
-                            <td>${p.id}</td>
-                            <td><strong>${p.nombre}</strong></td>
-                            <td>${p.coordenadas}</td>
-                            <td><span class="status-badge ${p.status === 'activa' ? 'status-active' : 'status-inactive'}">${p.status}</span></td>
-                            <td>
-                                <button class="btn-edit" onclick="editarParada(${p.id})" title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn-delete" onclick="eliminarParada(${p.id})" title="Eliminar">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `).join('')}
-                    ${paradas.length === 0 ? '<tr><td colspan="5" style="text-align: center; padding: 30px;">No hay paradas registradas</td></tr>' : ''}
-                </tbody>
-            </table>
-        `;
-        const tablaContainer = document.getElementById('tablaParadas');
-        if (tablaContainer) tablaContainer.innerHTML = tablaHtml;
-
-        inicializarMapaPrincipal(paradas);
+        todasLasParadas = data.data || [];
+        paradasFiltradas = [...todasLasParadas];
+        
+        inicializarMapaPrincipal(todasLasParadas);
+        renderizarTabla();
+        actualizarPaginacion();
 
     } catch (error) {
         console.error('Error al cargar paradas:', error);
@@ -414,7 +505,7 @@ async function editarParada(id) {
         });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
-        if (!data.data) throw new Error('Datos inválidos');
+        if (!data.data) throw new Error('Datos invalidos');
 
         const parada = data.data;
         editandoId = id;
@@ -427,7 +518,7 @@ async function editarParada(id) {
 }
 
 async function eliminarParada(id) {
-    if (!confirm('¿Estás seguro de eliminar esta parada?')) return;
+    if (!confirm('¿Estas seguro de eliminar esta parada?')) return;
 
     try {
         const response = await fetch(`/admin/paradas/${id}`, {
@@ -444,15 +535,38 @@ async function eliminarParada(id) {
         }
     } catch (error) {
         console.error('Error:', error);
-        showToast('Error de conexión al servidor', 'error');
+        showToast('Error de conexion al servidor', 'error');
     }
 }
 
-// ========== INICIALIZACIÓN ==========
+// ========== INICIALIZACION ==========
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM cargado - Inicializando paradas.js');
 
+    // Buscador
+    const buscarInput = document.getElementById('buscarParada');
+    if (buscarInput) {
+        buscarInput.addEventListener('input', filtrarParadas);
+    }
+
+    // Paginacion
+    const btnAnterior = document.getElementById('btnAnterior');
+    const btnSiguiente = document.getElementById('btnSiguiente');
+    if (btnAnterior) {
+        btnAnterior.addEventListener('click', function() { irPagina(-1); });
+    }
+    if (btnSiguiente) {
+        btnSiguiente.addEventListener('click', function() { irPagina(1); });
+    }
+
+    // Expandir mapa
+    const btnExpandir = document.getElementById('btnExpandirMapa');
+    if (btnExpandir) {
+        btnExpandir.addEventListener('click', toggleExpandirMapa);
+    }
+
+    // Toggle del mapa en modal
     const btnToggleMapa = document.getElementById('btnToggleMapa');
     if (btnToggleMapa) {
         btnToggleMapa.addEventListener('click', function() {
@@ -462,6 +576,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Formulario
     const form = document.getElementById('paradaForm');
     if (form) {
         form.addEventListener('submit', async (e) => {
@@ -483,7 +598,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 status: statusSelect ? statusSelect.value : 'activa'
             };
 
-            // Solo validación mínima en frontend
             if (!datos.nombre) {
                 showToast('El nombre es obligatorio', 'error');
                 loading = false;
@@ -497,8 +611,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (btnGuardar) btnGuardar.disabled = false;
                 return;
             }
-
-
 
             const url = editandoId ? `/admin/paradas/${editandoId}` : '/admin/paradas';
             const method = editandoId ? 'PUT' : 'POST';
@@ -525,7 +637,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showToast('Error de conexión al servidor', 'error');
+                showToast('Error de conexion al servidor', 'error');
             } finally {
                 loading = false;
                 if (btnGuardar) btnGuardar.disabled = false;
@@ -533,6 +645,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Boton nueva parada
     const btnNueva = document.getElementById('btnNuevaParada');
     if (btnNueva) {
         btnNueva.addEventListener('click', function() {
@@ -541,7 +654,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    window.onclick = (event) => {
+    // Cerrar modal al hacer clic fuera
+    window.onclick = function(event) {
         const modal = document.getElementById('paradaModal');
         if (modal && event.target === modal) {
             cerrarModal();

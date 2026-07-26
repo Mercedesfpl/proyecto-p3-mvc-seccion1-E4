@@ -2,7 +2,7 @@
 
 {% extends 'layouts/base.html' %}
 
-{% block title %}Gestión de Paradas{% endblock %}
+{% block title %}Gestion de Paradas{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/paradas.css') }}">
@@ -13,26 +13,56 @@
 
 {% block content %}
 <div class="paradas-header">
-    <h1>Gestión de Paradas</h1>
+    <h1>Gestion de Paradas</h1>
     <button class="btn-add" id="btnNuevaParada">
         <i class="fas fa-plus"></i> Nueva Parada
     </button>
 </div>
 
-<!-- ===== MAPA PRINCIPAL DE PARADAS ===== -->
-<div class="mapa-principal-container">
-    <div class="mapa-principal-header">
-        <h3><i class="fas fa-map-marked-alt"></i> Ubicación de Paradas</h3>
-        <span class="contador-paradas" id="contadorParadas">0 paradas</span>
+<!-- Layout con mapa a la derecha -->
+<div class="paradas-layout">
+    <!-- Tabla (izquierda) -->
+    <div class="paradas-tabla-wrapper">
+        <div class="tabla-container">
+            <!-- Buscador -->
+            <div class="tabla-toolbar">
+                <div class="tabla-busqueda">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="buscarParada" placeholder="Buscar parada...">
+                </div>
+            </div>
+            <div id="tablaParadas"></div>
+            <!-- Paginacion -->
+            <div class="tabla-paginacion" id="paginacionParadas">
+                <button id="btnAnterior" disabled>
+                    <i class="fas fa-chevron-left"></i> Anterior
+                </button>
+                <span class="info-pagina" id="infoPagina">Pagina 1 de 1</span>
+                <button id="btnSiguiente" disabled>
+                    Siguiente <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
     </div>
-    <div id="mapa-principal"></div>
+
+    <!-- Mapa (derecha, mas pequeno) -->
+    <div class="paradas-mapa-wrapper">
+        <div class="mapa-principal-container">
+            <div class="mapa-principal-header">
+                <h3><i class="fas fa-map-marked-alt"></i> Ubicacion de Paradas</h3>
+                <div class="mapa-acciones">
+                    <span class="contador-paradas" id="contadorParadas">0 paradas</span>
+                    <button class="btn-expandir-mapa" id="btnExpandirMapa" title="Expandir mapa">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="mapa-principal"></div>
+        </div>
+    </div>
 </div>
 
-<div class="tabla-container">
-    <div id="tablaParadas"></div>
-</div>
-
-<!-- MODAL (igual que antes) -->
+<!-- MODAL (sin cambios) -->
 <div id="paradaModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -61,12 +91,11 @@
                 <small>Formato: latitud,longitud (ej: 10.3447,-67.0400)</small>
             </div>
 
-            <!-- Mapa en modal (oculto por defecto) -->
             <div class="form-group" id="mapaContainer" style="display: none;">
                 <div id="map-container"></div>
                 <div class="mapa-ayuda">
                     <i class="fas fa-info-circle"></i>
-                    Haz clic en el mapa para seleccionar una ubicación
+                    Haz clic en el mapa para seleccionar una ubicacion
                 </div>
             </div>
 

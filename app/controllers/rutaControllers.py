@@ -22,6 +22,7 @@ def get_ruta_by_id(id_ruta):
 def create_ruta():
     try:
         data = request.get_json()
+        print("Datos recibidos en create_ruta:", data)  # Debug
         ruta = RutaServices.create_ruta(data)
         return success_response(message="Ruta creada exitosamente", data=ruta.to_dict())
     except ResourceNotValid as e:
@@ -29,6 +30,8 @@ def create_ruta():
     except ResourceNotFound as e:
         return error_response(error=str(e), message=str(e), status_code=404)
     except Exception as e:
+        import traceback
+        print("ERROR EN create_ruta:", traceback.format_exc())  
         return error_response(error=str(e), message="Error al crear la ruta", status_code=500)
 
 def update_ruta(id_ruta):

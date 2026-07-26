@@ -315,7 +315,7 @@ def create_ruta():
     from flask import request
     from app.controllers.rutaControllers import create_ruta
     data = request.get_json()
-    return create_ruta(data)
+    return create_ruta()
 
 @admin_scope.route("/rutas/<int:id_ruta>", methods=["PUT"])
 @jwt_required()

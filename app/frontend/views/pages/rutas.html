@@ -11,73 +11,66 @@
 
 {% block content %}
 <div class="rutas-header">
-    <h1>Gestion de Rutas</h1>
+    <h1>Gestión de Rutas</h1>
     <button class="btn-add" id="btnNuevaRuta">
         <i class="fas fa-plus"></i> Nueva Ruta
     </button>
 </div>
 
-<!-- Mapa principal de rutas -->
-<div class="mapa-principal-container">
-    <div class="mapa-principal-header">
-        <h3><i class="fas fa-map-marked-alt"></i> Visualizacion de Rutas</h3>
-        <span class="contador-rutas" id="contadorRutas">0 rutas</span>
-    </div>
-    <div id="mapa-rutas-principal"></div>
-</div>
+<!-- Layout con mapa a la derecha -->
+<div class="rutas-layout">
+    <!-- Tabla (izquierda) -->
+    <div class="rutas-tabla-wrapper">
+        <!-- Filtros -->
+        <div class="filters-bar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchRuta" placeholder="Buscar ruta..." />
+            </div>
+            <div class="filter-group">
+                <select class="filter-select" id="filterLinea">
+                    <option value="">Todas las líneas</option>
+                </select>
+                <select class="filter-select" id="filterEstado">
+                    <option value="">Todos</option>
+                    <option value="activa">Activas</option>
+                    <option value="inactiva">Inactivas</option>
+                </select>
+            </div>
+        </div>
 
-<!-- KPIs 
-<div class="grid-4">
-    <div class="kpi-card">
-        <div class="kpi-header">
-            <span>Total Rutas</span>
-            <div class="kpi-icon"><i class="fas fa-route"></i></div>
+        <div class="tabla-container">
+            <div id="tablaRutas"></div>
         </div>
-        <div class="kpi-value" id="totalRutas">0</div>
-    </div>
-    <div class="kpi-card">
-        <div class="kpi-header">
-            <span>Rutas Activas</span>
-            <div class="kpi-icon"><i class="fas fa-check-circle"></i></div>
-        </div>
-        <div class="kpi-value" id="rutasActivas" style="color: #10b981">0</div>
-    </div>
-    <div class="kpi-card">
-        <div class="kpi-header">
-            <span>Rutas Inactivas</span>
-            <div class="kpi-icon"><i class="fas fa-ban"></i></div>
-        </div>
-        <div class="kpi-value" id="rutasInactivas" style="color: var(--rojo)">0</div>
-    </div>
-    <div class="kpi-card">
-        <div class="kpi-header">
-            <span>Total Paradas</span>
-            <div class="kpi-icon"><i class="fas fa-map-marker-alt"></i></div>
-        </div>
-        <div class="kpi-value" id="totalParadas">0</div>
-    </div>
-</div>
--->
-<!-- Filtros -->
-<div class="filters-bar">
-    <div class="search-box">
-        <i class="fas fa-search"></i>
-        <input type="text" id="searchRuta" placeholder="Buscar ruta..." />
-    </div>
-    <div class="filter-group">
-        <select class="filter-select" id="filterLinea">
-            <option value="">Todas las lineas</option>
-        </select>
-        <select class="filter-select" id="filterEstado">
-            <option value="">Todos</option>
-            <option value="activa">Activas</option>
-            <option value="inactiva">Inactivas</option>
-        </select>
-    </div>
-</div>
 
-<!-- Tarjetas de rutas -->
-<div class="rutas-grid" id="rutasGrid"></div>
+        <!-- Paginación -->
+        <div class="tabla-paginacion" id="paginacionRutas">
+            <button id="btnAnterior" disabled>
+                <i class="fas fa-chevron-left"></i> Anterior
+            </button>
+            <span class="info-pagina" id="infoPagina">Página 1 de 1</span>
+            <button id="btnSiguiente" disabled>
+                Siguiente <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mapa (derecha, más pequeño) -->
+    <div class="rutas-mapa-wrapper">
+        <div class="mapa-principal-container">
+            <div class="mapa-principal-header">
+                <h3><i class="fas fa-map-marked-alt"></i> Visualización de Rutas</h3>
+                <div class="mapa-acciones">
+                    <span class="contador-rutas" id="contadorRutas">0 rutas</span>
+                    <button class="btn-expandir-mapa" id="btnExpandirMapa" title="Expandir mapa">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="mapa-rutas-principal"></div>
+        </div>
+    </div>
+</div>
 
 <!-- MODAL NUEVA RUTA -->
 <div id="modalNuevaRuta" class="modal">
@@ -93,9 +86,9 @@
                     <input type="text" id="nombre_ruta" name="nombre" placeholder="Ej: Ruta Los Teques - Caracas" required>
                 </div>
                 <div class="form-group">
-                    <label>Linea <span class="required">*</span></label>
+                    <label>Línea <span class="required">*</span></label>
                     <select id="id_linea_ruta" name="id_linea" required>
-                        <option value="">Seleccione una linea...</option>
+                        <option value="">Seleccione una línea...</option>
                     </select>
                 </div>
             </div>
@@ -110,59 +103,45 @@
                 </div>
             </div>
 
+            <div class="form-group">
+                <label>Paradas que conforman la ruta</label>
+                <div class="paradas-lista-container">
+                    <div class="paradas-disponibles">
+                        <div class="lista-titulo">
+                            <span>Paradas disponibles</span>
+                            <span class="contador" id="contadorDisponibles">0 disponibles</span>
+                        </div>
+                        <div class="lista-items" id="listaDisponibles">
+                            <div class="item-vacio">Cargando paradas...</div>
+                        </div>
+                        <button type="button" class="btn-agregar-todas" id="btnAgregarTodasParadas">
+                            <i class="fas fa-plus-circle"></i> Agregar todas
+                        </button>
+                    </div>
 
-
-<div class="form-group">
-    <label>Paradas que conforman la ruta</label>
-    <div class="paradas-seleccion-container">
-        <!-- Columna izquierda: Paradas disponibles -->
-        <div class="paradas-disponibles">
-            <label>Paradas disponibles</label>
-            <select id="paradas_disponibles" multiple></select>
-            <div class="paradas-acciones">
-                <button type="button" id="btnAgregarParada" class="btn-agregar" title="Agregar parada seleccionada">
-                    <i class="fas fa-arrow-right"></i> Agregar
-                </button>
-                <button type="button" id="btnAgregarTodas" class="btn-agregar-todas" title="Agregar todas las paradas">
-                    <i class="fas fa-fast-forward"></i> Agregar todas
-                </button>
+                    <div class="paradas-seleccionadas">
+                        <div class="lista-titulo">
+                            <span>Paradas seleccionadas (en orden)</span>
+                            <span class="contador" id="contadorSeleccionadas">0 paradas</span>
+                        </div>
+                        <div class="lista-items" id="listaSeleccionadas">
+                            <div class="item-vacio">No hay paradas seleccionadas</div>
+                        </div>
+                        <button type="button" class="btn-quitar-todas" id="btnQuitarTodasParadas">
+                            <i class="fas fa-trash-alt"></i> Quitar todas
+                        </button>
+                    </div>
+                </div>
+                <small>Presiona "Agregar" al lado de cada parada para añadirla al final de la lista</small>
             </div>
-        </div>
 
-        <!-- Columna central: Botones de orden -->
-        <div class="btn-mover">
-            <button type="button" id="btnSubirParada" class="btn-mover-arriba" title="Subir parada seleccionada">
-                <i class="fas fa-arrow-up"></i>
-            </button>
-            <button type="button" id="btnBajarParada" class="btn-mover-abajo" title="Bajar parada seleccionada">
-                <i class="fas fa-arrow-down"></i>
-            </button>
-        </div>
-
-        <!-- Columna derecha: Paradas seleccionadas -->
-        <div class="paradas-seleccionadas">
-            <label>Paradas seleccionadas (en orden)</label>
-            <select id="paradas_seleccionadas" multiple></select>
-            <div class="paradas-acciones">
-                <button type="button" id="btnQuitarParada" class="btn-quitar" title="Quitar parada seleccionada">
-                    <i class="fas fa-arrow-left"></i> Quitar
-                </button>
-                <button type="button" id="btnQuitarTodas" class="btn-quitar-todas" title="Quitar todas las paradas">
-                    <i class="fas fa-fast-backward"></i> Quitar todas
-                </button>
+            <div class="form-group">
+                <label>Visualización en el mapa</label>
+                <div id="mapa-rutas-modal"></div>
+                <small>
+                    <span id="contadorParadasSeleccionadas">0 paradas</span> seleccionadas
+                </small>
             </div>
-        </div>
-    </div>
-    <small>Selecciona las paradas y organizalas en el orden correcto</small>
-</div>
-
-<div class="form-group">
-    <label>Visualizacion en el mapa</label>
-    <div id="mapa-rutas-modal"></div>
-    <small>
-        <span id="contadorParadasSeleccionadas">0 paradas</span> seleccionadas
-    </small>
-</div>
 
             <button type="submit" class="btn-guardar" id="guardarRutaBtn">
                 <i class="fas fa-save"></i> Guardar Ruta

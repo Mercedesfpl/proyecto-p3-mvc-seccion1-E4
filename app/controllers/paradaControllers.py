@@ -29,7 +29,7 @@ def get_parada_by_id(id_parada):
     except Exception as e:
         return error_response(error=str(e), message="Error al obtener la parada", status_code=500)
     
-def create_parada():
+def create_parada(data):
     try:
         data = request.get_json()
         
