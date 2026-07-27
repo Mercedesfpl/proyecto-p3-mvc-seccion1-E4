@@ -1,7 +1,164 @@
-/* frontend/static/css/flota.css */
-/* Solo estilos específicos de la página de flota */
+/* frontend/static/css/pages/flota.css */
 
-/* Badges de estado */
+.flota-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.flota-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* ===== FILTROS ===== */
+.filters-bar {
+    background: var(--blanco);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    box-shadow: var(--sombra);
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background: var(--gris);
+    border-radius: 40px;
+    padding: 6px 16px;
+    gap: 8px;
+    flex: 1;
+    max-width: 280px;
+}
+
+.search-box i {
+    color: var(--texto-claro);
+    font-size: 14px;
+}
+
+.search-box input {
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 14px;
+    width: 100%;
+    font-family: var(--font-family);
+    padding: 6px 0;
+}
+
+.filter-group {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-select {
+    padding: 6px 14px;
+    border-radius: 40px;
+    border: 1px solid var(--borde);
+    background: var(--blanco);
+    font-size: 13px;
+    cursor: pointer;
+    font-family: var(--font-family);
+    transition: var(--transition);
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--azul);
+}
+
+/* ===== TABLA ===== */
+.tabla-container {
+    background: var(--blanco);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--sombra);
+    overflow-x: auto;
+}
+
+.tabla-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.tabla-busqueda {
+    display: flex;
+    align-items: center;
+    background: var(--gris);
+    border-radius: 40px;
+    padding: 6px 16px;
+    gap: 8px;
+    flex: 1;
+    max-width: 280px;
+}
+
+.tabla-busqueda i {
+    color: var(--texto-claro);
+    font-size: 14px;
+}
+
+.tabla-busqueda input {
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 14px;
+    width: 100%;
+    font-family: var(--font-family);
+    padding: 6px 0;
+}
+
+/* ===== PAGINACIÓN ===== */
+.tabla-paginacion {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    justify-content: flex-end;
+}
+
+.tabla-paginacion button {
+    background: var(--gris);
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: var(--transition);
+    color: var(--texto-oscuro);
+}
+
+.tabla-paginacion button:hover:not(:disabled) {
+    background: var(--azul);
+    color: white;
+}
+
+.tabla-paginacion button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.tabla-paginacion .info-pagina {
+    font-size: 13px;
+    color: var(--texto-claro);
+    padding: 0 8px;
+}
+
+/* ===== BADGES DE ESTADO ===== */
 .status-badge {
     display: inline-flex;
     align-items: center;
@@ -27,7 +184,7 @@
     color: var(--amarillo);
 }
 
-/* Botones de acción en tabla */
+/* ===== BOTONES DE ACCIÓN ===== */
 .action-buttons {
     display: flex;
     gap: 8px;
@@ -49,4 +206,99 @@
 
 .action-btn.delete:hover {
     color: var(--rojo);
+}
+
+/* ===== MODAL ===== */
+#modalNuevaUnidad .modal-content {
+    max-width: 600px;
+}
+
+#modalNuevaUnidad .form-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+#modalNuevaUnidad .form-group {
+    margin-bottom: 10px;
+}
+
+#modalNuevaUnidad .form-group label {
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+#modalNuevaUnidad .form-group input,
+#modalNuevaUnidad .form-group select {
+    padding: 8px 12px;
+    font-size: 13px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .filters-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-box {
+        max-width: none;
+    }
+
+    .filter-group {
+        flex-wrap: wrap;
+    }
+
+    .filter-group .filter-select {
+        flex: 1;
+        min-width: 120px;
+    }
+
+    #modalNuevaUnidad .form-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    #modalNuevaUnidad .modal-content {
+        max-width: 95%;
+        padding: 16px;
+    }
+
+    .tabla-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .tabla-busqueda {
+        max-width: none;
+    }
+
+    .tabla-paginacion {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .flota-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .flota-header .btn-add {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .filter-group {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .filter-group .filter-select {
+        width: 100%;
+    }
+
+    .filter-group .btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
 }

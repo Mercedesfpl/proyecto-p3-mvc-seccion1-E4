@@ -1,378 +1,143 @@
 <!-- frontend/views/flota.html -->
-{% extends 'layouts/base.html' %} {% block title %}Flota{% endblock %} {% block
-styles %}
-<!-- flota.html -->
+{% extends 'layouts/base.html' %}
 
-<!-- CSS specífico -->
-<link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='css/flota.css') }}"
-/>
-{% endblock %} {% block content %}
+{% block title %}Flota{% endblock %}
 
-<!-- KPIs de flota -->
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/flota.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="flota-header">
+    <h1>Gestión de Flota</h1>
+    <button class="btn-add" id="nuevaUnidadBtn">
+        <i class="fas fa-plus"></i> Nueva Unidad
+    </button>
+</div>
+
+<!-- KPIs -->
 <div class="grid-4">
-  <div class="kpi-card">
-    <div class="kpi-header">
-      <span>Total de Unidades</span>
-      <div class="kpi-icon"><i class="fas fa-bus"></i></div>
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <span>Total de Unidades</span>
+            <div class="kpi-icon"><i class="fas fa-bus"></i></div>
+        </div>
+        <div class="kpi-value" id="totalUnidades">0</div>
     </div>
-    <div class="kpi-value">124</div>
-  </div>
-  <div class="kpi-card">
-    <div class="kpi-header">
-      <span>Unidades Activas</span>
-      <div class="kpi-icon"><i class="fas fa-play-circle"></i></div>
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <span>Unidades Activas</span>
+            <div class="kpi-icon"><i class="fas fa-play-circle"></i></div>
+        </div>
+        <div class="kpi-value" id="unidadesActivas" style="color: #10b981">0</div>
     </div>
-    <div class="kpi-value" style="color: #10b981">86</div>
-  </div>
-  <div class="kpi-card">
-    <div class="kpi-header">
-      <span>Unidades En Servicio</span>
-      <div class="kpi-icon"><i class="fas fa-road"></i></div>
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <span>Unidades En Servicio</span>
+            <div class="kpi-icon"><i class="fas fa-road"></i></div>
+        </div>
+        <div class="kpi-value" id="unidadesServicio" style="color: var(--amarillo)">0</div>
     </div>
-    <div class="kpi-value" style="color: var(--amarillo)">72</div>
-  </div>
-  <div class="kpi-card">
-    <div class="kpi-header">
-      <span>Unidades Taller</span>
-      <div class="kpi-icon"><i class="fas fa-wrench"></i></div>
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <span>Unidades Taller</span>
+            <div class="kpi-icon"><i class="fas fa-wrench"></i></div>
+        </div>
+        <div class="kpi-value" id="unidadesTaller" style="color: var(--rojo)">0</div>
     </div>
-    <div class="kpi-value" style="color: var(--rojo)">8</div>
-  </div>
 </div>
 
 <!-- Filtros -->
 <div class="filters-bar">
-  <div class="search-box">
-    <i class="fas fa-search"></i>
-    <input
-      type="text"
-      id="searchUnidad"
-      placeholder="Buscar por código, placa o conductor..."
-    />
-  </div>
-  <div class="filter-group">
-    <select class="filter-select" id="filterLinea">
-      <option>Todas las líneas</option>
-      <option>Línea 1 (Los Teques - Caracas)</option>
-      <option>Línea 2 (El Tambor - La Miel)</option>
-      <option>Línea 3 (San Antonio)</option>
-    </select>
-    <select class="filter-select" id="filterEstado">
-      <option>Todos los estados</option>
-      <option>Activo</option>
-      <option>En servicio</option>
-      <option>En taller</option>
-    </select>
-    <button class="btn-primary" id="nuevaUnidadBtn">
-      <i class="fas fa-plus"></i> Nueva Unidad
-    </button>
-  </div>
-</div>
-
-<!-- Tabla de unidades -->
-<div class="unidades-table-container">
-  <div class="table-header">
-    <h2><i class="fas fa-list"></i> Listado de Unidades</h2>
-    <button class="export-btn" id="exportarBtn">
-      <i class="fas fa-download"></i> Exportar
-    </button>
-  </div>
-
-  <div class="table-responsive">
-    <table class="data-table" id="unidadesTable">
-      <thead>
-        <tr>
-          <th>Código</th>
-          <th>Placa</th>
-          <th>Línea / Ruta</th>
-          <th>Conductor</th>
-          <th>Estado</th>
-          <th>Ubicación</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody id="unidadesTableBody">
-        <tr>
-          <td><strong>BUS-001</strong></td>
-          <td>AB123CD</td>
-          <td>Los Teques - Caracas</td>
-          <td>Juan Pérez</td>
-          <td>
-            <span class="status-badge status-active"
-              ><i class="fas fa-circle"></i> Activo</span
-            >
-          </td>
-          <td>Parada Central</td>
-          <td class="action-buttons">
-            <button class="action-btn view" data-id="1">
-              <i class="fas fa-eye"></i>
-            </button>
-            <button class="action-btn edit" data-id="1">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="action-btn delete" data-id="1">
-              <i class="fas fa-trash"></i>
-            </button>
-          </td>
-        </tr>
-        <tr>
-          <td><strong>BUS-002</strong></td>
-          <td>EF456GH</td>
-          <td>Los Teques - Caracas</td>
-          <td>María López</td>
-          <td>
-            <span class="status-badge status-active"
-              ><i class="fas fa-circle"></i> Activo</span
-            >
-          </td>
-          <td>Terminal</td>
-          <td class="action-buttons">
-            <button class="action-btn view" data-id="2">
-              <i class="fas fa-eye"></i>
-            </button>
-            <button class="action-btn edit" data-id="2">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="action-btn delete" data-id="2">
-              <i class="fas fa-trash"></i>
-            </button>
-          </td>
-        </tr>
-        <tr>
-          <td><strong>BUS-003</strong></td>
-          <td>IJ789KL</td>
-          <td>El Tambor - La Miel</td>
-          <td>Carlos Rodríguez</td>
-          <td>
-            <span class="status-badge status-warning"
-              ><i class="fas fa-exclamation-triangle"></i> En servicio</span
-            >
-          </td>
-          <td>Ruta activa</td>
-          <td class="action-buttons">
-            <button class="action-btn view" data-id="3">
-              <i class="fas fa-eye"></i>
-            </button>
-            <button class="action-btn edit" data-id="3">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="action-btn delete" data-id="3">
-              <i class="fas fa-trash"></i>
-            </button>
-          </td>
-        </tr>
-        <tr>
-          <td><strong>BUS-004</strong></td>
-          <td>MN012OP</td>
-          <td>San Antonio</td>
-          <td>Ana Martínez</td>
-          <td>
-            <span class="status-badge status-active"
-              ><i class="fas fa-circle"></i> Activo</span
-            >
-          </td>
-          <td>San Antonio</td>
-          <td class="action-buttons">
-            <button class="action-btn view" data-id="4">
-              <i class="fas fa-eye"></i>
-            </button>
-            <button class="action-btn edit" data-id="4">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="action-btn delete" data-id="4">
-              <i class="fas fa-trash"></i>
-            </button>
-          </td>
-        </tr>
-        <tr>
-          <td><strong>BUS-005</strong></td>
-          <td>PQ345RS</td>
-          <td>Altos de Pipe</td>
-          <td>Luis Fernández</td>
-          <td>
-            <span class="status-badge status-inactive"
-              ><i class="fas fa-circle"></i> En taller</span
-            >
-          </td>
-          <td>Taller Central</td>
-          <td class="action-buttons">
-            <button class="action-btn view" data-id="5">
-              <i class="fas fa-eye"></i>
-            </button>
-            <button class="action-btn edit" data-id="5">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="action-btn delete" data-id="5">
-              <i class="fas fa-trash"></i>
-            </button>
-          </td>
-        </tr>
-        <tr>
-          <td><strong>BUS-006</strong></td>
-          <td>TU678VW</td>
-          <td>Los Teques - Caracas</td>
-          <td>Gabriela Díaz</td>
-          <td>
-            <span class="status-badge status-active"
-              ><i class="fas fa-circle"></i> Activo</span
-            >
-          </td>
-          <td>Parada Norte</td>
-          <td class="action-buttons">
-            <button class="action-btn view" data-id="6">
-              <i class="fas fa-eye"></i>
-            </button>
-            <button class="action-btn edit" data-id="6">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="action-btn delete" data-id="6">
-              <i class="fas fa-trash"></i>
-            </button>
-          </td>
-        </tr>
-        <tr>
-          <td><strong>BUS-007</strong></td>
-          <td>XY901ZA</td>
-          <td>El Tambor - La Miel</td>
-          <td>Ricardo Sánchez</td>
-          <td>
-            <span class="status-badge status-warning"
-              ><i class="fas fa-exclamation-triangle"></i> En servicio</span
-            >
-          </td>
-          <td>Ruta activa</td>
-          <td class="action-buttons">
-            <button class="action-btn view" data-id="7">
-              <i class="fas fa-eye"></i>
-            </button>
-            <button class="action-btn edit" data-id="7">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="action-btn delete" data-id="7">
-              <i class="fas fa-trash"></i>
-            </button>
-          </td>
-        </tr>
-        <tr>
-          <td><strong>BUS-008</strong></td>
-          <td>BC234DE</td>
-          <td>San Antonio</td>
-          <td>Elena Rojas</td>
-          <td>
-            <span class="status-badge status-inactive"
-              ><i class="fas fa-circle"></i> En taller</span
-            >
-          </td>
-          <td>Taller Central</td>
-          <td class="action-buttons">
-            <button class="action-btn view" data-id="8">
-              <i class="fas fa-eye"></i>
-            </button>
-            <button class="action-btn edit" data-id="8">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="action-btn delete" data-id="8">
-              <i class="fas fa-trash"></i>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Paginación -->
-  <div class="pagination">
-    <div class="page-item prev">Anterior</div>
-    <div class="page-item active">1</div>
-    <div class="page-item">2</div>
-    <div class="page-item">3</div>
-    <div class="page-item">4</div>
-    <div class="page-item next">Siguiente</div>
-  </div>
-</div>
-
-<!-- MODAL NUEVA UNIDAD (estilo igual al de personas) -->
-<div id="modalNuevaUnidad" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2><i class="fas fa-bus"></i> Nueva Unidad</h2>
-      <span class="modal-close" onclick="cerrarModalUnidad()">&times;</span>
+    <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchUnidad" placeholder="Buscar por placa o línea...">
     </div>
-    <form id="formNuevaUnidad">
-      <!-- Fila 1: Placa + Línea -->
-      <div class="form-row">
-        <div class="form-group">
-          <label>Placa *</label>
-          <input
-            type="text"
-            id="placa"
-            name="placa"
-            placeholder="Ej: ABC123"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label>Línea *</label>
-          <select id="id_linea" name="id_linea" required>
-            <option value="">Seleccione una línea...</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Fila 2: Ruta + Secretario -->
-      <div class="form-row">
-        <div class="form-group">
-          <label
-            >Ruta
-            <span style="color: var(--texto-claro)">(opcional)</span></label
-          >
-          <select id="id_ruta" name="id_ruta">
-            <option value="">Sin ruta asignada</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Secretario *</label>
-          <select id="id_secretario" name="id_secretario" required>
-            <option value="">Seleccione un secretario...</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Fila 3: Estado -->
-      <div class="form-row">
-        <div class="form-group">
-          <label>Estado</label>
-          <select id="status" name="status">
-            <option value="activa">Activa</option>
-            <option value="inactiva">Inactiva</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Nota informativa (opcional) -->
-      <div
-        style="
-          margin-top: 16px;
-          padding: 12px;
-          background: #f0f7ff;
-          border-radius: 6px;
-          font-size: 14px;
-          color: #1a3a5c;
-        "
-      >
-        <i class="fas fa-info-circle" style="color: #1a73e8"></i>
-        La placa debe ser única. La ruta es opcional.
-      </div>
-
-      <button type="submit" class="btn-guardar" id="guardarUnidadBtn">
-        <i class="fas fa-save"></i> Guardar Unidad
-      </button>
-    </form>
-  </div>
+    <div class="filter-group">
+        <select class="filter-select" id="filterLinea">
+            <option value="">Todas las líneas</option>
+        </select>
+        <select class="filter-select" id="filterEstado">
+            <option value="">Todos los estados</option>
+            <option value="activa">Activo</option>
+            <option value="en_servicio">En servicio</option>
+            <option value="inactiva">Inactivo</option>
+        </select>
+    </div>
 </div>
-{% endblock %} {% block scripts %}
-<!-- JS específico de esta vista -->
+
+<div class="tabla-container">
+    <div id="tablaUnidades"></div>
+</div>
+
+<!-- Paginación -->
+<div class="tabla-paginacion" id="paginacionUnidades">
+    <button id="btnAnterior" disabled>
+        <i class="fas fa-chevron-left"></i> Anterior
+    </button>
+    <span class="info-pagina" id="infoPagina">Página 1 de 1</span>
+    <button id="btnSiguiente" disabled>
+        Siguiente <i class="fas fa-chevron-right"></i>
+    </button>
+</div>
+
+<!-- MODAL NUEVA UNIDAD -->
+<div id="modalNuevaUnidad" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-bus"></i> <span id="modalUnidadTitle">Nueva Unidad</span></h2>
+            <span class="modal-close" onclick="cerrarModalUnidad()">&times;</span>
+        </div>
+        <form id="formNuevaUnidad">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Placa <span class="required">*</span></label>
+                    <input type="text" id="placa" name="placa" placeholder="Ej: ABC123" required>
+                </div>
+                <div class="form-group">
+                    <label>Línea <span class="required">*</span></label>
+                    <select id="id_linea" name="id_linea" required>
+                        <option value="">Seleccione una línea...</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Ruta <span style="color: var(--texto-claro); font-weight: 400;">(opcional)</span></label>
+                    <select id="id_ruta" name="id_ruta">
+                        <option value="">Sin ruta asignada</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Secretario <span class="required">*</span></label>
+                    <select id="id_secretario" name="id_secretario" required>
+                        <option value="">Seleccione un secretario...</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Estado</label>
+                <select id="status" name="status">
+                    <option value="activa">Activa</option>
+                    <option value="inactiva">Inactiva</option>
+                </select>
+            </div>
+
+            <div style="margin-top: 12px; padding: 10px; background: #f0f7ff; border-radius: 6px; font-size: 13px; color: #1a3a5c;">
+                <i class="fas fa-info-circle" style="color: #1a73e8;"></i>
+                La placa debe ser única. La ruta es opcional.
+            </div>
+
+            <button type="submit" class="btn-guardar" id="guardarUnidadBtn">
+                <i class="fas fa-save"></i> Guardar Unidad
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
 <script src="{{ url_for('static', filename='js/flota.js') }}"></script>
 {% endblock %}
