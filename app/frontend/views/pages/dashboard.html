@@ -5,25 +5,131 @@
 
 {% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/dashboard.css') }}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.css" />
 {% endblock %}
 
 {% block content %}
 <div class="dashboard-welcome">
-    <h1>Panel de Control</h1>
-    <p>Resumen general del sistema de transporte público</p>
+    <div>
+        <h1>Panel de Control</h1>
+        <p>Resumen general del sistema de transporte público</p>
+    </div>
+    <div class="dashboard-fecha">
+        <i class="fas fa-calendar-alt"></i>
+        <span id="fechaActual"></span>
+        <span class="separador">|</span>
+        <i class="fas fa-clock"></i>
+        <span id="reloj">00:00</span>
+    </div>
 </div>
 
+<!-- KPIs -->
 <div class="grid-4">
     <div class="kpi-card">
-        <div class="kpi-header"><span>Unidades Activas</span><div class="kpi-icon"><i class="fas fa-bus"></i></div></div>
-        <div class="kpi-value">86</div>
-        <div class="kpi-trend"><i class="fas fa-arrow-up trend-up"></i>+12% vs ayer</div>
+        <div class="kpi-header">
+            <span>Líneas Registradas</span>
+            <div class="kpi-icon"><i class="fas fa-layer-group"></i></div>
+        </div>
+        <div class="kpi-value" id="totalLineas">0</div>
+        <div class="kpi-trend">Líneas activas en el sistema</div>
     </div>
-    <!-- más KPIs -->
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <span>Rutas Activas</span>
+            <div class="kpi-icon"><i class="fas fa-route"></i></div>
+        </div>
+        <div class="kpi-value" id="totalRutas">0</div>
+        <div class="kpi-trend">Rutas en operación</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <span>Paradas Registradas</span>
+            <div class="kpi-icon"><i class="fas fa-map-pin"></i></div>
+        </div>
+        <div class="kpi-value" id="totalParadas">0</div>
+        <div class="kpi-trend">Puntos de control</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <span>Autobuses Activos</span>
+            <div class="kpi-icon"><i class="fas fa-bus"></i></div>
+        </div>
+        <div class="kpi-value" id="totalBuses">0</div>
+        <div class="kpi-trend">Unidades en servicio</div>
+    </div>
 </div>
-<!-- más contenido -->
+
+<!-- Segunda fila de KPIs -->
+<div class="grid-4">
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <span>Rutas Activas</span>
+            <div class="kpi-icon" style="background: rgba(16, 185, 129, 0.1);">
+                <i class="fas fa-check-circle" style="color: #10b981;"></i>
+            </div>
+        </div>
+        <div class="kpi-value" style="color: #10b981;" id="rutasActivas">0</div>
+        <div class="kpi-trend">En operación normal</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <span>Rutas Inactivas</span>
+            <div class="kpi-icon" style="background: rgba(239, 68, 68, 0.1);">
+                <i class="fas fa-ban" style="color: #ef4444;"></i>
+            </div>
+        </div>
+        <div class="kpi-value" style="color: #ef4444;" id="rutasInactivas">0</div>
+        <div class="kpi-trend">Fuera de servicio</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <span>Paradas Activas</span>
+            <div class="kpi-icon" style="background: rgba(52, 211, 153, 0.1);">
+                <i class="fas fa-circle" style="color: #34d399;"></i>
+            </div>
+        </div>
+        <div class="kpi-value" style="color: #34d399;" id="paradasActivas">0</div>
+        <div class="kpi-trend">Operativas</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <span>Personas Registradas</span>
+            <div class="kpi-icon" style="background: rgba(251, 191, 36, 0.1);">
+                <i class="fas fa-users" style="color: #fbbf24;"></i>
+            </div>
+        </div>
+        <div class="kpi-value" style="color: #fbbf24;" id="totalPersonas">0</div>
+        <div class="kpi-trend">Usuarios del sistema</div>
+    </div>
+</div>
+
+<!-- Gráficos y últimas rutas -->
+<div class="grid-2">
+    <!-- Gráfico de distribución -->
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-chart-pie"></i> Distribución de Rutas</h3>
+        </div>
+        <div class="chart-container">
+            <canvas id="distribucionChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Últimas rutas creadas -->
+    <div class="card">
+        <div class="card-header">
+            <h3><i class="fas fa-clock"></i> Últimas Rutas Creadas</h3>
+            <a href="/admin/rutas-page" class="btn-link">Ver todas →</a>
+        </div>
+        <div class="ultimas-rutas" id="ultimasRutas">
+            <div class="loading-text">Cargando rutas...</div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 {% endblock %}
