@@ -1,5 +1,6 @@
 # app/controllers/userControllers.py
 from flask import jsonify, request, render_template, make_response
+from flask_jwt_extended import get_jwt_identity, create_access_token
 from app.services.userService import UserService
 from app.repositories.userRepository import UserRepository
 from app.models.userModels import UserSession
@@ -8,11 +9,11 @@ from app.models.exceptions import (
     UserNotFound,
     UserAlreadyExists,
     ResourceNotValid,
+    ResourceNotFound,
     Unauthorized
 )
 from app.helpers.makeResponse import success_response, error_response
 import traceback
-from flask_jwt_extended import create_access_token
 
 # ========== FUNCIONES DE AUTENTICACIÓN ==========
 
@@ -194,14 +195,6 @@ def show_flota():
 def show_reportes():
     return render_template("reportes.html")
 
-def show_prueba():
-    return render_template("prueba.html")
-
-def show_pruebaMinima():
-    return render_template("prueba_minima.html")
-    #Muestra la página de reportes
-    return render_template("pages/reportes.html")
-
 def index():
     #Muestra el formulario de login
     return render_template("auth/login.html")
@@ -213,3 +206,54 @@ def show_form_register():
 def show_form_forgot_pass():
     #Muestra el formulario de recuperación de clave
     return render_template("auth/forgot-password.html")
+
+def show_miPerfil():
+    return render_template("pages/perfil.html")
+
+def show_configuracion():
+    return render_template("pages/configuracion.html")
+
+# ========== OPCIONES DE PERFIL DE USUARIO ==========
+
+def get_perfil():
+    #obtener perfil de usuario identificado
+    try:
+        user_id = int(get_jwt_identity())
+        perfil = UserService.get_perfil(user_id)
+        return success_response(data=perfil)
+    except ResourceNotFound as e:
+        return error_response(error=str(e), message="Usuario no encontrado", status_code=404)
+    except Exception as e:
+        return error_response(error=str(e), message="Error al obtener el perfil", status_code=500)
+
+def update_perfil():
+    #actualizar perfil auntenticado
+    try:
+        user_id = int(get_jwt_identity())
+        data = request.get_json()
+        perfil = UserService.update_perfil(user_id, data)
+        return success_response(message="Perfil actualizado exitosamente" ,data=perfil)
+    except ResourceNotFound as e:
+        return error_response(error=str(e), message="Usuario no encontrado", status_code=404)
+    except Exception as e:
+        return error_response(error=str(e), message="Error al obtener el perfil", status_code=500)
+
+def cambiar_contrasenia():
+    try:
+        user_id = int(get_jwt_identity())
+        data = request.get_json()
+        contasenia_actual = data.get('contrasenia_actual')
+        nueva_contrasenia = data.get('nueva_contrasenia')
+
+        if not contasenia_actual or not nueva_contrasenia:
+            return error_response(error= "Faltan campos", message="Contraseña actual y nueva son campos obligatorios", status_code=400)
+
+        UserService.cambiar_contrasenia(user_id, contasenia_actual, nueva_contrasenia)
+        return success_response(message="Contraseña cambiada de manera exitosa")
+    except ResourceNotValid as e:
+        return error_response(error=str(e), message=str(e), status_code=400)
+    except ResourceNotFound as e:
+        return error_response(error=str(e), message="Usuario no encontrado", status_code=400)
+    except Exception as e:
+        print("Error", traceback.format_exc())
+        return error_response(error=str(e), message="Error al cambiar la contraseña", status_code=500)
