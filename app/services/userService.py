@@ -1,7 +1,8 @@
 # app/services/userService.py
 from app.repositories.userRepository import UserRepository
+from app.repositories.personaRepository import PersonaRepository
 from app.models.models import Usuario, PreRegistro
-from app.models.exceptions import UserNotValid, UserNotFound, UserAlreadyExists, ResourceNotValid, Unauthorized
+from app.models.exceptions import UserNotValid, UserNotFound, UserAlreadyExists, ResourceNotValid, Unauthorized,ResourceNotFound
 from app.services.authServices import get_access_token, unset_cookiess, esta_bloqueado
 from app.services.emailServices import enviar_correo_recuperacion, enviar_correo_verificacion
 from app.helpers.makeResponse import success_response
@@ -30,13 +31,13 @@ class UserService:
             )
 
         if user.verificar_password(user_data.password):
-            # ✅ Credenciales correctas
+            #Credenciales correctas
             user.intentos_fallidos = 0
             user.bloqueado_hasta = None
             UserRepository.update(user)
             login_user(user)
         
-            # ✅ Generar token
+            #Generar token
             from flask_jwt_extended import create_access_token
             datos_adicionales = {"rol": user.rol}
             access_token = create_access_token(
@@ -269,3 +270,69 @@ class UserService:
         return success_response(
             message="Se ha verificado correctamente tu correo electrónico"
         )
+
+    @staticmethod
+    def get_perfil(user_id):
+        usuario = UserRepository.get_by_id(user_id)
+        if not usuario:
+            raise ResourceNotFound("Usuario no encontrado")
+
+        persona = None
+        if usuario.persona_id:
+            persona = PersonaRepository.get_by_id(usuario.persona.id)
+
+        return {
+            "nombre": usuario.nombre,
+            "email": usuario.email,
+            "rol": usuario.rol,
+        }
+    
+    @staticmethod
+    def update_perfil(user_id, data):
+
+        usuario = UserRepository.get_by_id(user_id)
+
+        if not usuario:
+            raise ResourceNotFound("Usuario no encontrado")
+
+        #validar credenciales
+        if 'nombre' in data:
+            nuevo_nombre = data['nombre'].strip()
+            if not nuevo_nombre:
+                raise ResourceNotFound("Nombre","El nombre no puede estar vacio")
+            usuario.nombre = nuevo_nombre
+
+        if 'email' in data:
+            nuevo_email = data['email'].strip()
+            if not nuevo_email:
+                raise ResourceNotFound("Email","El email no puede estar vacio")
+            #verificar formato
+            import re
+            if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', nuevo_email):
+                raise ResourceNotValid("Email", "Formato de email invalido")
+            #verificar si no está en uso con otro usuario
+            otro_usuario = UserRepository.get_by_email(nuevo_email)
+            if otro_usuario and otro_usuario.id != user_id:
+                raise ResourceNotValid("Email", "El correo está registrado por otro usuario")
+            usuario.email = nuevo_email
+
+            UserRepository.update(usuario)
+
+            return UserService.get_perfil(user_id)
+
+    @staticmethod
+    def cambiar_contrasenia(user_id, contrasenia_actual, nueva_contrasenia):
+
+        usuario = UserRepository.get_by_id(user_id)
+        if not usuario:
+            raise ResourceNotFound("Usuario no encontrado")
+
+        if not usuario.verificar_password(contrasenia_actual):
+            raise ResourceNotValid("nueva_contrasenia", "La contraseña actual no coincide")
+
+        if not Usuario.formatPass(nueva_contrasenia):
+            raise ResourceNotValid("nueva_contrasenia", "La nueva contraseña debe tener al menos 8 caracteres, incluir mayúscula, minúscula, número y carácter especial")
+
+        usuario.generateHass(nueva_contrasenia)
+        UserRepository.update(usuario)
+        return True

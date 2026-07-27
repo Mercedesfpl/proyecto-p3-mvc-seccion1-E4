@@ -33,13 +33,16 @@ def reportes_show():
 def rutas_show():
     return userControllers.show_rutas()
 
-@admin_scope.route("/prueba", methods=["GET"])
-def pruebas_ws():
-    return userControllers.show_prueba()
 
-@admin_scope.route("/minima")
-def pruebas_minima():
-    return userControllers.show_pruebaMinima()
+@admin_scope.route("/perfil", methods=["GET"])
+@jwt_required()
+def perfil_show():
+    return userControllers.show_miPerfil()
+
+@admin_scope.route("/configuración", methods=["GET"])
+@jwt_required()
+def configuracion_show():
+    return userControllers.show_configuracion()
 
 @admin_scope.route("/form-muestra", methods=["GET"])
 @jwt_required()
