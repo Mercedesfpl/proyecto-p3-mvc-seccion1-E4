@@ -1,3 +1,5 @@
+// frontend/static/js/pages/lineas.js
+
 // ========================================
 // PÁGINA DE LÍNEAS - CRUD
 // ========================================
@@ -23,21 +25,18 @@ function showToast(message, type = "success") {
 // ========== CARGAR SELECTORES ==========
 async function cargarSelectores() {
   try {
-    // Cargar presidentes (personas con rol 'presidente')
     const responsePres = await fetch("/admin/personas/select", {
       credentials: "include",
     });
     const dataPres = await responsePres.json();
     presidentes = dataPres.data || [];
 
-    // Cargar secretarios (usuarios con rol 'secretario')
     const responseSec = await fetch("/admin/secretarios/select", {
       credentials: "include",
     });
     const dataSec = await responseSec.json();
     secretarios = dataSec.data || [];
 
-    // Llenar select de presidentes
     const selectPres = document.getElementById("presidente_id");
     selectPres.innerHTML =
       '<option value="">Seleccione un presidente...</option>';
@@ -50,7 +49,6 @@ async function cargarSelectores() {
       }
     });
 
-    // Llenar select de secretarios
     const selectSec = document.getElementById("secretario_id");
     selectSec.innerHTML =
       '<option value="">Seleccione un secretario (opcional)...</option>';
@@ -71,16 +69,25 @@ function abrirModal(titulo, data = null) {
   const modal = document.getElementById("lineaModal");
   document.getElementById("modalTitle").textContent = titulo;
 
-  // Resetear formulario
   document.getElementById("lineaForm").reset();
   document.getElementById("presidente_id").value = "";
   document.getElementById("secretario_id").value = "";
+  
+  // Resetear color a valor por defecto
+  document.getElementById("color_linea").value = "#74A9D3";
+  document.getElementById("colorHex").textContent = "#74A9D3";
 
   if (data) {
     document.getElementById("nombre").value = data.nombre || "";
     document.getElementById("rif").value = data.rif || "";
     document.getElementById("presidente_id").value = data.presidente_id || "";
     document.getElementById("secretario_id").value = data.secretario_id || "";
+    
+    // Cargar color si existe
+    if (data.color) {
+      document.getElementById("color_linea").value = data.color;
+      document.getElementById("colorHex").textContent = data.color.toUpperCase();
+    }
   }
 
   modal.classList.add("show");
@@ -126,6 +133,7 @@ async function cargarLineas() {
                         <th>Presidente</th>
                         <th>Secretario</th>
                         <th>RIF</th>
+                        <th>Color</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -139,6 +147,9 @@ async function cargarLineas() {
                             <td>${linea.presidente ? linea.presidente : "-"}</td>
                             <td>${linea.secretario_nombre || "-"}</td>
                             <td>${linea.rif}</td>
+                            <td>
+                                <span style="display: inline-block; width: 24px; height: 24px; border-radius: 50%; background: ${linea.color || '#74A9D3'}; border: 1px solid #ddd;"></span>
+                            </td>
                             <td>
                                 <button class="btn-edit" onclick="editarLinea(${linea.id})" title="Editar">
                                     <i class="fas fa-edit"></i>
@@ -155,7 +166,7 @@ async function cargarLineas() {
                       lineas.length === 0
                         ? `
                         <tr>
-                            <td colspan="6" style="text-align: center; padding: 30px; color: var(--texto-claro);">
+                            <td colspan="7" style="text-align: center; padding: 30px; color: var(--texto-claro);">
                                 No hay líneas registradas
                             </td>
                         </tr>
@@ -188,7 +199,6 @@ async function editarLinea(id) {
     const linea = data.data;
     editandoId = id;
 
-    // Asegurar que los selects estén cargados
     await cargarSelectores();
 
     abrirModal("Editar Línea", {
@@ -196,6 +206,7 @@ async function editarLinea(id) {
       rif: linea.rif || "",
       presidente_id: linea.presidente_id || "",
       secretario_id: linea.secretario_id || "",
+      color: linea.color || "#74A9D3",
     });
   } catch (error) {
     console.error("Error al cargar línea:", error);
@@ -216,7 +227,7 @@ async function eliminarLinea(id) {
     const data = await response.json();
 
     if (response.ok) {
-      showToast(" Línea suspendida exitosamente", "success");
+      showToast("Línea suspendida exitosamente", "success");
       cargarLineas();
     } else {
       showToast(data.error || data.message || "Error al suspender", "error");
@@ -229,10 +240,17 @@ async function eliminarLinea(id) {
 
 // ========== INICIALIZACIÓN ==========
 document.addEventListener("DOMContentLoaded", async () => {
-  // Cargar selectores
+  // Color picker
+  const colorInput = document.getElementById("color_linea");
+  const colorHex = document.getElementById("colorHex");
+  if (colorInput && colorHex) {
+    colorInput.addEventListener("input", function() {
+      colorHex.textContent = this.value.toUpperCase();
+    });
+  }
+
   await cargarSelectores();
 
-  // Formulario
   document.getElementById("lineaForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -247,25 +265,25 @@ document.addEventListener("DOMContentLoaded", async () => {
       secretario_id: document.getElementById("secretario_id").value
         ? parseInt(document.getElementById("secretario_id").value)
         : null,
+      color: document.getElementById("color_linea").value,  // <-- NUEVO
     };
 
-    // Validaciones
     if (!datos.nombre) {
-      showToast(" El nombre es obligatorio", "error");
+      showToast("El nombre es obligatorio", "error");
       loading = false;
       document.getElementById("btnGuardar").disabled = false;
       return;
     }
 
     if (!datos.rif) {
-      showToast(" El RIF es obligatorio", "error");
+      showToast("El RIF es obligatorio", "error");
       loading = false;
       document.getElementById("btnGuardar").disabled = false;
       return;
     }
 
     if (!datos.presidente_id) {
-      showToast(" Debes seleccionar un presidente", "error");
+      showToast("Debes seleccionar un presidente", "error");
       loading = false;
       document.getElementById("btnGuardar").disabled = false;
       return;
@@ -289,7 +307,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       if (response.ok) {
         showToast(
-          editandoId ? " Línea actualizada" : " Línea creada exitosamente",
+          editandoId ? "Línea actualizada" : "Línea creada exitosamente",
           "success",
         );
         cerrarModal();
@@ -306,14 +324,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // Botón nueva línea
   document.getElementById("btnNuevaLinea").onclick = async () => {
     editandoId = null;
     await cargarSelectores();
     abrirModal("Nueva Línea");
   };
 
-  // Cerrar modal al hacer clic fuera
   window.onclick = (event) => {
     const modal = document.getElementById("lineaModal");
     if (event.target === modal) {
@@ -321,6 +337,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   };
 
-  // Cargar líneas
   cargarLineas();
 });

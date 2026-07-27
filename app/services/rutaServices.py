@@ -2,7 +2,7 @@
 
 from app.repositories.rutaRepository import RutaRepository
 from app.repositories.lineaRepository import LineaRepository
-from app.factory.ruta_factory import RutaFactory
+from app.factory.ruta_factory import RutaFactory 
 from app.models.exceptions import ResourceNotFound, ResourceNotValid
 from app.extensions import db
 
@@ -14,7 +14,6 @@ class RutaServices:
         rutas = RutaRepository.get_all()
         resultado = []
         for r in rutas:
-            # Obtener paradas de la ruta con su orden
             from app.models.ruta_parada import RutaParada
             from app.repositories.paradaRepository import ParadaRepository
             
@@ -32,11 +31,11 @@ class RutaServices:
             
             resultado.append({
                 "id": r.id,
-                "id_ruta": r.id,
                 "nombre": r.nombre,
                 "status": r.status,
                 "id_linea": r.id_linea,
                 "linea_nombre": r.linea.nombre if r.linea else None,
+                "color": r.linea.color if r.linea else '#74A9D3',  # Color de la línea
                 "paradas": paradas
             })
         return resultado
@@ -47,7 +46,6 @@ class RutaServices:
         if not ruta:
             raise ResourceNotFound("Ruta")
         
-        # Obtener paradas de la ruta
         from app.models.ruta_parada import RutaParada
         from app.repositories.paradaRepository import ParadaRepository
         
@@ -64,12 +62,13 @@ class RutaServices:
                 })
         
         return {
-            "id_ruta": ruta.id,
+            "id": ruta.id,
             "nombre": ruta.nombre,
             "status": ruta.status,
             "id_linea": ruta.id_linea,
             "linea_nombre": ruta.linea.nombre if ruta.linea else None,
-            "paradas": paradas
+            "paradas": paradas,
+            "color": ruta.linea.color if ruta.linea else '#74A9D3'
         }
     
     @staticmethod
@@ -86,11 +85,16 @@ class RutaServices:
         if not linea:
             raise ResourceNotFound("Línea no encontrada")
         
-        # Crear ruta
-        ruta = RutaFactory.crear_ruta(data)
+        # Crear ruta con el color de la línea
+        ruta_data = {
+            'nombre': nombre,
+            'id_linea': id_linea,
+            'status': data.get('status', 'activa')
+        }
+        ruta = RutaFactory.crear_ruta(ruta_data)
         ruta_guardada = RutaRepository.save(ruta)
         
-        # Guardar relaciones con paradas
+        # Guardar paradas
         paradas_ids = data.get('paradas_ids', [])
         if paradas_ids:
             from app.models.ruta_parada import RutaParada
@@ -137,7 +141,6 @@ class RutaServices:
                 raise ResourceNotFound("Línea no encontrada")
             ruta.id_linea = data['id_linea']
         
-        # Actualizar paradas si se envían
         if 'paradas_ids' in data:
             from app.models.ruta_parada import RutaParada
             RutaParada.query.filter_by(id_ruta=id_ruta).delete()

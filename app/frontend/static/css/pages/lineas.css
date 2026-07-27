@@ -26,3 +26,29 @@
         justify-content: center;
     }
 }
+
+.color-picker-wrapper {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.color-picker-wrapper input[type="color"] {
+    width: 40px;
+    height: 40px;
+    padding: 2px;
+    border: 2px solid var(--borde);
+    border-radius: 6px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.color-picker-wrapper input[type="color"]:hover {
+    border-color: var(--azul);
+}
+
+.color-picker-wrapper .color-hex {
+    font-size: 13px;
+    color: var(--texto-claro);
+    font-family: monospace;
+}

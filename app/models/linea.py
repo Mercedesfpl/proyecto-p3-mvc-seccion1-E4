@@ -9,6 +9,7 @@ class Linea(db.Model):
     nombre = db.Column(db.String(100), nullable=False, unique=True)
     rif = db.Column(db.String(50), nullable=False)
     suspendido = db.Column(db.Boolean, default=False)
+    color = db.Column(db.String(7), default='#74A9D3')  # NUEVO CAMPO
     created_at = db.Column(db.DateTime, default=datetime.now)
 
     # Relación con Usuario (Secretario de Organización)
@@ -25,6 +26,7 @@ class Linea(db.Model):
             "nombre": self.nombre,
             "rif": self.rif,
             "suspendido": self.suspendido,
+            "color": self.color or '#74A9D3',
             "secretario_id": self.secretario_id,
             "secretario_nombre": self.secretario.nombre if self.secretario else None,
             "presidente_id": self.presidente_id,

@@ -21,10 +21,8 @@
 
 <!-- Layout con mapa a la derecha -->
 <div class="layout-mapa-derecha">
-    <!-- Tabla (izquierda) -->
     <div class="tabla-wrapper">
         <div class="tabla-container">
-            <!-- Buscador y filtros DENTRO de la tabla -->
             <div class="tabla-toolbar">
                 <div class="tabla-busqueda">
                     <i class="fas fa-search"></i>
@@ -42,7 +40,6 @@
                 </div>
             </div>
             <div id="tablaRutas"></div>
-            <!-- Paginación -->
             <div class="tabla-paginacion" id="paginacionRutas">
                 <button id="btnAnterior" disabled>
                     <i class="fas fa-chevron-left"></i> Anterior
@@ -55,7 +52,6 @@
         </div>
     </div>
 
-    <!-- Mapa (derecha, más pequeño) -->
     <div class="mapa-wrapper">
         <div class="mapa-container">
             <div class="mapa-header">
@@ -72,81 +68,87 @@
     </div>
 </div>
 
-<!-- MODAL NUEVA RUTA -->
+<!-- MODAL NUEVA RUTA - Layout de 2 columnas -->
 <div id="modalNuevaRuta" class="modal">
     <div class="modal-content">
         <div class="modal-header">
             <h2><i class="fas fa-route"></i> <span id="modalRutaTitle">Nueva Ruta</span></h2>
             <span class="modal-close" onclick="cerrarModalRuta()">&times;</span>
         </div>
-        <form id="formNuevaRuta">
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Nombre de la Ruta <span class="required">*</span></label>
-                    <input type="text" id="nombre_ruta" name="nombre" placeholder="Ej: Ruta Los Teques - Caracas" required>
-                </div>
-                <div class="form-group">
-                    <label>Línea <span class="required">*</span></label>
-                    <select id="id_linea_ruta" name="id_linea" required>
-                        <option value="">Seleccione una línea...</option>
-                    </select>
-                </div>
-            </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Estado</label>
-                    <select id="status_ruta" name="status">
-                        <option value="activa">Activa</option>
-                        <option value="inactiva">Inactiva</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Paradas que conforman la ruta</label>
-                <div class="paradas-lista-container">
-                    <div class="paradas-disponibles">
-                        <div class="lista-titulo">
-                            <span>Paradas disponibles</span>
-                            <span class="contador" id="contadorDisponibles">0 disponibles</span>
+        <!-- Layout de 2 columnas -->
+        <div class="modal-ruta-layout">
+            <!-- Columna izquierda: Formulario -->
+            <div class="form-columna">
+                <form id="formNuevaRuta">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nombre <span class="required">*</span></label>
+                            <input type="text" id="nombre_ruta" name="nombre" placeholder="Ej: Ruta Los Teques" required>
                         </div>
-                        <div class="lista-items" id="listaDisponibles">
-                            <div class="item-vacio">Cargando paradas...</div>
+                        <div class="form-group">
+                            <label>Línea <span class="required">*</span></label>
+                            <select id="id_linea_ruta" name="id_linea" required>
+                                <option value="">Seleccione...</option>
+                            </select>
                         </div>
-                        <button type="button" class="btn-agregar-todas" id="btnAgregarTodasParadas">
-                            <i class="fas fa-plus-circle"></i> Agregar todas
-                        </button>
                     </div>
 
-                    <div class="paradas-seleccionadas">
-                        <div class="lista-titulo">
-                            <span>Paradas seleccionadas (en orden)</span>
-                            <span class="contador" id="contadorSeleccionadas">0 paradas</span>
-                        </div>
-                        <div class="lista-items" id="listaSeleccionadas">
-                            <div class="item-vacio">No hay paradas seleccionadas</div>
-                        </div>
-                        <button type="button" class="btn-quitar-todas" id="btnQuitarTodasParadas">
-                            <i class="fas fa-trash-alt"></i> Quitar todas
-                        </button>
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <select id="status_ruta" name="status">
+                            <option value="activa">Activa</option>
+                            <option value="inactiva">Inactiva</option>
+                        </select>
                     </div>
-                </div>
-                <small>Presiona "Agregar" al lado de cada parada para añadirla al final de la lista</small>
+
+                    <div class="form-group">
+                        <label>Paradas que conforman la ruta</label>
+                        <div class="paradas-lista-container">
+                            <div class="paradas-disponibles">
+                                <div class="lista-titulo">
+                                    <span>Disponibles</span>
+                                    <span class="contador" id="contadorDisponibles">0</span>
+                                </div>
+                                <div class="lista-items" id="listaDisponibles">
+                                    <div class="item-vacio">Cargando...</div>
+                                </div>
+                                <button type="button" class="btn-agregar-todas" id="btnAgregarTodasParadas">
+                                    <i class="fas fa-plus-circle"></i> Agregar todas
+                                </button>
+                            </div>
+
+                            <div class="paradas-seleccionadas">
+                                <div class="lista-titulo">
+                                    <span>Seleccionadas</span>
+                                    <span class="contador" id="contadorSeleccionadas">0</span>
+                                </div>
+                                <div class="lista-items" id="listaSeleccionadas">
+                                    <div class="item-vacio">No hay paradas</div>
+                                </div>
+                                <button type="button" class="btn-quitar-todas" id="btnQuitarTodasParadas">
+                                    <i class="fas fa-trash-alt"></i> Quitar todas
+                                </button>
+                            </div>
+                        </div>
+                        <small style="font-size: 10px;">Presiona "Agregar" para añadir al final de la lista</small>
+                    </div>
+
+                    <button type="submit" class="btn-guardar" id="guardarRutaBtn" style="margin-top: 8px;">
+                        <i class="fas fa-save"></i> Guardar Ruta
+                    </button>
+                </form>
             </div>
 
-            <div class="form-group">
-                <label>Visualización en el mapa</label>
+            <!-- Columna derecha: Mapa -->
+            <div class="mapa-columna">
+                <span class="mapa-label">Visualización en el mapa</span>
                 <div id="mapa-rutas-modal"></div>
                 <small>
                     <span id="contadorParadasSeleccionadas">0 paradas</span> seleccionadas
                 </small>
             </div>
-
-            <button type="submit" class="btn-guardar" id="guardarRutaBtn">
-                <i class="fas fa-save"></i> Guardar Ruta
-            </button>
-        </form>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -154,5 +156,6 @@
 {% block scripts %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.js"></script>
-<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script><script src="{{ url_for('static', filename='js/rutas.js') }}"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+<script src="{{ url_for('static', filename='js/rutas.js') }}"></script>
 {% endblock %}

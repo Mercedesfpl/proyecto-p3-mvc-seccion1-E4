@@ -1,30 +1,69 @@
 /* frontend/static/css/pages/rutas.css */
 
-/* Solo estilos específicos de rutas */
-/* Todo lo que es layout, mapa, tabla, paginación está en components.css */
-
+/* ===== MODAL DE RUTAS - Layout de 2 columnas ===== */
 #modalNuevaRuta .modal-content {
-    max-width: 700px;
+    max-width: 950px; /* Un poco más amplio para dar respiro */
+    width: 90%;
+    padding: 24px 28px;
+    box-sizing: border-box;
 }
 
-/* Lista de paradas (específico de rutas) */
-.paradas-lista-container {
+#modalNuevaRuta .modal-header h2 {
+    font-size: 20px;
+}
+
+/* Layout de 2 columnas ajustado para prevenir solapamientos */
+.modal-ruta-layout {
     display: flex;
     gap: 24px;
-    margin-top: 8px;
+    align-items: stretch; /* Permite que ambas columnas tengan igual altura */
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.paradas-lista-container .paradas-disponibles {
-    flex: 1;
+.modal-ruta-layout .form-columna {
+    flex: 1 1 50%; /* Ocupa el 50% de forma flexible */
+    min-width: 0;   /* Previene que los inputs o textos fuercen un desbordamiento */
 }
 
+.modal-ruta-layout .mapa-columna {
+    flex: 1 1 50%; /* Ocupa el 50% de forma flexible */
+    min-width: 0;   /* Evita desbordamientos */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ajustes al mapa para adaptarse a la columna */
+#mapa-rutas-modal {
+    height: 100%;
+    min-height: 340px; /* Mantiene una altura mínima visible */
+    width: 100%;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--borde);
+    background: var(--gris);
+}
+
+/* Ajuste preventivo para las subcolumnas de paradas */
+.paradas-lista-container {
+    display: flex;
+    gap: 12px;
+    margin-top: 6px;
+    width: 100%;
+}
+
+.paradas-lista-container .paradas-disponibles,
+.paradas-lista-container .paradas-seleccionadas {
+    flex: 1 1 50%;
+    min-width: 0; /* Asegura que la lista de paradas no se monte sobre la otra */
+}
+.paradas-lista-container .paradas-disponibles,
 .paradas-lista-container .paradas-seleccionadas {
     flex: 1;
 }
 
 .paradas-lista-container .lista-titulo {
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 12px;
+    font-weight: 600;
     color: var(--texto-oscuro);
     margin-bottom: 6px;
     display: flex;
@@ -33,13 +72,13 @@
 }
 
 .paradas-lista-container .lista-titulo .contador {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--texto-claro);
     font-weight: 400;
 }
 
 .paradas-lista-container .lista-items {
-    max-height: 200px;
+    max-height: 140px;
     overflow-y: auto;
     border: 1px solid var(--borde);
     border-radius: var(--radius-sm);
@@ -50,16 +89,16 @@
     padding: 20px;
     text-align: center;
     color: var(--texto-claro);
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .paradas-lista-container .lista-items .item-parada {
     display: flex;
     align-items: center;
-    padding: 8px 12px;
+    padding: 6px 10px;
     border-bottom: 1px solid var(--borde);
     transition: background 0.2s;
-    gap: 10px;
+    gap: 8px;
 }
 
 .paradas-lista-container .lista-items .item-parada:hover {
@@ -72,7 +111,7 @@
 
 .paradas-lista-container .lista-items .item-parada .nombre-parada {
     flex: 1;
-    font-size: 13px;
+    font-size: 12px;
     color: var(--texto-oscuro);
 }
 
@@ -81,8 +120,8 @@
     color: white;
     border: none;
     border-radius: 4px;
-    padding: 4px 12px;
-    font-size: 12px;
+    padding: 3px 12px;
+    font-size: 11px;
     cursor: pointer;
     transition: var(--transition);
     white-space: nowrap;
@@ -92,16 +131,20 @@
     background: var(--azul-oscuro);
 }
 
+.paradas-lista-container .lista-items .item-parada.seleccionado {
+    background: rgba(116, 169, 211, 0.06);
+}
+
 .paradas-lista-container .lista-items .item-parada.seleccionado .numero-orden {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     background: var(--azul);
     color: white;
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
     flex-shrink: 0;
 }
@@ -111,24 +154,33 @@
     color: white;
     border: none;
     border-radius: 4px;
-    padding: 4px 10px;
-    font-size: 12px;
+    padding: 3px 10px;
+    font-size: 11px;
     cursor: pointer;
     transition: var(--transition);
     white-space: nowrap;
 }
 
-.paradas-lista-container .btn-agregar-todas {
-    margin-top: 8px;
-    padding: 6px 16px;
-    background: var(--azul);
-    color: white;
+.paradas-lista-container .lista-items .item-parada .btn-quitar-item:hover {
+    background: #7a1a1e;
+}
+
+.paradas-lista-container .btn-agregar-todas,
+.paradas-lista-container .btn-quitar-todas {
+    margin-top: 6px;
+    padding: 5px 14px;
     border: none;
-    border-radius: 6px;
-    font-size: 13px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
     cursor: pointer;
     transition: var(--transition);
     width: 100%;
+}
+
+.paradas-lista-container .btn-agregar-todas {
+    background: var(--azul);
+    color: white;
 }
 
 .paradas-lista-container .btn-agregar-todas:hover {
@@ -136,36 +188,104 @@
 }
 
 .paradas-lista-container .btn-quitar-todas {
-    margin-top: 8px;
-    padding: 6px 16px;
     background: var(--rojo);
     color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 13px;
-    cursor: pointer;
-    transition: var(--transition);
-    width: 100%;
 }
 
 .paradas-lista-container .btn-quitar-todas:hover {
     background: #7a1a1e;
 }
 
+/* ===== MAPA EN MODAL (columna derecha) ===== */
+.mapa-columna .mapa-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--texto-oscuro);
+    margin-bottom: 6px;
+    display: block;
+}
+
 #mapa-rutas-modal {
-    height: 250px;
+    height: 340px;
     width: 100%;
     border-radius: var(--radius-sm);
     border: 1px solid var(--borde);
-    margin-top: 8px;
+    background: var(--gris);
 }
 
+.mapa-columna small {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--texto-claro);
+}
+
+/* ===== BOTÓN GUARDAR ===== */
+#modalNuevaRuta .btn-guardar {
+    width: 100%;
+    padding: 10px;
+    margin-top: 12px;
+    background: var(--azul);
+    color: white;
+    border: none;
+    border-radius: 40px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+#modalNuevaRuta .btn-guardar:hover {
+    background: var(--azul-oscuro);
+}
+
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
+    #modalNuevaRuta .modal-content {
+        max-width: 95%;
+        padding: 16px 18px;
+    }
+
+    .modal-ruta-layout {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .modal-ruta-layout .mapa-columna {
+        flex: 1;
+        width: 100%;
+        min-width: unset;
+    }
+
+    #mapa-rutas-modal {
+        height: 220px;
+    }
+
+    #modalNuevaRuta .form-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
     .paradas-lista-container {
         flex-direction: column;
+        gap: 10px;
     }
-    
+
+    .paradas-lista-container .lista-items {
+        max-height: 100px;
+    }
+}
+
+@media (max-width: 480px) {
+    #modalNuevaRuta .modal-content {
+        padding: 12px 14px;
+    }
+
     #mapa-rutas-modal {
-        height: 200px;
+        height: 180px;
+    }
+
+    .paradas-lista-container .lista-items {
+        max-height: 80px;
     }
 }

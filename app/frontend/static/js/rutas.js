@@ -63,21 +63,17 @@ function inicializarMapaPrincipal() {
 function actualizarMapaPrincipal(rutasData) {
     if (!mapaPrincipal) return;
 
-    // Limpiar controles de ruta anteriores
+    // Limpiar controles anteriores
     if (controlesRuta.length > 0) {
         controlesRuta.forEach(control => {
             try {
                 mapaPrincipal.removeControl(control);
-            } catch (e) {
-                // Si el control ya fue removido, ignorar
-            }
+            } catch (e) {}
         });
         controlesRuta = [];
     }
 
-    // Limpiar capas (excepto el tileLayer)
     mapaPrincipal.eachLayer(function(layer) {
-        // Solo eliminar si es un Marker, Polyline o CircleMarker
         if (layer instanceof L.Marker || 
             layer instanceof L.Polyline || 
             layer instanceof L.CircleMarker) {
@@ -91,22 +87,17 @@ function actualizarMapaPrincipal(rutasData) {
         return;
     }
 
-    const colores = ['#ea4335', '#4285f4', '#34a853', '#fbbc04', '#9c27b0', '#00bcd4'];
-
     rutasData.forEach((ruta, index) => {
-        const color = colores[index % colores.length];
+        const color = ruta.color || '#74A9D3';
 
         if (ruta.paradas && ruta.paradas.length >= 2) {
-            // Ordenar paradas por orden
             const paradasOrdenadas = [...ruta.paradas].sort((a, b) => a.orden - b.orden);
             
-            // Convertir paradas a waypoints
             const waypoints = paradasOrdenadas.map(p => {
                 const coords = p.coordenadas.split(',');
                 return L.latLng(parseFloat(coords[0].trim()), parseFloat(coords[1].trim()));
             });
 
-            // Si hay Leaflet Routing Machine disponible
             if (typeof L.Routing !== 'undefined' && waypoints.length >= 2) {
                 try {
                     const rutaControl = L.Routing.control({
@@ -124,19 +115,14 @@ function actualizarMapaPrincipal(rutasData) {
                         }),
                         show: false
                     }).addTo(mapaPrincipal);
-
                     controlesRuta.push(rutaControl);
                 } catch (e) {
-                    console.warn('Error al crear ruta con Routing:', e);
-                    // Fallback: dibujar línea recta
                     dibujarLineaRecta(mapaPrincipal, waypoints, color);
                 }
             } else {
-                // Fallback: dibujar línea recta
                 dibujarLineaRecta(mapaPrincipal, waypoints, color);
             }
 
-            // Agregar marcadores en las paradas
             waypoints.forEach((coord, i) => {
                 const parada = paradasOrdenadas[i];
                 const marker = L.circleMarker(coord, {
@@ -163,7 +149,6 @@ function actualizarMapaPrincipal(rutasData) {
     }
 }
 
-// Función fallback para dibujar línea recta
 function dibujarLineaRecta(mapa, waypoints, color) {
     if (waypoints.length < 2) return;
     const coords = waypoints.map(w => w);
@@ -317,6 +302,7 @@ function abrirModalRuta(titulo = 'Nueva Ruta', data = null) {
         document.getElementById('nombre_ruta').value = data.nombre || '';
         document.getElementById('id_linea_ruta').value = data.id_linea || '';
         document.getElementById('status_ruta').value = data.status || 'activa';
+        
         if (data.paradas) {
             paradasSeleccionadasIds = data.paradas.map(p => p.id);
         }
@@ -560,6 +546,9 @@ function renderizarTablaRutas() {
     `;
 
     rutasPagina.forEach(ruta => {
+        const rutaId = ruta.id || ruta.id_ruta;
+        if (!rutaId) return;
+
         const statusClass = ruta.status === 'activa' ? 'active' : 'inactive';
         const statusText = ruta.status === 'activa' ? 'Activa' : 'Inactiva';
         const nombreLinea = ruta.linea_nombre || 'Sin línea';
@@ -567,16 +556,16 @@ function renderizarTablaRutas() {
 
         html += `
             <tr>
-                <td>${ruta.id}</td>
+                <td>${rutaId}</td>
                 <td><strong>${ruta.nombre}</strong></td>
                 <td>${nombreLinea}</td>
                 <td>${paradasCount}</td>
                 <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                 <td>
-                    <button class="btn-edit" onclick="editarRuta(${ruta.id})" title="Editar">
+                    <button class="btn-edit" onclick="editarRuta(${rutaId})" title="Editar">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn-delete" onclick="eliminarRuta(${ruta.id})" title="Eliminar">
+                    <button class="btn-delete" onclick="eliminarRuta(${rutaId})" title="Eliminar">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -617,18 +606,15 @@ async function cargarRutas() {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
         
-        console.log('Datos de rutas recibidos:', data); // Debug para ver la estructura
-        
         if (data.success && data.data) {
             rutas = data.data || [];
         } else {
             rutas = [];
         }
 
-        // Asegurar que cada ruta tenga un id
         rutas = rutas.map(r => ({
             ...r,
-            id: r.id || r.id_ruta || null  // Asegurar que id existe
+            id: r.id || r.id_ruta || null
         }));
 
         rutasFiltradas = [...rutas];
@@ -642,94 +628,6 @@ async function cargarRutas() {
     }
 }
 
-// ========== RENDERIZAR TABLA ==========
-
-function renderizarTablaRutas() {
-    const inicio = (paginaActual - 1) * registrosPorPagina;
-    const fin = inicio + registrosPorPagina;
-    const rutasPagina = rutasFiltradas.slice(inicio, fin);
-
-    const container = document.getElementById('tablaRutas');
-    if (!container) return;
-
-    if (rutasFiltradas.length === 0) {
-        container.innerHTML = `
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Línea</th>
-                        <th>Paradas</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="6" style="text-align: center; padding: 30px; color: var(--texto-claro);">
-                            No hay rutas que coincidan con la búsqueda
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        `;
-        return;
-    }
-
-    let html = `
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Línea</th>
-                    <th>Paradas</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-
-    rutasPagina.forEach(ruta => {
-        // Asegurar que tenemos un ID válido
-        const rutaId = ruta.id || ruta.id_ruta;
-        if (!rutaId) {
-            console.warn('Ruta sin ID:', ruta);
-            return;
-        }
-
-        const statusClass = ruta.status === 'activa' ? 'active' : 'inactive';
-        const statusText = ruta.status === 'activa' ? 'Activa' : 'Inactiva';
-        const nombreLinea = ruta.linea_nombre || 'Sin línea';
-        const paradasCount = (ruta.paradas || []).length;
-
-        html += `
-            <tr>
-                <td>${rutaId}</td>
-                <td><strong>${ruta.nombre}</strong></td>
-                <td>${nombreLinea}</td>
-                <td>${paradasCount}</td>
-                <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                <td>
-                    <button class="btn-edit" onclick="editarRuta(${rutaId})" title="Editar">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn-delete" onclick="eliminarRuta(${rutaId})" title="Eliminar">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
-        `;
-    });
-
-    html += `</tbody></table>`;
-    container.innerHTML = html;
-}
-
-// ========== EDITAR RUTA ==========
-
 async function editarRuta(id) {
     if (!id) {
         showToast('ID de ruta inválido', 'error');
@@ -737,7 +635,6 @@ async function editarRuta(id) {
     }
     
     try {
-        console.log('Editando ruta con ID:', id); // Debug
         const response = await fetch(`/admin/rutas/${id}`, { credentials: 'include' });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
@@ -751,8 +648,6 @@ async function editarRuta(id) {
         showToast('Error al cargar la ruta', 'error');
     }
 }
-
-// ========== ELIMINAR RUTA ==========
 
 async function eliminarRuta(id) {
     if (!id) {
@@ -784,6 +679,7 @@ async function eliminarRuta(id) {
 // ========== INICIALIZACIÓN Y EVENTOS ==========
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar mapa principal
     inicializarMapaPrincipal();
 
     // Expandir mapa
@@ -815,6 +711,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 id_linea: parseInt(document.getElementById('id_linea_ruta').value),
                 status: document.getElementById('status_ruta').value,
                 paradas_ids: paradasSeleccionadasIds
+                // El color se obtiene de la línea seleccionada
             };
 
             if (!datos.nombre) {

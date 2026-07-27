@@ -88,7 +88,7 @@ def get_linea(id_linea):
 def create_linea():
 
     data = request.get_json()
-    return lineaControllers.create_linea(data)
+    return lineaControllers.create_linea()
 
 
 @admin_scope.route("/lineas/<int:id_linea>", methods=["PUT"])

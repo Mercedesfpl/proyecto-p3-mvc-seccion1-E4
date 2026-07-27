@@ -1,5 +1,8 @@
+# app/factory/ruta_factory.py
+
 from ..models.ruta import Ruta
 from ..models.exceptions import ResourceNotValid
+
 
 class RutaFactory:
     

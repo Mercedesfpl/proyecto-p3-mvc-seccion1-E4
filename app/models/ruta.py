@@ -15,10 +15,10 @@ class Ruta(db.Model):
     
     def to_dict(self):
         return {
-            "id": self.id,                   
+            "id": self.id,
             "nombre": self.nombre,
             "status": self.status,
             "id_linea": self.id_linea,
             "linea_nombre": self.linea.nombre if self.linea else None,
-            "paradas": []  # Esto se llena desde el service
+            "paradas": []
         }
