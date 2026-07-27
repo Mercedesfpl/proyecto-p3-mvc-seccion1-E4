@@ -1,101 +1,88 @@
-from app.repositories.busRepository import BusRepository
-from app.repositories.lineaRepository import LineaRepository
-from app.repositories.userRepository import UserRepository
-from app.repositories.rutaRepository import RutaRepository
-from app.factory.bus_factory import BusFactory
-from app.models.exceptions import ResourceNotFound, ResourceNotValid
+# app/services/busServices.py
+
+from ..models.exceptions import ResourceNotFound, ResourceNotValid
+from ..repositories.busRepository import BusRepository
+from ..repositories.lineaRepository import LineaRepository
+from ..repositories.rutaRepository import RutaRepository
+from ..factory.bus_factory import BusFactory
 
 class BusServices:
-    
+
     @staticmethod
     def get_all_buses():
         buses = BusRepository.get_all()
-        return [b.to_dict() for b in buses]
-    
+        return [bus.to_dict() for bus in buses]
+
     @staticmethod
     def get_bus_by_id(id_vehiculo):
         bus = BusRepository.get_by_id(id_vehiculo)
         if not bus:
             raise ResourceNotFound("Bus")
         return bus.to_dict()
-    
+
     @staticmethod
     def create_bus(data):
-        # Validar placa única
-        if data.get('placa') and BusRepository.existentePorPlaca(data['placa']):
-            raise ResourceNotValid("placa", "Ya existe un bus con esa placa")
-        
-        # Validar que la línea exista
-        if data.get('id_linea'):
-            linea = LineaRepository.get_by_id(data['id_linea'])
-            if not linea:
-                raise ResourceNotFound("Línea no encontrada")
-        
-        # Validar que el secretario exista
-        if data.get('id_secretario'):
-            secretario = UserRepository.get_by_id(data['id_secretario'])
-            if not secretario:
-                raise ResourceNotFound("Secretario no encontrado")
-        
-        # Validar que la ruta exista (si se asignó)
-        if data.get('id_ruta'):
-            ruta = RutaRepository.get_by_id(data['id_ruta'])
+        placa = data.get("placa", "").strip().upper()
+        if BusRepository.existePorPlaca(placa):
+            raise ResourceNotValid("Bus", "Ya existe un bus con esa placa")
+
+        linea = LineaRepository.get_by_id(data.get("id_linea"))
+        if not linea:
+            raise ResourceNotFound("Linea")
+
+        if data.get("id_ruta"):
+            ruta = RutaRepository.get_by_id(data["id_ruta"])
             if not ruta:
-                raise ResourceNotFound("Ruta no encontrada")
-        
-        # Crear instancia con Factory
+                raise ResourceNotFound("Ruta")
+
         bus = BusFactory.crear_bus(data)
         return BusRepository.save(bus)
-    
+
     @staticmethod
     def update_bus(id_vehiculo, data):
         bus = BusRepository.get_by_id(id_vehiculo)
         if not bus:
             raise ResourceNotFound("Bus")
-        
-        # Actualizar placa (si se envía)
-        if 'placa' in data:
-            placa = data['placa'].strip().upper()
-            if BusRepository.existentePorPlaca(placa, exclude_id=id_vehiculo):
-                raise ResourceNotValid("placa", "Ya existe otro bus con esa placa")
+
+        if "placa" in data:
+            placa = data["placa"].strip().upper()
+            if BusRepository.existePorPlaca(placa, exclude_id=id_vehiculo):
+                raise ResourceNotValid("Bus", "Ya existe otro bus con esa placa")
             bus.placa = placa
-        
-        # Actualizar línea
-        if 'id_linea' in data:
-            linea = LineaRepository.get_by_id(data['id_linea'])
+
+        if "status" in data:
+            if data["status"] not in ["activa", "inactiva"]:
+                raise ResourceNotValid("Bus", f"Status invalido: {data['status']}")
+            bus.status = data["status"]
+
+        if "id_linea" in data:
+            linea = LineaRepository.get_by_id(data["id_linea"])
             if not linea:
-                raise ResourceNotFound("Línea no encontrada")
-            bus.id_linea = data['id_linea']
-        
-        # Actualizar secretario
-        if 'id_secretario' in data:
-            secretario = UserRepository.get_by_id(data['id_secretario'])
-            if not secretario:
-                raise ResourceNotFound("Secretario no encontrado")
-            bus.id_secretario = data['id_secretario']
-        
-        # Actualizar ruta (opcional)
-        if 'id_ruta' in data:
-            if data['id_ruta']:
-                ruta = RutaRepository.get_by_id(data['id_ruta'])
+                raise ResourceNotFound("Linea")
+            bus.id_linea = data["id_linea"]
+
+        if "id_ruta" in data:
+            if data["id_ruta"]:
+                ruta = RutaRepository.get_by_id(data["id_ruta"])
                 if not ruta:
-                    raise ResourceNotFound("Ruta no encontrada")
-                bus.id_ruta = data['id_ruta']
-            else:
-                bus.id_ruta = None
-        
-        # Actualizar status
-        if 'status' in data:
-            status = data['status']
-            if status not in ["activa", "inactiva"]:
-                raise ResourceNotValid("status", "Status inválido")
-            bus.status = status
-        
-        return BusRepository.save(bus)
-    
+                    raise ResourceNotFound("Ruta")
+            bus.id_ruta = data["id_ruta"]
+
+        return BusRepository.update(bus)
+
     @staticmethod
     def delete_bus(id_vehiculo):
         bus = BusRepository.get_by_id(id_vehiculo)
         if not bus:
             raise ResourceNotFound("Bus")
         return BusRepository.delete(bus)
+
+    @staticmethod
+    def get_rutas_disponibles():
+        rutas = RutaRepository.get_all()
+        return [{"id": r.id, "nombre": r.nombre} for r in rutas]
+
+    @staticmethod
+    def get_lineas_disponibles():
+        lineas = LineaRepository.get_all_activas()
+        return [{"id": l.id, "nombre": l.nombre} for l in lineas]

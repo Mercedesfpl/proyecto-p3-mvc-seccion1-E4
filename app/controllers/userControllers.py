@@ -37,7 +37,7 @@ def login(usuario):
         else:
             redirect_url = "/home"
 
-        # ✅ 4. Construir response_body ANTES de imprimirlo
+        #Construir response_body ANTES de imprimirlo
         response_body = {
             "success": True,
             "message": "Login exitoso",

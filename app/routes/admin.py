@@ -100,7 +100,7 @@ def create_linea():
 def update_linea(id_linea):
 
     data = request.get_json()
-    return lineaControllers.update_linea(id_linea, data)
+    return lineaControllers.update_linea(id_linea)
 
 
 @admin_scope.route("/lineas/<int:id_linea>", methods=["DELETE"])
@@ -253,7 +253,7 @@ def delete_parada(id_parada):
 def paradas_page():
     return render_template("pages/paradas.html")
 
-#******************** CRUD DE BUSES (FLOTAS)*********************
+# ========== CRUD DE BUSES (FLOTA) ==========
 
 @admin_scope.route("/buses", methods=["GET"])
 @jwt_required()
@@ -294,6 +294,11 @@ def delete_bus(id_vehiculo):
     from app.controllers.busControllers import delete_bus
     return delete_bus(id_vehiculo)
 
+@admin_scope.route("/flota-page", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def flota_page():
+    return render_template("pages/flota.html")
 
 #*********************************** CRUD DE RUTAS**********************************
 

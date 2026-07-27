@@ -35,7 +35,6 @@ function abrirModalUnidad(titulo = 'Nueva Unidad', data = null) {
         document.getElementById('placa').value = data.placa || '';
         document.getElementById('id_linea').value = data.id_linea || '';
         document.getElementById('id_ruta').value = data.id_ruta || '';
-        document.getElementById('id_secretario').value = data.id_secretario || '';
         document.getElementById('status').value = data.status || 'activa';
         editandoIdUnidad = data.id_vehiculo || null;
     }
@@ -53,7 +52,6 @@ function cerrarModalUnidad() {
     document.getElementById('guardarUnidadBtn').disabled = false;
 }
 
-// Cerrar con ESC
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') cerrarModalUnidad();
 });
@@ -62,7 +60,6 @@ document.addEventListener('keydown', (e) => {
 
 async function cargarSelectoresUnidad() {
     try {
-        // Líneas
         const respLineas = await fetch('/admin/lineas', { credentials: 'include' });
         const dataLineas = await respLineas.json();
         if (dataLineas.success) {
@@ -78,7 +75,6 @@ async function cargarSelectoresUnidad() {
             if (currentValue) select.value = currentValue;
         }
 
-        // Rutas
         const respRutas = await fetch('/admin/rutas/api', { credentials: 'include' });
         const dataRutas = await respRutas.json();
         if (dataRutas.success) {
@@ -94,29 +90,13 @@ async function cargarSelectoresUnidad() {
             if (currentValue) select.value = currentValue;
         }
 
-        // Secretarios
-        const respSecretarios = await fetch('/admin/secretarios/select', { credentials: 'include' });
-        const dataSecretarios = await respSecretarios.json();
-        if (dataSecretarios.success) {
-            const select = document.getElementById('id_secretario');
-            const currentValue = select.value;
-            select.innerHTML = '<option value="">Seleccione un secretario...</option>';
-            dataSecretarios.data.forEach(sec => {
-                const opt = document.createElement('option');
-                opt.value = sec.id;
-                opt.textContent = sec.nombre;
-                select.appendChild(opt);
-            });
-            if (currentValue) select.value = currentValue;
-        }
-
     } catch (error) {
         console.error('Error al cargar selectores:', error);
         showToast('Error al cargar datos del formulario', 'error');
     }
 }
 
-// ========== PAGINACIÓN Y BÚSQUEDA ==========
+// ========== PAGINACION Y BUSQUEDA ==========
 
 function filtrarBuses() {
     const busqueda = document.getElementById('searchUnidad')?.value?.toLowerCase() || '';
@@ -157,14 +137,13 @@ function renderizarTabla() {
                         <th>Placa</th>
                         <th>Línea</th>
                         <th>Ruta</th>
-                        <th>Secretario</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td colspan="7" style="text-align: center; padding: 30px; color: var(--texto-claro);">
+                        <td colspan="6" style="text-align: center; padding: 30px; color: var(--texto-claro);">
                             No hay unidades que coincidan con la búsqueda
                         </td>
                     </tr>
@@ -182,7 +161,6 @@ function renderizarTabla() {
                     <th>Placa</th>
                     <th>Línea</th>
                     <th>Ruta</th>
-                    <th>Secretario</th>
                     <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
@@ -193,10 +171,9 @@ function renderizarTabla() {
     busesPagina.forEach(bus => {
         const codigo = `BUS-${String(bus.id_vehiculo).padStart(3, '0')}`;
         const statusClass = bus.status === 'activa' ? 'status-active' : 'status-inactive';
-        const statusText = bus.status === 'activa' ? 'Activo' : 'Inactivo';
+        const statusText = bus.status === 'activa' ? 'Activa' : 'Inactiva';
         const nombreLinea = bus.linea_nombre || 'Sin línea';
         const nombreRuta = bus.ruta_nombre || 'Sin ruta';
-        const nombreSecretario = bus.secretario_nombre || 'Sin secretario';
 
         html += `
             <tr>
@@ -204,7 +181,6 @@ function renderizarTabla() {
                 <td>${bus.placa}</td>
                 <td>${nombreLinea}</td>
                 <td>${nombreRuta}</td>
-                <td>${nombreSecretario}</td>
                 <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                 <td>
                     <button class="btn-edit" onclick="editarUnidad(${bus.id_vehiculo})" title="Editar">
@@ -257,14 +233,6 @@ async function cargarBuses() {
             todosLosBuses = [];
         }
 
-        // Actualizar KPIs
-        const total = todosLosBuses.length;
-        const activas = todosLosBuses.filter(b => b.status === 'activa').length;
-        const inactivas = total - activas;
-        document.getElementById('totalUnidades').textContent = total;
-        document.getElementById('unidadesActivas').textContent = activas;
-        document.getElementById('unidadesInactivas').textContent = inactivas;
-
         busesFiltrados = [...todosLosBuses];
         renderizarTabla();
         actualizarPaginacion();
@@ -313,22 +281,18 @@ async function eliminarUnidad(id) {
     }
 }
 
-// ========== INICIALIZACIÓN ==========
+// ========== INICIALIZACION ==========
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Cargar selectores para el modal
     cargarSelectoresUnidad();
 
-    // Filtros
     document.getElementById('searchUnidad')?.addEventListener('input', filtrarBuses);
     document.getElementById('filterLinea')?.addEventListener('change', filtrarBuses);
     document.getElementById('filterEstado')?.addEventListener('change', filtrarBuses);
 
-    // Paginación
     document.getElementById('btnAnterior').addEventListener('click', function() { irPagina(-1); });
     document.getElementById('btnSiguiente').addEventListener('click', function() { irPagina(1); });
 
-    // Formulario
     const form = document.getElementById('formNuevaUnidad');
     if (form) {
         form.addEventListener('submit', async (e) => {
@@ -342,7 +306,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 placa: document.getElementById('placa').value.trim().toUpperCase(),
                 id_linea: parseInt(document.getElementById('id_linea').value),
                 id_ruta: document.getElementById('id_ruta').value ? parseInt(document.getElementById('id_ruta').value) : null,
-                id_secretario: parseInt(document.getElementById('id_secretario').value),
                 status: document.getElementById('status').value
             };
 
@@ -355,13 +318,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (!datos.id_linea) {
                 showToast('Debes seleccionar una línea', 'error');
-                loadingUnidad = false;
-                document.getElementById('guardarUnidadBtn').disabled = false;
-                return;
-            }
-
-            if (!datos.id_secretario) {
-                showToast('Debes seleccionar un secretario', 'error');
                 loadingUnidad = false;
                 document.getElementById('guardarUnidadBtn').disabled = false;
                 return;
@@ -400,14 +356,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Botón nueva unidad
-    document.getElementById('nuevaUnidadBtn').addEventListener('click', function() {
+    document.getElementById('btnNuevaUnidad').addEventListener('click', function() {
         editandoIdUnidad = null;
         cargarSelectoresUnidad();
         abrirModalUnidad('Nueva Unidad');
     });
 
-    // Cerrar modal al hacer clic fuera
     window.onclick = function(event) {
         const modal = document.getElementById('modalNuevaUnidad');
         if (event.target === modal) {

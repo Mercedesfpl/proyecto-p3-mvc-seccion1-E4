@@ -1,4 +1,5 @@
-<!-- frontend/views/flota.html -->
+<!-- app/frontend/views/pages/flota.html -->
+
 {% extends 'layouts/base.html' %}
 
 {% block title %}Flota{% endblock %}
@@ -8,77 +9,40 @@
 {% endblock %}
 
 {% block content %}
-<div class="flota-header">
+<div class="page-header">
     <h1>Gestión de Flota</h1>
-    <button class="btn-add" id="nuevaUnidadBtn">
+    <button class="btn-add" id="btnNuevaUnidad">
         <i class="fas fa-plus"></i> Nueva Unidad
     </button>
 </div>
 
-<!-- KPIs -->
-<div class="grid-4">
-    <div class="kpi-card">
-        <div class="kpi-header">
-            <span>Total de Unidades</span>
-            <div class="kpi-icon"><i class="fas fa-bus"></i></div>
-        </div>
-        <div class="kpi-value" id="totalUnidades">0</div>
-    </div>
-    <div class="kpi-card">
-        <div class="kpi-header">
-            <span>Unidades Activas</span>
-            <div class="kpi-icon"><i class="fas fa-play-circle"></i></div>
-        </div>
-        <div class="kpi-value" id="unidadesActivas" style="color: #10b981">0</div>
-    </div>
-    <div class="kpi-card">
-        <div class="kpi-header">
-            <span>Unidades En Servicio</span>
-            <div class="kpi-icon"><i class="fas fa-road"></i></div>
-        </div>
-        <div class="kpi-value" id="unidadesServicio" style="color: var(--amarillo)">0</div>
-    </div>
-    <div class="kpi-card">
-        <div class="kpi-header">
-            <span>Unidades Taller</span>
-            <div class="kpi-icon"><i class="fas fa-wrench"></i></div>
-        </div>
-        <div class="kpi-value" id="unidadesTaller" style="color: var(--rojo)">0</div>
-    </div>
-</div>
-
-<!-- Filtros -->
-<div class="filters-bar">
-    <div class="search-box">
-        <i class="fas fa-search"></i>
-        <input type="text" id="searchUnidad" placeholder="Buscar por placa o línea...">
-    </div>
-    <div class="filter-group">
-        <select class="filter-select" id="filterLinea">
-            <option value="">Todas las líneas</option>
-        </select>
-        <select class="filter-select" id="filterEstado">
-            <option value="">Todos los estados</option>
-            <option value="activa">Activo</option>
-            <option value="en_servicio">En servicio</option>
-            <option value="inactiva">Inactivo</option>
-        </select>
-    </div>
-</div>
-
 <div class="tabla-container">
+    <div class="tabla-toolbar">
+        <div class="tabla-busqueda">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchUnidad" placeholder="Buscar por placa o línea...">
+        </div>
+        <div class="filter-group">
+            <select class="filter-select" id="filterLinea">
+                <option value="">Todas las líneas</option>
+            </select>
+            <select class="filter-select" id="filterEstado">
+                <option value="">Todos los estados</option>
+                <option value="activa">Activa</option>
+                <option value="inactiva">Inactiva</option>
+            </select>
+        </div>
+    </div>
     <div id="tablaUnidades"></div>
-</div>
-
-<!-- Paginación -->
-<div class="tabla-paginacion" id="paginacionUnidades">
-    <button id="btnAnterior" disabled>
-        <i class="fas fa-chevron-left"></i> Anterior
-    </button>
-    <span class="info-pagina" id="infoPagina">Página 1 de 1</span>
-    <button id="btnSiguiente" disabled>
-        Siguiente <i class="fas fa-chevron-right"></i>
-    </button>
+    <div class="tabla-paginacion" id="paginacionUnidades">
+        <button id="btnAnterior" disabled>
+            <i class="fas fa-chevron-left"></i> Anterior
+        </button>
+        <span class="info-pagina" id="infoPagina">Página 1 de 1</span>
+        <button id="btnSiguiente" disabled>
+            Siguiente <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
 </div>
 
 <!-- MODAL NUEVA UNIDAD -->
@@ -110,24 +74,17 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Secretario <span class="required">*</span></label>
-                    <select id="id_secretario" name="id_secretario" required>
-                        <option value="">Seleccione un secretario...</option>
+                    <label>Estado</label>
+                    <select id="status" name="status">
+                        <option value="activa">Activa</option>
+                        <option value="inactiva">Inactiva</option>
                     </select>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>Estado</label>
-                <select id="status" name="status">
-                    <option value="activa">Activa</option>
-                    <option value="inactiva">Inactiva</option>
-                </select>
-            </div>
-
             <div style="margin-top: 12px; padding: 10px; background: #f0f7ff; border-radius: 6px; font-size: 13px; color: #1a3a5c;">
                 <i class="fas fa-info-circle" style="color: #1a73e8;"></i>
-                La placa debe ser única. La ruta es opcional.
+                La placa debe ser única.
             </div>
 
             <button type="submit" class="btn-guardar" id="guardarUnidadBtn">

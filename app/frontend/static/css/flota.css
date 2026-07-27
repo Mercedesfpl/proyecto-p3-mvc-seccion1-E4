@@ -1,6 +1,6 @@
 /* frontend/static/css/pages/flota.css */
 
-.flota-header {
+.page-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -9,7 +9,7 @@
     gap: 12px;
 }
 
-.flota-header h1 {
+.page-header h1 {
     font-size: 24px;
     font-weight: 700;
 }
@@ -26,55 +26,6 @@
     flex-wrap: wrap;
     gap: 12px;
     box-shadow: var(--sombra);
-}
-
-.search-box {
-    display: flex;
-    align-items: center;
-    background: var(--gris);
-    border-radius: 40px;
-    padding: 6px 16px;
-    gap: 8px;
-    flex: 1;
-    max-width: 280px;
-}
-
-.search-box i {
-    color: var(--texto-claro);
-    font-size: 14px;
-}
-
-.search-box input {
-    border: none;
-    background: none;
-    outline: none;
-    font-size: 14px;
-    width: 100%;
-    font-family: var(--font-family);
-    padding: 6px 0;
-}
-
-.filter-group {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    align-items: center;
-}
-
-.filter-select {
-    padding: 6px 14px;
-    border-radius: 40px;
-    border: 1px solid var(--borde);
-    background: var(--blanco);
-    font-size: 13px;
-    cursor: pointer;
-    font-family: var(--font-family);
-    transition: var(--transition);
-}
-
-.filter-select:focus {
-    outline: none;
-    border-color: var(--azul);
 }
 
 /* ===== TABLA ===== */
@@ -119,6 +70,29 @@
     width: 100%;
     font-family: var(--font-family);
     padding: 6px 0;
+}
+
+.filter-group {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-select {
+    padding: 6px 14px;
+    border-radius: 40px;
+    border: 1px solid var(--borde);
+    background: var(--blanco);
+    font-size: 13px;
+    cursor: pointer;
+    font-family: var(--font-family);
+    transition: var(--transition);
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--azul);
 }
 
 /* ===== PAGINACIÓN ===== */
@@ -179,35 +153,6 @@
     color: var(--rojo);
 }
 
-.status-warning {
-    background: rgba(243, 176, 1, 0.1);
-    color: var(--amarillo);
-}
-
-/* ===== BOTONES DE ACCIÓN ===== */
-.action-buttons {
-    display: flex;
-    gap: 8px;
-}
-
-.action-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--texto-claro);
-    font-size: 16px;
-    transition: color 0.2s;
-    padding: 4px;
-}
-
-.action-btn:hover {
-    color: var(--azul);
-}
-
-.action-btn.delete:hover {
-    color: var(--rojo);
-}
-
 /* ===== MODAL ===== */
 #modalNuevaUnidad .modal-content {
     max-width: 600px;
@@ -240,7 +185,12 @@
         align-items: stretch;
     }
 
-    .search-box {
+    .tabla-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .tabla-busqueda {
         max-width: none;
     }
 
@@ -263,27 +213,18 @@
         padding: 16px;
     }
 
-    .tabla-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .tabla-busqueda {
-        max-width: none;
-    }
-
     .tabla-paginacion {
         justify-content: center;
     }
 }
 
 @media (max-width: 480px) {
-    .flota-header {
+    .page-header {
         flex-direction: column;
         align-items: stretch;
     }
 
-    .flota-header .btn-add {
+    .page-header .btn-add {
         width: 100%;
         justify-content: center;
     }
@@ -295,10 +236,5 @@
 
     .filter-group .filter-select {
         width: 100%;
-    }
-
-    .filter-group .btn-primary {
-        width: 100%;
-        justify-content: center;
     }
 }
