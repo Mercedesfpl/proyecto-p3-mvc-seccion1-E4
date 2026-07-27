@@ -306,7 +306,6 @@ function abrirModalRuta(titulo = 'Nueva Ruta', data = null) {
         if (data.paradas) {
             paradasSeleccionadasIds = data.paradas.map(p => p.id);
         }
-        editandoIdRuta = data.id_ruta || null;
     } else {
         editandoIdRuta = null;
     }
@@ -640,6 +639,9 @@ async function editarRuta(id) {
         const data = await response.json();
         if (!data.data) throw new Error('Datos inválidos');
 
+        const ruta = data.data;
+        editandoIdRuta = parseInt(id) || parseInt(ruta.id) || parseInt(ruta.id_ruta) || null;
+        console.log('editandoIdRuta asignado:', editandoIdRuta);  // Debug
         await cargarSelectoresRuta();
         abrirModalRuta('Editar Ruta', data.data);
 
@@ -737,6 +739,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const url = editandoIdRuta ? `/admin/rutas/${editandoIdRuta}` : '/admin/rutas';
             const method = editandoIdRuta ? 'PUT' : 'POST';
+
+            console.log('URL:', url, 'Método:', method, 'ID:', editandoIdRuta);  // Debug
+
 
             try {
                 const response = await fetch(url, {

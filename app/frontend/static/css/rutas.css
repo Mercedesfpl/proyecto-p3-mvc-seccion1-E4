@@ -2,7 +2,7 @@
 
 /* ===== MODAL DE RUTAS - Layout de 2 columnas ===== */
 #modalNuevaRuta .modal-content {
-    max-width: 950px; /* Un poco más amplio para dar respiro */
+    max-width: 950px; 
     width: 90%;
     padding: 24px 28px;
     box-sizing: border-box;
@@ -12,38 +12,35 @@
     font-size: 20px;
 }
 
-/* Layout de 2 columnas ajustado para prevenir solapamientos */
 .modal-ruta-layout {
     display: flex;
     gap: 24px;
-    align-items: stretch; /* Permite que ambas columnas tengan igual altura */
+    align-items: stretch; 
     width: 100%;
     box-sizing: border-box;
 }
 
 .modal-ruta-layout .form-columna {
-    flex: 1 1 50%; /* Ocupa el 50% de forma flexible */
-    min-width: 0;   /* Previene que los inputs o textos fuercen un desbordamiento */
+    flex: 1 1 50%; 
+    min-width: 0;   
 }
 
 .modal-ruta-layout .mapa-columna {
-    flex: 1 1 50%; /* Ocupa el 50% de forma flexible */
-    min-width: 0;   /* Evita desbordamientos */
+    flex: 1 1 50%; 
+    min-width: 0;   
     display: flex;
     flex-direction: column;
 }
 
-/* Ajustes al mapa para adaptarse a la columna */
 #mapa-rutas-modal {
     height: 100%;
-    min-height: 340px; /* Mantiene una altura mínima visible */
+    min-height: 340px; 
     width: 100%;
     border-radius: var(--radius-sm);
     border: 1px solid var(--borde);
     background: var(--gris);
 }
 
-/* Ajuste preventivo para las subcolumnas de paradas */
 .paradas-lista-container {
     display: flex;
     gap: 12px;
@@ -54,7 +51,7 @@
 .paradas-lista-container .paradas-disponibles,
 .paradas-lista-container .paradas-seleccionadas {
     flex: 1 1 50%;
-    min-width: 0; /* Asegura que la lista de paradas no se monte sobre la otra */
+    min-width: 0; 
 }
 .paradas-lista-container .paradas-disponibles,
 .paradas-lista-container .paradas-seleccionadas {

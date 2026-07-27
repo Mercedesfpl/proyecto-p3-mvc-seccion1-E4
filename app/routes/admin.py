@@ -324,7 +324,7 @@ def update_ruta(id_ruta):
     from flask import request
     from app.controllers.rutaControllers import update_ruta
     data = request.get_json()
-    return update_ruta(id_ruta, data)
+    return update_ruta(id_ruta)
 
 @admin_scope.route("/rutas/<int:id_ruta>", methods=["DELETE"])
 @jwt_required()
