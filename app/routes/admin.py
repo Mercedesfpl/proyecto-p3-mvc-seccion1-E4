@@ -340,3 +340,56 @@ def update_ruta(id_ruta):
 def delete_ruta(id_ruta):
     from app.controllers.rutaControllers import delete_ruta
     return delete_ruta(id_ruta)
+
+# ========== CRUD DE DETECCIONES ==========
+
+@admin_scope.route("/detecciones", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_detecciones():
+    from app.controllers.deteccionControllers import get_all_detecciones
+    return get_all_detecciones()
+
+@admin_scope.route("/detecciones/<int:id_deteccion>", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_deteccion(id_deteccion):
+    from app.controllers.deteccionControllers import get_deteccion_by_id
+    return get_deteccion_by_id(id_deteccion)
+
+@admin_scope.route("/detecciones/vehiculo/<int:id_vehiculo>", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_detecciones_vehiculo(id_vehiculo):
+    from app.controllers.deteccionControllers import get_detecciones_by_vehiculo
+    return get_detecciones_by_vehiculo(id_vehiculo)
+
+@admin_scope.route("/detecciones/parada/<int:id_parada>", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_detecciones_parada(id_parada):
+    from app.controllers.deteccionControllers import get_detecciones_by_parada
+    return get_detecciones_by_parada(id_parada)
+
+@admin_scope.route("/detecciones/alertas", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_alertas():
+    from app.controllers.deteccionControllers import get_alertas
+    return get_alertas()
+
+@admin_scope.route("/detecciones", methods=["POST"])
+@jwt_required()
+@role_required("admin")
+def create_deteccion():
+    from flask import request
+    from app.controllers.deteccionControllers import create_deteccion
+    data = request.get_json()
+    return create_deteccion()
+
+@admin_scope.route("/detecciones/<int:id_deteccion>", methods=["DELETE"])
+@jwt_required()
+@role_required("admin")
+def delete_deteccion(id_deteccion):
+    from app.controllers.deteccionControllers import delete_deteccion
+    return delete_deteccion(id_deteccion)
