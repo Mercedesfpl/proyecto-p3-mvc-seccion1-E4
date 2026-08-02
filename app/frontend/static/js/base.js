@@ -13,7 +13,7 @@ window.mostrarToast = function (message, type = "error") {
   }
 };
 document.addEventListener("DOMContentLoaded", function () {
-  //  DROPDOWN DEL USUARIO (mostrar/ocultar) 
+  //  DROPDOWN DEL USUARIO (mostrar/ocultar)
   const userDropdown = document.getElementById("userDropdown");
   const dropdownMenu = document.getElementById("dropdownMenu");
 
@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  //  PANEL DE NOTIFICACIONES (mostrar/ocultar) 
+  //  PANEL DE NOTIFICACIONES (mostrar/ocultar)
   const notificationBtn = document.getElementById("notificationBtn");
   const notificationsPanel = document.getElementById("notificationsPanel");
 
@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  //  CERRAR AL HACER CLIC FUERA 
+  //  CERRAR AL HACER CLIC FUERA
   document.addEventListener("click", function (e) {
     // Cerrar dropdown si se clica fuera
     if (dropdownMenu && dropdownMenu.style.display === "block") {
@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  //  EFECTO: MARCAR NOTIFICACIONES COMO LEÍDAS 
+  //  EFECTO: MARCAR NOTIFICACIONES COMO LEÍDAS
   const markReadBtn = document.querySelector(".mark-read");
   if (markReadBtn) {
     markReadBtn.addEventListener("click", function () {
@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  //  EFECTO: HOVER EN TARJETAS 
+  //  EFECTO: HOVER EN TARJETAS
   const cards = document.querySelectorAll(".kpi-card, .card");
   cards.forEach((card) => {
     card.addEventListener("mouseenter", function () {
@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  //  ANIMACIÓN  AL CARGAR LAS TARJETAS 
+  //  ANIMACIÓN  AL CARGAR LAS TARJETAS
   const kpis = document.querySelectorAll(".kpi-card");
   kpis.forEach((kpi, index) => {
     kpi.style.opacity = "0";
@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }, index * 50);
   });
 
-  //  EFECTO EN LOS FILTROS  
+  //  EFECTO EN LOS FILTROS
   const filterSelects = document.querySelectorAll(".filter-select");
   filterSelects.forEach((select) => {
     select.addEventListener("change", function () {
@@ -123,7 +123,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  //  EFECTO EN BOTONES 
+  //  EFECTO EN BOTONES
   const btns = document.querySelectorAll(".btn-primary, .btn-secondary");
   btns.forEach((btn) => {
     btn.addEventListener("click", function (e) {
@@ -171,7 +171,7 @@ window.fetch = async function (...args) {
   return response;
 };
 
-//  LOGOUT 
+//  LOGOUT
 const logoutBtn = document.getElementById("btn-logout");
 if (logoutBtn) {
   logoutBtn.addEventListener("click", async (e) => {
@@ -189,107 +189,129 @@ if (logoutBtn) {
   });
 }
 
-//  FUNCIONES COMUNES PARA TODOS LOS CRUD 
+//  FUNCIONES COMUNES PARA TODOS LOS CRUD
 
 // Mostrar notificación
-function showToast(message, type = 'success') {
-    const toast = document.getElementById('toastMessage');
-    if (!toast) return;
-    toast.textContent = message;
-    toast.className = `toast-message ${type} show`;
-    setTimeout(() => toast.classList.remove('show'), 3000);
+function showToast(message, type = "success") {
+  const toast = document.getElementById("toastMessage");
+  if (!toast) return;
+  toast.textContent = message;
+  toast.className = `toast-message ${type} show`;
+  setTimeout(() => toast.classList.remove("show"), 3000);
 }
 
 // Petición genérica a la API
-async function fetchAPI(url, method = 'GET', body = null) {
-    const options = {
-        method: method,
-        headers: { 'Content-Type': 'application/json' }
-    };
-    if (body) options.body = JSON.stringify(body);
-    
-    const response = await fetch(url, options);
-    const data = await response.json();
-    
-    if (!response.ok) {
-        throw new Error(data.message || data.error || 'Error en la petición');
-    }
-    return data;
+async function fetchAPI(url, method = "GET", body = null) {
+  const options = {
+    method: method,
+    headers: { "Content-Type": "application/json" },
+  };
+  if (body) options.body = JSON.stringify(body);
+
+  const response = await fetch(url, options);
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || data.error || "Error en la petición");
+  }
+  return data;
 }
 
 // Abrir modal genérico
 function openModal(title, fields, data = {}) {
-    const modal = document.getElementById('genericModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
-    
-    modalTitle.textContent = title;
-    
-    // Generar campos dinámicamente
-    modalBody.innerHTML = fields.map(field => `
+  const modal = document.getElementById("genericModal");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalBody = document.getElementById("modalBody");
+
+  modalTitle.textContent = title;
+
+  // Generar campos dinámicamente
+  modalBody.innerHTML = fields
+    .map(
+      (field) => `
         <div class="form-group">
             <label>${field.label}</label>
-            <input type="${field.type || 'text'}" 
+            <input type="${field.type || "text"}" 
                    id="${field.name}" 
                    name="${field.name}" 
                    class="form-input" 
-                   value="${data[field.name] || ''}"
-                   ${field.required ? 'required' : ''}>
+                   value="${data[field.name] || ""}"
+                   ${field.required ? "required" : ""}>
         </div>
-    `).join('');
-    
-    modal.style.display = 'block';
+    `,
+    )
+    .join("");
+
+  modal.style.display = "block";
 }
 
 // Cerrar modal
 function closeModal() {
-    document.getElementById('genericModal').style.display = 'none';
+  document.getElementById("genericModal").style.display = "none";
 }
 
 // Cargar datos en tabla genérica
 function renderTable(containerId, columns, data, actions = true) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    
-    const thead = `<thead><tr>${columns.map(col => `<th>${col.label}</th>`).join('')}${actions ? '<th>Acciones</th>' : ''}</tr></thead>`;
-    
-    const tbody = `<tbody>
-        ${data.map(row => `<tr>
-            ${columns.map(col => `<td>${row[col.field] || '-'}</td>`).join('')}
-            ${actions ? `<td>
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  const thead = `<thead><tr>${columns.map((col) => `<th>${col.label}</th>`).join("")}${actions ? "<th>Acciones</th>" : ""}</tr></thead>`;
+
+  const tbody = `<tbody>
+        ${data
+          .map(
+            (row) => `<tr>
+            ${columns.map((col) => `<td>${row[col.field] || "-"}</td>`).join("")}
+            ${
+              actions
+                ? `<td>
                 <button class="btn-edit" data-id="${row.id}"><i class="fas fa-edit"></i></button>
                 <button class="btn-delete" data-id="${row.id}"><i class="fas fa-trash"></i></button>
-            </td>` : ''}
-        </tr>`).join('')}
+            </td>`
+                : ""
+            }
+        </tr>`,
+          )
+          .join("")}
     </tbody>`;
-    
-    container.innerHTML = `<table class="data-table">${thead}${tbody}</table>`;
-}
 
+  container.innerHTML = `<table class="data-table">${thead}${tbody}</table>`;
+}
 
 // Obtener el rol del usuario actual (desde el DOM o desde una API)
 function getUserRole() {
-    // Opción 1: Si el rol está en un data attribute del body
-    const body = document.body;
-    if (body.getAttribute('data-user-rol')) {
-        return body.getAttribute('data-user-rol');
-    }
-    return null;
+  // Opción 1: Si el rol está en un data attribute del body
+  const body = document.body;
+  if (body.getAttribute("data-user-rol")) {
+    return body.getAttribute("data-user-rol");
+  }
+  return null;
 }
 
 // Mostrar/ocultar elementos según el rol
 function toggleAdminOnlyElements() {
-    const role = getUserRole();
-    const adminElements = document.querySelectorAll('.admin-only');
-    
-    if (role === 'admin') {
-        adminElements.forEach(el => el.style.display = '');
-    } else {
-        adminElements.forEach(el => el.style.display = 'none');
-    }
+  const role = getUserRole();
+  const adminElements = document.querySelectorAll(".admin-only");
+
+  if (role === "admin") {
+    adminElements.forEach((el) => (el.style.display = ""));
+  } else {
+    adminElements.forEach((el) => (el.style.display = "none"));
+  }
 }
 
 // Ejecutar cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', function() {
-    toggleAdminOnlyElements();
+document.addEventListener("DOMContentLoaded", function () {
+  toggleAdminOnlyElements();
+});
+
+// aplica el modo oscuro
+document.addEventListener("DOMContentLoaded", function () {
+  // Cargar tema guardado en localStorage
+  const tema = localStorage.getItem("theme") || "claro";
+  if (tema === "oscuro") {
+    document.body.classList.add("dark-mode");
+  } else {
+    document.body.classList.remove("dark-mode");
+  }
 });

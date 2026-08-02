@@ -3,50 +3,469 @@
 
 /* Badges de estado */
 .status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .status-active {
-    background: rgba(16, 185, 129, 0.1);
-    color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
 }
 
 .status-inactive {
-    background: rgba(149, 36, 42, 0.1);
-    color: var(--rojo);
+  background: rgba(149, 36, 42, 0.1);
+  color: var(--rojo);
 }
 
 .status-warning {
-    background: rgba(243, 176, 1, 0.1);
-    color: var(--amarillo);
+  background: rgba(243, 176, 1, 0.1);
+  color: var(--amarillo);
 }
 
-/* Botones de acción en tabla */
+/* ===== BOTONES DE ACCIÓN ===== */
 .action-buttons {
-    display: flex;
-    gap: 8px;
+  display: flex;
+  gap: 8px;
 }
 
 .action-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--texto-claro);
-    font-size: 16px;
-    transition: color 0.2s;
-    padding: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--texto-claro);
+  font-size: 16px;
+  transition: all 0.2s ease;
+  padding: 4px;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .action-btn:hover {
-    color: var(--azul);
+  background-color: rgba(116, 169, 211, 0.1);
+  color: var(--azul);
 }
 
 .action-btn.delete:hover {
-    color: var(--rojo);
+  background-color: rgba(149, 36, 42, 0.1);
+  color: var(--rojo);
+}
+
+/* ===== FILTROS ===== */
+.filters-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  background: var(--blanco);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 32px;
+  box-shadow: var(--sombra);
+  border: 1px solid var(--borde);
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background: var(--gris);
+  border-radius: 40px;
+  padding: 8px 16px;
+  gap: 10px;
+  flex: 1;
+  max-width: 320px;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.search-box:focus-within {
+  border-color: var(--azul);
+  box-shadow: 0 0 0 3px rgba(116, 169, 211, 0.15);
+}
+
+.search-box i {
+  color: var(--texto-claro);
+  font-size: 14px;
+}
+
+.search-box input {
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 14px;
+  width: 100%;
+  color: var(--texto-oscuro);
+}
+
+.search-box input::placeholder {
+  color: var(--texto-claro);
+}
+
+.filter-group {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-select {
+  padding: 8px 16px;
+  border-radius: 40px;
+  border: 1px solid var(--borde);
+  background: var(--blanco);
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--texto-oscuro);
+  transition: all 0.2s ease;
+  min-width: 160px;
+}
+
+.filter-select:hover {
+  border-color: var(--azul);
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--azul);
+  box-shadow: 0 0 0 3px rgba(116, 169, 211, 0.15);
+}
+
+/* ===== TABLA HEADER ===== */
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.table-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--texto-oscuro);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.table-header h2 i {
+  color: var(--azul);
+}
+
+.export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  border-radius: 40px;
+  border: 1px solid var(--borde);
+  background: transparent;
+  color: var(--texto-oscuro);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.export-btn:hover {
+  background: var(--gris);
+  border-color: var(--azul);
+}
+
+.export-btn i {
+  color: var(--texto-claro);
+}
+
+/* ===== CONTENEDOR DE TABLA ===== */
+.unidades-table-container {
+  background: var(--blanco);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--sombra);
+  border: 1px solid var(--borde);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .filters-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-box {
+    max-width: none;
+  }
+
+  .filter-group {
+    flex-wrap: wrap;
+  }
+
+  .filter-select {
+    flex: 1;
+    min-width: 120px;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .unidades-table-container {
+    padding: 16px;
+  }
+
+  .filter-select {
+    min-width: 100%;
+  }
+}
+
+/* ============================================
+   🎨 MODO OSCURO - FLOTA
+   (Agregar ESTO al FINAL del archivo)
+   ============================================ */
+
+body.dark-mode .filters-bar {
+  background-color: #16213e !important;
+  border-color: #2a2a4a !important;
+}
+
+body.dark-mode .search-box {
+  background-color: #0f0f1f !important;
+  border: 1px solid #2a2a4a !important;
+}
+
+body.dark-mode .search-box input {
+  background-color: transparent !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .search-box input::placeholder {
+  color: #a0aec0 !important;
+}
+
+body.dark-mode .filter-select {
+  background-color: #0f0f1f !important;
+  color: #e0e0e0 !important;
+  border-color: #2a2a4a !important;
+}
+
+body.dark-mode .filter-select option {
+  background-color: #0f0f1f !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .table-header h2 {
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .export-btn {
+  color: #e0e0e0 !important;
+  border-color: #2a2a4a !important;
+}
+
+body.dark-mode .export-btn:hover {
+  background-color: #2a2a4a !important;
+}
+
+body.dark-mode .status-badge.status-active {
+  background-color: rgba(16, 185, 129, 0.2) !important;
+  color: #34d399 !important;
+}
+
+body.dark-mode .status-badge.status-warning {
+  background-color: rgba(243, 176, 1, 0.2) !important;
+  color: #fbbf24 !important;
+}
+
+body.dark-mode .status-badge.status-inactive {
+  background-color: rgba(149, 36, 42, 0.2) !important;
+  color: #f87171 !important;
+}
+
+body.dark-mode .action-btn {
+  color: #a0aec0 !important;
+}
+
+body.dark-mode .action-btn:hover {
+  background-color: #2a2a4a !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .action-btn.delete:hover {
+  background-color: rgba(149, 36, 42, 0.2) !important;
+  color: #f87171 !important;
+}
+
+body.dark-mode .unidades-table-container {
+  background-color: #16213e !important;
+  border-color: #2a2a4a !important;
+}
+
+body.dark-mode .data-table thead th {
+  background-color: #0f0f1f !important;
+  color: #a0aec0 !important;
+  border-color: #2a2a4a !important;
+}
+
+body.dark-mode .data-table tbody td {
+  border-color: #2a2a4a !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .data-table tbody tr:hover {
+  background-color: #2a2a4a !important;
+}
+
+body.dark-mode .pagination .page-item {
+  background-color: #16213e !important;
+  color: #e0e0e0 !important;
+  border-color: #2a2a4a !important;
+}
+
+body.dark-mode .pagination .page-item:hover {
+  background-color: #2a2a4a !important;
+}
+
+body.dark-mode .pagination .page-item.active {
+  background-color: #74a9d3 !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .kpi-card {
+  background-color: #16213e !important;
+  border-color: #2a2a4a !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .kpi-header span {
+  color: #a0aec0 !important;
+}
+
+body.dark-mode .kpi-value {
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .kpi-card {
+  background-color: #16213e !important;
+  border-color: #2a2a4a !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .kpi-header span {
+  color: #a0aec0 !important;
+}
+
+body.dark-mode .kpi-value {
+  color: #e0e0e0 !important;
+}
+
+/* 🔴 Fondo de la tabla */
+body.dark-mode .unidades-table-container {
+  background-color: #16213e !important;
+  border-color: #2a2a4a !important;
+}
+
+/* 🔴 Filas de la tabla */
+body.dark-mode .data-table tbody tr {
+  background-color: transparent !important;
+}
+
+body.dark-mode .data-table tbody td {
+  border-color: #2a2a4a !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .data-table tbody tr:hover {
+  background-color: #2a2a4a !important;
+}
+
+/* 🔴 Filtros y buscador */
+body.dark-mode .filters-bar {
+  background-color: #16213e !important;
+  border-color: #2a2a4a !important;
+}
+
+body.dark-mode .search-box {
+  background-color: #0f0f1f !important;
+  border: 1px solid #2a2a4a !important;
+}
+
+body.dark-mode .search-box input {
+  background-color: transparent !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .search-box input::placeholder {
+  color: #a0aec0 !important;
+}
+
+/* 🔴 Selectores */
+body.dark-mode .filter-select {
+  background-color: #0f0f1f !important;
+  color: #e0e0e0 !important;
+  border-color: #2a2a4a !important;
+}
+
+body.dark-mode .filter-select option {
+  background-color: #0f0f1f !important;
+  color: #e0e0e0 !important;
+}
+
+/* 🔴 Paginación */
+body.dark-mode .pagination .page-item {
+  background-color: #16213e !important;
+  color: #e0e0e0 !important;
+  border-color: #2a2a4a !important;
+}
+
+body.dark-mode .pagination .page-item:hover {
+  background-color: #2a2a4a !important;
+}
+
+body.dark-mode .pagination .page-item.active {
+  background-color: #74a9d3 !important;
+  color: #ffffff !important;
+}
+
+/* 🔴 Botón de exportar */
+body.dark-mode .export-btn {
+  color: #e0e0e0 !important;
+  border-color: #2a2a4a !important;
+}
+
+body.dark-mode .export-btn:hover {
+  background-color: #2a2a4a !important;
+}
+
+/* 🔴 Títulos de la tabla */
+body.dark-mode .table-header h2 {
+  color: #e0e0e0 !important;
+}
+
+/* 🔴 Badges de estado (para que se vean mejor) */
+body.dark-mode .status-badge.status-active {
+  background-color: rgba(16, 185, 129, 0.2) !important;
+  color: #34d399 !important;
+}
+
+body.dark-mode .status-badge.status-warning {
+  background-color: rgba(243, 176, 1, 0.2) !important;
+  color: #fbbf24 !important;
+}
+
+body.dark-mode .status-badge.status-inactive {
+  background-color: rgba(149, 36, 42, 0.2) !important;
+  color: #f87171 !important;
 }
