@@ -27,28 +27,84 @@
     }
 }
 
-.color-picker-wrapper {
+/* PALETA DE COLORES Y CONTROLES */
+.color-palette-container {
     display: flex;
-    gap: 8px;
-    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+    margin-bottom: 12px;
 }
 
-.color-picker-wrapper input[type="color"] {
-    width: 40px;
-    height: 40px;
-    padding: 2px;
-    border: 2px solid var(--borde);
-    border-radius: 6px;
+.color-swatch {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 3px solid transparent;
     cursor: pointer;
-    flex-shrink: 0;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 0;
 }
 
-.color-picker-wrapper input[type="color"]:hover {
-    border-color: var(--azul);
+.color-swatch:hover {
+    transform: scale(1.15);
 }
 
-.color-picker-wrapper .color-hex {
+.color-swatch.active {
+    border-color: #ffffff;
+    box-shadow: 0 0 0 2px var(--azul, #4891CE), 0 4px 8px rgba(0,0,0,0.15);
+    transform: scale(1.1);
+}
+
+.color-custom-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8fafc;
+    border: 1px solid var(--borde, #e2e8f0);
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+}
+
+.color-custom-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-size: 13px;
-    color: var(--texto-claro);
+    font-weight: 600;
+    color: var(--texto-oscuro, #1e293b);
+}
+
+.color-custom-input input[type="color"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 28px;
+    height: 28px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.color-custom-input input[type="color"]::-webkit-color-swatch {
+    border-radius: 50%;
+    border: 1px solid #cbd5e1;
+}
+
+.color-custom-input input[type="color"]::-moz-color-swatch {
+    border-radius: 50%;
+    border: 1px solid #cbd5e1;
+}
+
+.color-hex-badge {
     font-family: monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--texto-claro, #64748b);
+    background: #ffffff;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--borde, #e2e8f0);
 }

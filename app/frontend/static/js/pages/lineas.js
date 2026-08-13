@@ -1,7 +1,5 @@
-// frontend/static/js/pages/lineas.js
-
 // ========================================
-// PÁGINA DE LÍNEAS - CRUD
+// PÁGINA DE LÍNEAS - CRUD Y PALETA
 // ========================================
 
 let editandoId = null;
@@ -20,6 +18,24 @@ function showToast(message, type = "success") {
   toast._timeout = setTimeout(() => {
     toast.classList.remove("show");
   }, 4000);
+}
+
+// ========== MANEJO DE SELECCIÓN DE COLOR ==========
+function seleccionarColor(hexColor) {
+  const hex = hexColor.toUpperCase();
+  document.getElementById("color_linea").value = hex;
+  document.getElementById("colorHex").textContent = hex;
+  document.getElementById("customColorPicker").value = hex;
+
+  // Marcar/Desmarcar swatches
+  const swatches = document.querySelectorAll(".color-swatch");
+  swatches.forEach(swatch => {
+    if (swatch.dataset.color.toUpperCase() === hex) {
+      swatch.classList.add("active");
+    } else {
+      swatch.classList.remove("active");
+    }
+  });
 }
 
 // ========== CARGAR SELECTORES ==========
@@ -73,21 +89,15 @@ function abrirModal(titulo, data = null) {
   document.getElementById("presidente_id").value = "";
   document.getElementById("secretario_id").value = "";
   
-  // Resetear color a valor por defecto
-  document.getElementById("color_linea").value = "#74A9D3";
-  document.getElementById("colorHex").textContent = "#74A9D3";
+  // Establecer color inicial o cargado
+  const colorInicial = (data && data.color) ? data.color : "#74A9D3";
+  seleccionarColor(colorInicial);
 
   if (data) {
     document.getElementById("nombre").value = data.nombre || "";
     document.getElementById("rif").value = data.rif || "";
     document.getElementById("presidente_id").value = data.presidente_id || "";
     document.getElementById("secretario_id").value = data.secretario_id || "";
-    
-    // Cargar color si existe
-    if (data.color) {
-      document.getElementById("color_linea").value = data.color;
-      document.getElementById("colorHex").textContent = data.color.toUpperCase();
-    }
   }
 
   modal.classList.add("show");
@@ -148,7 +158,7 @@ async function cargarLineas() {
                             <td>${linea.secretario_nombre || "-"}</td>
                             <td>${linea.rif}</td>
                             <td>
-                                <span style="display: inline-block; width: 24px; height: 24px; border-radius: 50%; background: ${linea.color || '#74A9D3'}; border: 1px solid #ddd;"></span>
+                                <span style="display: inline-block; width: 24px; height: 24px; border-radius: 50%; background: ${linea.color || '#74A9D3'}; border: 2px solid #fff; box-shadow: 0 0 0 1px #cbd5e1;"></span>
                             </td>
                             <td>
                                 <button class="btn-edit" onclick="editarLinea(${linea.id})" title="Editar">
@@ -240,12 +250,22 @@ async function eliminarLinea(id) {
 
 // ========== INICIALIZACIÓN ==========
 document.addEventListener("DOMContentLoaded", async () => {
-  // Color picker
-  const colorInput = document.getElementById("color_linea");
-  const colorHex = document.getElementById("colorHex");
-  if (colorInput && colorHex) {
-    colorInput.addEventListener("input", function() {
-      colorHex.textContent = this.value.toUpperCase();
+  // Listeners para paleta de colores
+  const paletteContainer = document.getElementById("colorPalette");
+  if (paletteContainer) {
+    paletteContainer.addEventListener("click", (e) => {
+      const button = e.target.closest(".color-swatch");
+      if (button) {
+        seleccionarColor(button.dataset.color);
+      }
+    });
+  }
+
+  // Listener para el selector personalizado
+  const customColorPicker = document.getElementById("customColorPicker");
+  if (customColorPicker) {
+    customColorPicker.addEventListener("input", function() {
+      seleccionarColor(this.value);
     });
   }
 
@@ -265,7 +285,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       secretario_id: document.getElementById("secretario_id").value
         ? parseInt(document.getElementById("secretario_id").value)
         : null,
-      color: document.getElementById("color_linea").value,  // <-- NUEVO
+      color: document.getElementById("color_linea").value,
     };
 
     if (!datos.nombre) {
