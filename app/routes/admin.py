@@ -393,3 +393,47 @@ def create_deteccion():
 def delete_deteccion(id_deteccion):
     from app.controllers.deteccionControllers import delete_deteccion
     return delete_deteccion(id_deteccion)
+
+# ========== CRUD BÁSICO ESP32 ==========
+
+@admin_scope.route("/esp32", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_esp32():
+    from app.controllers.esp32Controllers import get_all_esp32
+    return get_all_esp32()
+
+@admin_scope.route("/esp32/<int:id_esp32>", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_esp32_id(id_esp32):
+    from app.controllers.esp32Controllers import get_esp32_by_id
+    return get_esp32_by_id(id_esp32)
+
+@admin_scope.route("/esp32", methods=["POST"])
+@jwt_required()
+@role_required("admin")
+def create_esp32():
+    from app.controllers.esp32Controllers import create_esp32
+    return create_esp32()
+
+@admin_scope.route("/esp32/<int:id_esp32>", methods=["PUT"])
+@jwt_required()
+@role_required("admin")
+def update_esp32(id_esp32):
+    from app.controllers.esp32Controllers import update_esp32
+    return update_esp32(id_esp32)
+
+@admin_scope.route("/esp32/<int:id_esp32>", methods=["DELETE"])
+@jwt_required()
+@role_required("admin")
+def delete_esp32(id_esp32):
+    from app.controllers.esp32Controllers import delete_esp32
+    return delete_esp32(id_esp32)
+
+# Vista de la página
+@admin_scope.route("/esp32-page", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def esp32_page():
+    return render_template("pages/esp32.html")

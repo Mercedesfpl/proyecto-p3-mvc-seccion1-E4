@@ -1,5 +1,3 @@
-<!-- app/frontend/views/layouts/header.html -->
-
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <div class="sidebar-logo" id="sidebarLogo">
@@ -34,6 +32,13 @@
                 <a href="{{ url_for('admin.rutas_show') }}" class="sidebar-nav-link" id="nav-rutas">
                     <i class="fas fa-route"></i>
                     <span>Rutas</span>
+                </a>
+            </li>
+            <!-- Corregidas clases e id para ESP32 -->
+            <li class="sidebar-nav-item">
+                <a href="{{ url_for('admin.esp32_page') }}" class="sidebar-nav-link" id="nav-esp32">
+                    <i class="fas fa-microchip"></i>
+                    <span>ESP32</span>
                 </a>
             </li>
             <li class="sidebar-nav-item">
@@ -82,11 +87,9 @@
         </div>
 
         <div class="sidebar-user-menu" id="sidebarUserMenu">
+            <!-- Unificado: lleva a Perfil y Configuración en la misma pantalla -->
             <a href="{{ url_for('admin.perfil_show') }}" class="sidebar-user-menu-item">
-                <i class="fas fa-user-circle"></i> Mi Perfil
-            </a>
-            <a href="{{ url_for('admin.configuracion_show') }}" class="sidebar-user-menu-item">
-                <i class="fas fa-cog"></i> Configuración
+                <i class="fas fa-user-cog"></i> Mi Perfil y Ajustes
             </a>
             <hr class="sidebar-user-menu-divider" />
             <button class="sidebar-user-menu-item logout" id="btn-logout-sidebar">
