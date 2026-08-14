@@ -78,9 +78,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    if (sidebarUser && sidebarUserMenu) {
+if (sidebarUser && sidebarUserMenu) {
         sidebarUser.addEventListener('click', function(e) {
             e.stopPropagation();
+            
+            // Si el sidebar está colapsado, redirigir directo al perfil
+            if (sidebar.classList.contains('collapsed')) {
+                window.location.href = "/admin/perfil"; // O la ruta que usas para el perfil
+                return;
+            }
+
+            // Si está expandido, despliega/oculta el menú de usuario
             sidebarUser.classList.toggle('open');
             sidebarUserMenu.classList.toggle('open');
         });

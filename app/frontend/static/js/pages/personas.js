@@ -127,7 +127,7 @@ async function cargarPersonas() {
         document.getElementById('tablaPersonas').innerHTML = tablaHtml;
 
         if (personas.length > 0) {
-            showToast(`${personas.length} personas cargadas`, 'success');
+            //showToast(`${personas.length} personas cargadas`, 'success');
         }
     } catch (error) {
         console.error('Error al cargar personas:', error);

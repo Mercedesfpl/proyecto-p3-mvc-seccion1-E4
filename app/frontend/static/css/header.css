@@ -180,9 +180,6 @@ body {
     padding: 16px 12px;
 }
 
-.sidebar.collapsed .sidebar-logo .logo-icon i {
-    transform: rotate(180deg);
-}
 
 .sidebar-nav {
     flex: 1;
