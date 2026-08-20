@@ -498,8 +498,11 @@ async function editarParada(id) {
 }
 
 async function eliminarParada(id) {
-    // Reemplazado confirm(...) nativo por confirmDelete de SweetAlert2
-    const confirmado = await confirmDelete('¿Estás seguro?', '¿Deseas eliminar esta parada?');
+    const confirmado = await confirmDelete(
+        '¿Eliminar parada?',
+        'Esta acción eliminará la parada del sistema.'
+    );
+
     if (!confirmado) return;
 
     try {
@@ -507,17 +510,19 @@ async function eliminarParada(id) {
             method: 'DELETE',
             credentials: 'include'
         });
+
         const data = await response.json();
 
-        if (response.ok) {
+        if (response.ok && data.success) {
             showToast('Parada eliminada exitosamente', 'success');
-            cargarParadas();
+            cargarParadas(); // Recargar la lista
         } else {
-            showToast(data.error || data.message || 'Error al eliminar', 'error');
+            const mensajeError = data.error || data.message || 'No se puede eliminar la parada porque está asociada a una línea.';
+            showAlert('No se puede eliminar', mensajeError, 'error');
         }
     } catch (error) {
-        console.error('Error:', error);
-        showToast('Error de conexión al servidor', 'error');
+        console.error('Error al eliminar parada:', error);
+        showToast('Error de conexión con el servidor', 'error');
     }
 }
 

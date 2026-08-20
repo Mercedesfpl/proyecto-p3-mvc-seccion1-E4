@@ -658,14 +658,15 @@ async function eliminarRuta(id) {
         });
         const data = await response.json();
 
-        if (response.ok) {
+        if (response.ok && data.success) {
             showToast('Ruta eliminada exitosamente', 'success');
             cargarRutas();
         } else {
-            showToast(data.error || data.message || 'Error al eliminar', 'error');
+            const msg = data.error || data.message || 'No se puede eliminar la ruta debido a dependencias con el sistema.';
+            showAlert('No se puede eliminar', msg, 'error');
         }
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error al eliminar ruta:', error);
         showToast('Error de conexión al servidor', 'error');
     }
 }
@@ -745,15 +746,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const data = await response.json();
 
-                if (response.ok) {
+                if (response.ok && data.success) {
                     showToast(editandoIdRuta ? 'Ruta actualizada' : 'Ruta creada exitosamente', 'success');
                     cerrarModalRuta();
                     cargarRutas();
                 } else {
-                    showToast(data.error || data.message || 'Error al guardar', 'error');
+                    const msg = data.error || data.message || 'Error al guardar la ruta';
+                    showAlert('Error en la operación', msg, 'error');
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error al guardar ruta:', error);
                 showToast('Error de conexión al servidor', 'error');
             } finally {
                 loadingRuta = false;
