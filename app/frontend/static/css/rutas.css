@@ -4,7 +4,7 @@
 #tablaRutas table,
 .tabla-container table {
     width: 100%;
-    table-layout: auto; /* Permite que el contenido determine el espacio sin ocultar columnas */
+    table-layout: auto;
 }
 
 /* Reducir el ancho de la columna de ID (primera columna) */
@@ -25,7 +25,7 @@
     width: 110px;
     min-width: 110px;
     text-align: center;
-    white-space: nowrap; /* Evita que los botones se encimen */
+    white-space: nowrap;
 }
 
 /* Estilo para los botones de acción dentro de la tabla */
@@ -39,3 +39,180 @@
     padding: 6px;
     margin: 0 2px;
 }
+
+
+/* ===== MODAL NUEVA RUTA (Estructura de 2 columnas) ===== */
+
+#modalNuevaRuta .modal-content {
+    max-width: 900px;
+    width: 90%;
+}
+
+.modal-ruta-layout {
+    display: flex;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.form-columna {
+    flex: 1.2;
+}
+
+.mapa-columna {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+#mapa-rutas-modal {
+    width: 100%;
+    height: 320px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+}
+
+/* Formulario */
+.form-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 12px;
+}
+
+.form-group label {
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+.form-group input,
+.form-group select {
+    padding: 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+/* ===== SECTOR DE PARADAS (Lado a Lado) ===== */
+
+.paradas-lista-container {
+    display: flex !important;
+    gap: 10px !important;
+    margin-top: 6px;
+}
+
+.paradas-disponibles,
+.paradas-seleccionadas {
+    flex: 1;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px;
+    background-color: #f9fafb;
+    display: flex;
+    flex-direction: column;
+}
+
+.lista-titulo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+    font-size: 12px;
+    padding-bottom: 6px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #374151;
+}
+
+.lista-titulo .contador {
+    background-color: #e5e7eb;
+    color: #4b5563;
+    border-radius: 10px;
+    padding: 1px 6px;
+    font-size: 10px;
+}
+
+/* Lista con Scroll Interno */
+.lista-items {
+    max-height: 180px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-right: 4px;
+}
+
+/* Tarjeta de cada parada */
+.item-parada {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+
+.nombre-parada {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 110px;
+}
+
+.numero-orden {
+    background-color: #2563eb;
+    color: white;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    margin-right: 6px;
+}
+
+.item-vacio {
+    font-size: 11px;
+    color: #9ca3af;
+    text-align: center;
+    padding: 15px 0;
+}
+
+/* Botones dentro de las tarjetas */
+.btn-agregar-item, 
+.btn-quitar-item {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.btn-agregar-item { color: #2563eb; }
+.btn-quitar-item { color: #dc2626; }
+
+/* Botones "Agregar todas" y "Quitar todas" */
+.btn-agregar-todas,
+.btn-quitar-todas {
+    margin-top: 8px;
+    padding: 6px;
+    border: none;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-agregar-todas { background-color: #dbeafe; color: #1e40af; }
+.btn-quitar-todas { background-color: #fee2e2; color: #991b1b; }

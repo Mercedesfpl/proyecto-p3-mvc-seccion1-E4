@@ -5,19 +5,6 @@
 let editandoId = null;
 let loading = false;
 
-function showToast(message, type = 'success') {
-    const toast = document.getElementById('toastMessage');
-    if (!toast) return;
-
-    toast.textContent = message;
-    toast.className = `toast-message ${type} show`;
-
-    clearTimeout(toast._timeout);
-    toast._timeout = setTimeout(() => {
-        toast.classList.remove('show');
-    }, 4000);
-}
-
 function getBadgeForRol(rol) {
     if (!rol) return '<span class="badge badge-sin-rol">Sin rol</span>';
 
@@ -125,10 +112,6 @@ async function cargarPersonas() {
         `;
 
         document.getElementById('tablaPersonas').innerHTML = tablaHtml;
-
-        if (personas.length > 0) {
-            //showToast(`${personas.length} personas cargadas`, 'success');
-        }
     } catch (error) {
         console.error('Error al cargar personas:', error);
         showToast('Error al cargar personas: ' + error.message, 'error');
@@ -165,9 +148,12 @@ async function editarPersona(id) {
 }
 
 async function eliminarPersona(id) {
-    if (!confirm('¿Estás seguro de eliminar esta persona? Esta acción no se puede deshacer.')) {
-        return;
-    }
+    const confirmado = await confirmDelete(
+        '¿Estás seguro?',
+        '¿Deseas eliminar esta persona? Esta acción no se puede deshacer.',
+        'Sí, eliminar'
+    );
+    if (!confirmado) return;
 
     try {
         const response = await fetch(`/admin/personas/${id}`, {
@@ -178,7 +164,7 @@ async function eliminarPersona(id) {
         const data = await response.json();
 
         if (response.ok) {
-            showToast('✅ Persona eliminada exitosamente', 'success');
+            showToast('Persona eliminada exitosamente', 'success');
             cargarPersonas();
         } else {
             showToast(data.error || data.message || 'Error al eliminar', 'error');
@@ -209,14 +195,14 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         if (!datos.nombre || !datos.apellido || !datos.cedula) {
-            showToast('⚠️ Nombre, apellido y cédula son obligatorios', 'error');
+            showToast('Nombre, apellido y cédula son obligatorios', 'error');
             loading = false;
             document.getElementById('btnGuardar').disabled = false;
             return;
         }
 
         if (!datos.rol) {
-            showToast('⚠️ Debes seleccionar un rol', 'error');
+            showToast('Debes seleccionar un rol', 'error');
             loading = false;
             document.getElementById('btnGuardar').disabled = false;
             return;
@@ -239,7 +225,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
 
             if (response.ok) {
-                showToast(editandoId ? '✅ Persona actualizada' : '✅ Persona creada exitosamente', 'success');
+                showToast(editandoId ? 'Persona actualizada' : 'Persona creada exitosamente', 'success');
                 cerrarModal();
                 cargarPersonas();
             } else {

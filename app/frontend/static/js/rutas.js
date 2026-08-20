@@ -13,19 +13,6 @@ let controlesRuta = [];
 const registrosPorPagina = 5;
 let rutasFiltradas = [];
 
-// ========== TOAST ==========
-
-function showToast(message, type = 'success') {
-    const toast = document.getElementById('toastMessage');
-    if (!toast) return;
-    toast.textContent = message;
-    toast.className = `toast-message ${type} show`;
-    clearTimeout(toast._timeout);
-    toast._timeout = setTimeout(() => {
-        toast.classList.remove('show');
-    }, 4000);
-}
-
 // ========== MAPA PRINCIPAL ==========
 
 function destruirMapaPrincipal() {
@@ -582,9 +569,9 @@ function actualizarPaginacion() {
     const btnSiguiente = document.getElementById('btnSiguiente');
     const infoPagina = document.getElementById('infoPagina');
 
-    btnAnterior.disabled = paginaActual <= 1;
-    btnSiguiente.disabled = paginaActual >= totalPaginas;
-    infoPagina.textContent = `Página ${paginaActual} de ${totalPaginas}`;
+    if (btnAnterior) btnAnterior.disabled = paginaActual <= 1;
+    if (btnSiguiente) btnSiguiente.disabled = paginaActual >= totalPaginas;
+    if (infoPagina) infoPagina.textContent = `Página ${paginaActual} de ${totalPaginas}`;
 }
 
 function irPagina(direccion) {
@@ -641,7 +628,6 @@ async function editarRuta(id) {
 
         const ruta = data.data;
         editandoIdRuta = parseInt(id) || parseInt(ruta.id) || parseInt(ruta.id_ruta) || null;
-        console.log('editandoIdRuta asignado:', editandoIdRuta);  // Debug
         await cargarSelectoresRuta();
         abrirModalRuta('Editar Ruta', data.data);
 
@@ -657,7 +643,13 @@ async function eliminarRuta(id) {
         return;
     }
     
-    if (!confirm('¿Está seguro de eliminar esta ruta?')) return;
+    const confirmado = await confirmDelete(
+        '¿Eliminar ruta?',
+        'Esta acción eliminará la ruta del sistema y no se podrá deshacer.',
+        'Sí, eliminar'
+    );
+
+    if (!confirmado) return;
 
     try {
         const response = await fetch(`/admin/rutas/${id}`, {
@@ -685,7 +677,8 @@ document.addEventListener('DOMContentLoaded', function() {
     inicializarMapaPrincipal();
 
     // Expandir mapa
-    document.getElementById('btnExpandirMapa').addEventListener('click', toggleExpandirMapa);
+    const btnExpandir = document.getElementById('btnExpandirMapa');
+    if (btnExpandir) btnExpandir.addEventListener('click', toggleExpandirMapa);
 
     // Filtros
     document.getElementById('searchRuta')?.addEventListener('input', filtrarRutas);
@@ -693,8 +686,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('filterEstado')?.addEventListener('change', filtrarRutas);
 
     // Paginación
-    document.getElementById('btnAnterior').addEventListener('click', function() { irPagina(-1); });
-    document.getElementById('btnSiguiente').addEventListener('click', function() { irPagina(1); });
+    document.getElementById('btnAnterior')?.addEventListener('click', function() { irPagina(-1); });
+    document.getElementById('btnSiguiente')?.addEventListener('click', function() { irPagina(1); });
 
     // Formulario
     const formRuta = document.getElementById('formNuevaRuta');
@@ -713,7 +706,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 id_linea: parseInt(document.getElementById('id_linea_ruta').value),
                 status: document.getElementById('status_ruta').value,
                 paradas_ids: paradasSeleccionadasIds
-                // El color se obtiene de la línea seleccionada
             };
 
             if (!datos.nombre) {
@@ -739,9 +731,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const url = editandoIdRuta ? `/admin/rutas/${editandoIdRuta}` : '/admin/rutas';
             const method = editandoIdRuta ? 'PUT' : 'POST';
-
-            console.log('URL:', url, 'Método:', method, 'ID:', editandoIdRuta);  // Debug
-
 
             try {
                 const response = await fetch(url, {
@@ -774,10 +763,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Botón nueva ruta
-    document.getElementById('btnNuevaRuta').addEventListener('click', function() {
-        cargarSelectoresRuta();
-        abrirModalRuta('Nueva Ruta');
-    });
+    const btnNueva = document.getElementById('btnNuevaRuta');
+    if (btnNueva) {
+        btnNueva.addEventListener('click', function() {
+            cargarSelectoresRuta();
+            abrirModalRuta('Nueva Ruta');
+        });
+    }
 
     window.onclick = function(event) {
         const modal = document.getElementById('modalNuevaRuta');

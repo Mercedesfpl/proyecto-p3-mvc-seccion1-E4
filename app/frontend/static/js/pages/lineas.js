@@ -7,19 +7,6 @@ let loading = false;
 let presidentes = [];
 let secretarios = [];
 
-function showToast(message, type = "success") {
-  const toast = document.getElementById("toastMessage");
-  if (!toast) return;
-
-  toast.textContent = message;
-  toast.className = `toast-message ${type} show`;
-
-  clearTimeout(toast._timeout);
-  toast._timeout = setTimeout(() => {
-    toast.classList.remove("show");
-  }, 4000);
-}
-
 // ========== MANEJO DE SELECCIÓN DE COLOR ==========
 function seleccionarColor(hexColor) {
   const hex = hexColor.toUpperCase();
@@ -226,7 +213,12 @@ async function editarLinea(id) {
 
 // ========== ELIMINAR LÍNEA ==========
 async function eliminarLinea(id) {
-  if (!confirm("¿Estás seguro de suspender esta línea?")) return;
+  const confirmado = await confirmDelete(
+    "¿Estás seguro?",
+    "¿Deseas suspender esta línea?",
+    "Sí, suspender"
+  );
+  if (!confirmado) return;
 
   try {
     const response = await fetch(`/admin/lineas/${id}`, {

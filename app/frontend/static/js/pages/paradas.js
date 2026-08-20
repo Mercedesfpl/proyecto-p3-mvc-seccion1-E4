@@ -1,5 +1,3 @@
-// frontend/static/js/pages/paradas.js
-
 let editandoId = null;
 let loading = false;
 let mapa = null;
@@ -10,20 +8,6 @@ let todasLasParadas = [];
 let paradasFiltradas = [];
 let paginaActual = 1;
 const registrosPorPagina = 5;
-
-
-// ========== TOAST ==========
-
-function showToast(message, type = 'success') {
-    const toast = document.getElementById('toastMessage');
-    if (!toast) return;
-    toast.textContent = message;
-    toast.className = `toast-message ${type} show`;
-    clearTimeout(toast._timeout);
-    toast._timeout = setTimeout(() => {
-        toast.classList.remove('show');
-    }, 4000);
-}
 
 // ========== MAPA PRINCIPAL ==========
 
@@ -74,15 +58,12 @@ function inicializarMapaPrincipal(paradas = []) {
         zoomAnimation: true
     }).setView([centroLat, centroLng], 12);
 
-    // ===== CAMBIO: Usar servidor de tiles alternativo =====
-    // Usar OpenStreetMap con un User-Agent diferente y más timeout
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         minZoom: 8,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         subdomains: 'abc',
         crossOrigin: true,
-        // Añadir timeout para evitar que se quede cargando
         errorTileUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
     }).addTo(mapaPrincipal);
 
@@ -195,7 +176,6 @@ function inicializarMapaModal(lat = 10.3447, lng = -67.0400) {
 
     mapa = L.map('map-container').setView([lat, lng], 15);
 
-    // ===== CAMBIO: Usar servidor de tiles alternativo =====
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -518,7 +498,9 @@ async function editarParada(id) {
 }
 
 async function eliminarParada(id) {
-    if (!confirm('¿Estas seguro de eliminar esta parada?')) return;
+    // Reemplazado confirm(...) nativo por confirmDelete de SweetAlert2
+    const confirmado = await confirmDelete('¿Estás seguro?', '¿Deseas eliminar esta parada?');
+    if (!confirmado) return;
 
     try {
         const response = await fetch(`/admin/paradas/${id}`, {
@@ -535,7 +517,7 @@ async function eliminarParada(id) {
         }
     } catch (error) {
         console.error('Error:', error);
-        showToast('Error de conexion al servidor', 'error');
+        showToast('Error de conexión al servidor', 'error');
     }
 }
 
