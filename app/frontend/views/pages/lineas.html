@@ -40,13 +40,35 @@
                 <label>RIF <span class="required">*</span></label>
                 <input type="text" id="rif" placeholder="Ej: J-12345678-0" required>
             </div>
+
+            <!-- SECCIÓN DE SELECCIÓN DE COLOR CON PALETA PREDEFINIDA -->
             <div class="form-group">
                 <label>Color de la Línea</label>
-                <div class="color-picker-wrapper">
-                    <input type="color" id="color_linea" name="color" value="#74A9D3">
-                    <span class="color-hex" id="colorHex">#74A9D3</span>
+                
+                <!-- Contenedor del selector oculto + entrada manual -->
+                <input type="hidden" id="color_linea" name="color" value="#74A9D3">
+                
+                <!-- Paleta de colores predeterminados -->
+                <div class="color-palette-container" id="colorPalette">
+                    <button type="button" class="color-swatch active" data-color="#74A9D3" style="background-color: #74A9D3;" title="Azul institucional"></button>
+                    <button type="button" class="color-swatch" data-color="#95242A" style="background-color: #95242A;" title="Rojo institucional"></button>
+                    <button type="button" class="color-swatch" data-color="#F3B001" style="background-color: #F3B001;" title="Amarillo institucional"></button>
+                    <button type="button" class="color-swatch" data-color="#2E9D62" style="background-color: #2E9D62;" title="Verde institucional"></button>
+                    <button type="button" class="color-swatch" data-color="#8E44AD" style="background-color: #8E44AD;" title="Púrpura"></button>
+                    <button type="button" class="color-swatch" data-color="#E67E22" style="background-color: #E67E22;" title="Naranja"></button>
+                    <button type="button" class="color-swatch" data-color="#34495E" style="background-color: #34495E;" title="Gris Oscuro"></button>
                 </div>
-                <small>Color que identifica a la línea en el mapa</small>
+
+                <!-- Personalización de color personalizado -->
+                <div class="color-custom-wrapper">
+                    <div class="color-custom-input">
+                        <input type="color" id="customColorPicker" value="#74A9D3">
+                        <span>Personalizado</span>
+                    </div>
+                    <span class="color-hex-badge" id="colorHex">#74A9D3</span>
+                </div>
+
+                <small><i class="fas fa-info-circle"></i> Selecciona un color de la paleta predefinida o crea uno personalizado para el mapa y reportes.</small>
             </div>
 
             <hr style="margin: 20px 0; border: 1px solid var(--borde);">

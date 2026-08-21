@@ -2,7 +2,7 @@
 
 from ..models.parada import Parada
 from ..models.exceptions import ResourceNotValid
-from ..helpers.coordenadas_helper import limpiar_coordenadas, validar_coordenadas
+from ..helpers.coordenadas_helper import limpiar_coordenadas, validar_y_redondear_coordenadas  # CAMBIADO
 
 class ParadaFactory:
     
@@ -20,11 +20,15 @@ class ParadaFactory:
     
     @staticmethod
     def _validar_coordenadas(coordenadas):
-        coordenadas_limpias = limpiar_coordenadas(coordenadas)
-        es_valido, mensaje, lat, lng = validar_coordenadas(coordenadas_limpias)
+        """Valida y redondea coordenadas a 6 decimales"""
+        es_valido, mensaje, lat, lng, coordenadas_redondeadas = validar_y_redondear_coordenadas(
+            coordenadas
+        )
+        
         if not es_valido:
             raise ResourceNotValid("Parada", mensaje)
-        return coordenadas_limpias
+        
+        return coordenadas_redondeadas
     
     @staticmethod
     def _validar_status(status):
@@ -49,7 +53,6 @@ class ParadaFactory:
     
     @staticmethod
     def actualizar_parada(parada_existente, data):
-        # Eliminar las validaciones de linea_id y orden que no existen en el modelo
         if 'nombre' in data:
             parada_existente.nombre = ParadaFactory._validar_nombre(data['nombre'])
         

@@ -1,5 +1,37 @@
 /* frontend/static/css/global.css */
+/* Personalización visual para SweetAlert2 acorde al panel */
+.swal-custom-popup {
+    border-radius: 20px !important;
+    padding: 2rem 1.5rem !important;
+    font-family: inherit !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+}
 
+.swal-custom-title {
+    color: #2d3748 !important;
+    font-size: 1.4rem !important;
+    font-weight: 700 !important;
+}
+
+.swal-custom-text {
+    color: #718096 !important;
+    font-size: 0.95rem !important;
+    margin-top: 0.5rem !important;
+}
+
+.swal-custom-confirm-btn, 
+.swal-custom-cancel-btn {
+    border-radius: 10px !important;
+    padding: 0.6rem 1.4rem !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    box-shadow: none !important;
+}
+
+.swal-custom-toast {
+    border-radius: 12px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06) !important;
+}
 /* ========== VARIABLES ========== */
 :root {
     --azul: #74A9D3;

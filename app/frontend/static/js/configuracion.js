@@ -1,19 +1,21 @@
+// app/frontend/static/js/pages/configuracion.js
 document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById("configForm");
 
-  function mostrarMensaje(mensaje, tipo = "success") {
-    const alertDiv = document.createElement("div");
-    alertDiv.className = `alert alert-${tipo} alert-dismissible fade show`;
-    alertDiv.role = "alert";
-    alertDiv.innerHTML = `
-            ${mensaje}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-    form.prepend(alertDiv);
-    setTimeout(() => alertDiv.remove(), 5000);
+  // Sistema de Notificaciones Toast (coincide con el resto de la app)
+  function mostrarToast(mensaje, tipo = "info") {
+    const toast = document.getElementById("toastNotification");
+    if (!toast) return;
+
+    toast.className = `toast-message ${tipo} show`;
+    toast.textContent = mensaje;
+
+    setTimeout(() => {
+      toast.classList.remove("show");
+    }, 4000);
   }
 
-  // Cargar configuración actual
+  // Cargar configuración actual desde la API
   async function cargarConfiguracion() {
     try {
       const response = await fetch("/api/configuracion", {
@@ -22,20 +24,30 @@ document.addEventListener("DOMContentLoaded", function () {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         },
       });
+
       const data = await response.json();
+
       if (response.ok) {
         document.getElementById("tema").value = data.tema || "claro";
         document.getElementById("notificaciones").value =
           data.notificaciones || "activadas";
+
+        // Aplicar el tema guardado
+        if (data.tema === "oscuro") {
+          document.body.classList.add("dark-mode");
+        } else {
+          document.body.classList.remove("dark-mode");
+        }
       } else {
-        mostrarMensaje("Error al cargar configuración", "danger");
+        mostrarToast("Error al cargar configuración", "error");
       }
     } catch (error) {
       console.error("Error:", error);
+      mostrarToast("Error de conexión al servidor", "error");
     }
   }
 
-  // Guardar configuración
+  // Guardar configuración al enviar el formulario
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
 
@@ -53,26 +65,30 @@ document.addEventListener("DOMContentLoaded", function () {
         },
         body: JSON.stringify(formData),
       });
+
       const data = await response.json();
+
       if (response.ok) {
-        mostrarMensaje("Configuración guardada correctamente", "success");
-        // Aplicar tema si es necesario
+        mostrarToast("Configuración guardada correctamente", "success");
+
+        // Aplicar o remover modo oscuro dinámicamente
         if (formData.tema === "oscuro") {
           document.body.classList.add("dark-mode");
         } else {
           document.body.classList.remove("dark-mode");
         }
       } else {
-        mostrarMensaje(
-          data.message || "Error al guardar configuración",
-          "danger",
+        mostrarToast(
+          data.message || "Error al guardar la configuración",
+          "error"
         );
       }
     } catch (error) {
       console.error("Error:", error);
-      mostrarMensaje("Error de conexión al servidor", "danger");
+      mostrarToast("Error de conexión al servidor", "error");
     }
   });
 
+  // Carga inicial al montar la vista
   cargarConfiguracion();
 });

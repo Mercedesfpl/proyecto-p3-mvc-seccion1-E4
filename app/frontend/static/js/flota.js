@@ -24,6 +24,8 @@ function showToast(message, type = 'success') {
 
 function abrirModalUnidad(titulo = 'Nueva Unidad', data = null) {
     const modal = document.getElementById('modalNuevaUnidad');
+    if (!modal) return;
+
     document.getElementById('modalUnidadTitle').textContent = titulo;
     document.getElementById('formNuevaUnidad').reset();
     document.getElementById('status').value = 'activa';
@@ -41,15 +43,17 @@ function abrirModalUnidad(titulo = 'Nueva Unidad', data = null) {
 
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
-    document.getElementById('guardarUnidadBtn').disabled = false;
+    const btnGuardar = document.getElementById('guardarUnidadBtn');
+    if (btnGuardar) btnGuardar.disabled = false;
 }
 
 function cerrarModalUnidad() {
     const modal = document.getElementById('modalNuevaUnidad');
-    modal.classList.remove('show');
+    if (modal) modal.classList.remove('show');
     document.body.style.overflow = '';
     editandoIdUnidad = null;
-    document.getElementById('guardarUnidadBtn').disabled = false;
+    const btnGuardar = document.getElementById('guardarUnidadBtn');
+    if (btnGuardar) btnGuardar.disabled = false;
 }
 
 document.addEventListener('keydown', (e) => {
@@ -64,30 +68,34 @@ async function cargarSelectoresUnidad() {
         const dataLineas = await respLineas.json();
         if (dataLineas.success) {
             const select = document.getElementById('id_linea');
-            const currentValue = select.value;
-            select.innerHTML = '<option value="">Seleccione una línea...</option>';
-            dataLineas.data.forEach(linea => {
-                const opt = document.createElement('option');
-                opt.value = linea.id;
-                opt.textContent = linea.nombre;
-                select.appendChild(opt);
-            });
-            if (currentValue) select.value = currentValue;
+            if (select) {
+                const currentValue = select.value;
+                select.innerHTML = '<option value="">Seleccione una línea...</option>';
+                dataLineas.data.forEach(linea => {
+                    const opt = document.createElement('option');
+                    opt.value = linea.id;
+                    opt.textContent = linea.nombre;
+                    select.appendChild(opt);
+                });
+                if (currentValue) select.value = currentValue;
+            }
         }
 
         const respRutas = await fetch('/admin/rutas/api', { credentials: 'include' });
         const dataRutas = await respRutas.json();
         if (dataRutas.success) {
             const select = document.getElementById('id_ruta');
-            const currentValue = select.value;
-            select.innerHTML = '<option value="">Sin ruta asignada</option>';
-            dataRutas.data.forEach(ruta => {
-                const opt = document.createElement('option');
-                opt.value = ruta.id;
-                opt.textContent = ruta.nombre;
-                select.appendChild(opt);
-            });
-            if (currentValue) select.value = currentValue;
+            if (select) {
+                const currentValue = select.value;
+                select.innerHTML = '<option value="">Sin ruta asignada</option>';
+                dataRutas.data.forEach(ruta => {
+                    const opt = document.createElement('option');
+                    opt.value = ruta.id;
+                    opt.textContent = ruta.nombre;
+                    select.appendChild(opt);
+                });
+                if (currentValue) select.value = currentValue;
+            }
         }
 
     } catch (error) {
@@ -204,9 +212,9 @@ function actualizarPaginacion() {
     const btnSiguiente = document.getElementById('btnSiguiente');
     const infoPagina = document.getElementById('infoPagina');
 
-    btnAnterior.disabled = paginaActual <= 1;
-    btnSiguiente.disabled = paginaActual >= totalPaginas;
-    infoPagina.textContent = `Página ${paginaActual} de ${totalPaginas}`;
+    if (btnAnterior) btnAnterior.disabled = paginaActual <= 1;
+    if (btnSiguiente) btnSiguiente.disabled = paginaActual >= totalPaginas;
+    if (infoPagina) infoPagina.textContent = `Página ${paginaActual} de ${totalPaginas}`;
 }
 
 function irPagina(direccion) {
@@ -260,7 +268,18 @@ async function editarUnidad(id) {
 }
 
 async function eliminarUnidad(id) {
-    if (!confirm('¿Está seguro de eliminar esta unidad?')) return;
+    if (!id) {
+        showToast('ID de unidad inválido', 'error');
+        return;
+    }
+
+    const confirmado = await confirmDelete(
+        '¿Eliminar unidad?',
+        'Esta acción eliminará la unidad del sistema y no se podrá deshacer.',
+        'Sí, eliminar'
+    );
+
+    if (!confirmado) return;
 
     try {
         const response = await fetch(`/admin/buses/${id}`, {
@@ -290,8 +309,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('filterLinea')?.addEventListener('change', filtrarBuses);
     document.getElementById('filterEstado')?.addEventListener('change', filtrarBuses);
 
-    document.getElementById('btnAnterior').addEventListener('click', function() { irPagina(-1); });
-    document.getElementById('btnSiguiente').addEventListener('click', function() { irPagina(1); });
+    document.getElementById('btnAnterior')?.addEventListener('click', function() { irPagina(-1); });
+    document.getElementById('btnSiguiente')?.addEventListener('click', function() { irPagina(1); });
 
     const form = document.getElementById('formNuevaUnidad');
     if (form) {
@@ -300,7 +319,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (loadingUnidad) return;
             loadingUnidad = true;
-            document.getElementById('guardarUnidadBtn').disabled = true;
+            const btnGuardar = document.getElementById('guardarUnidadBtn');
+            if (btnGuardar) btnGuardar.disabled = true;
 
             const datos = {
                 placa: document.getElementById('placa').value.trim().toUpperCase(),
@@ -312,14 +332,14 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!datos.placa) {
                 showToast('La placa es obligatoria', 'error');
                 loadingUnidad = false;
-                document.getElementById('guardarUnidadBtn').disabled = false;
+                if (btnGuardar) btnGuardar.disabled = false;
                 return;
             }
 
             if (!datos.id_linea) {
                 showToast('Debes seleccionar una línea', 'error');
                 loadingUnidad = false;
-                document.getElementById('guardarUnidadBtn').disabled = false;
+                if (btnGuardar) btnGuardar.disabled = false;
                 return;
             }
 
@@ -351,16 +371,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 showToast('Error de conexión al servidor', 'error');
             } finally {
                 loadingUnidad = false;
-                document.getElementById('guardarUnidadBtn').disabled = false;
+                if (btnGuardar) btnGuardar.disabled = false;
             }
         });
     }
 
-    document.getElementById('btnNuevaUnidad').addEventListener('click', function() {
-        editandoIdUnidad = null;
-        cargarSelectoresUnidad();
-        abrirModalUnidad('Nueva Unidad');
-    });
+    const btnNueva = document.getElementById('btnNuevaUnidad');
+    if (btnNueva) {
+        btnNueva.addEventListener('click', function() {
+            editandoIdUnidad = null;
+            cargarSelectoresUnidad();
+            abrirModalUnidad('Nueva Unidad');
+        });
+    }
 
     window.onclick = function(event) {
         const modal = document.getElementById('modalNuevaUnidad');

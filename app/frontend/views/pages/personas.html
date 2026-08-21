@@ -1,3 +1,5 @@
+<!-- app/frontend/views/pages/personas.html -->
+
 {% extends 'layouts/base.html' %}
 
 {% block title %}Gestión de Personas{% endblock %}
@@ -7,7 +9,8 @@
 {% endblock %}
 
 {% block content %}
-<div class="personas-header">
+<!-- Se cambió personas-header por page-header para alinearlo exactamente como las demás vistas -->
+<div class="page-header">
     <h1>Gestión de Personas</h1>
     <button class="btn-add" id="btnNuevaPersona">
         <i class="fas fa-plus"></i> Nueva Persona
@@ -26,17 +29,18 @@
         <form id="personaForm">
             <div class="form-row">
                 <div class="form-group">
-                    <label>Nombre *</label>
+                    <label>Nombre <span class="required">*</span></label>
                     <input type="text" id="nombre" placeholder="Nombre" required>
                 </div>
                 <div class="form-group">
-                    <label>Apellido *</label>
+                    <label>Apellido <span class="required">*</span></label>
                     <input type="text" id="apellido" placeholder="Apellido" required>
                 </div>
             </div>
+
             <div class="form-row">
                 <div class="form-group">
-                    <label>Cédula *</label>
+                    <label>Cédula <span class="required">*</span></label>
                     <input type="text" id="cedula" placeholder="Ej: 12345678" required>
                 </div>
                 <div class="form-group">
@@ -44,25 +48,30 @@
                     <input type="email" id="correo" placeholder="correo@ejemplo.com">
                 </div>
             </div>
+
             <div class="form-group">
                 <label>Teléfono</label>
                 <input type="text" id="telefono" placeholder="Ej: 04121234567">
             </div>
-<div class="form-group">
-    <label>Rol *</label>
-    <select id="rol" required>
-        <option value="">Seleccione un rol...</option>
-        <option value="admin">Administrador</option>
-        <option value="presidente">Presidente (solo vista)</option>
-        <option value="secretario">Secretario de Organización</option>
-        <option value="usuario">Usuario (solo mapa)</option>
-    </select>
-    <small>
-        <strong>Nota:</strong> Todos los roles generan un usuario automáticamente.
-        La contraseña inicial es la cédula.
-    </small>
-</div>
-            <button type="submit" class="btn-guardar" id="btnGuardar">Guardar Persona</button>
+
+            <div class="form-group">
+                <label>Rol <span class="required">*</span></label>
+                <select id="rol" required>
+                    <option value="">Seleccione un rol...</option>
+                    <option value="admin">Administrador</option>
+                    <option value="presidente">Presidente (solo vista)</option>
+                    <option value="secretario">Secretario de Organización</option>
+                    <option value="usuario">Usuario (solo mapa)</option>
+                </select>
+                <small>
+                    <strong>Nota:</strong> Todos los roles generan un usuario automáticamente.
+                    La contraseña inicial es la cédula.
+                </small>
+            </div>
+
+            <button type="submit" class="btn-guardar" id="btnGuardar">
+                <i class="fas fa-save"></i> Guardar Persona
+            </button>
         </form>
     </div>
 </div>

@@ -1,104 +1,166 @@
-/* frontend/static/css/pages/dashboard.css */
+/* Paleta Institucional basada en la imagen (Gama de Azules Exacta) */
+:root {
+    --brand-blue: #3B82C4;            /* Azul medio de la franja / columna */
+    --brand-blue-light: #549AD6;      /* Azul claro brillante */
+    --brand-blue-dark: #2B6296;       /* Azul oscuro institucional */
+    --brand-blue-bg: #EBF3FA;         /* Azul suave para fondos de íconos/hover */
+    --brand-blue-soft: #B9D7F2;       /* Azul pastel claro para texto sobre oscuro */
+    
+    --bg-page: #f8fafc;
+    --bg-card: #ffffff;
+    --border-color: #e2e8f0;
+    --text-dark: #1e293b;
+    --text-muted: #64748b;
+    
+    --radius-lg: 14px;
+    --radius-md: 10px;
+    --radius-sm: 8px;
+    --shadow-soft: 0 4px 16px -2px rgba(43, 98, 150, 0.08);
+}
 
-.dashboard-welcome {
+.dashboard-page {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 10px 0 30px 0;
+    box-sizing: border-box;
+}
+
+/* Header */
+.dashboard-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
     flex-wrap: wrap;
     gap: 12px;
 }
 
-.dashboard-welcome h1 {
-    font-size: 28px;
-    font-weight: 700;
+.dash-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--brand-blue-dark);
+    margin: 0;
 }
 
-.dashboard-welcome p {
-    color: var(--texto-claro);
-    font-size: 15px;
-    margin-top: 4px;
+.dash-subtitle {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 2px;
 }
 
-.dashboard-fecha {
+.dash-fecha-pill {
     display: flex;
     align-items: center;
-    gap: 10px;
-    background: var(--blanco);
-    padding: 10px 18px;
-    border-radius: 40px;
-    box-shadow: var(--sombra);
-    font-size: 14px;
-    color: var(--texto-oscuro);
+    gap: 8px;
+    background: var(--bg-card);
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
 }
 
-.dashboard-fecha .separador {
-    color: var(--borde);
+.dash-fecha-pill i { color: var(--brand-blue); }
+
+/* KPI Banner Top (Uniforme en el Azul Exacto del Logo) */
+.kpi-banner-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
 }
 
-.dashboard-fecha i {
-    color: var(--azul);
-}
-
-/* KPIs */
-.kpi-card {
-    background: var(--blanco);
-    border-radius: var(--radius-lg);
-    padding: 20px 24px;
-    box-shadow: var(--sombra);
-    transition: var(--transition);
-}
-
-.kpi-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--sombra-md);
-}
-
-.kpi-header {
+.kpi-pill-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    gap: 14px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-soft);
+    border-left: 4px solid var(--brand-blue);
 }
 
-.kpi-header span {
-    color: var(--texto-claro);
-    font-size: 14px;
-    font-weight: 500;
+/* Todas las tarjetas superiores se unifican en el azul institucional */
+.kpi-pill-card.red,
+.kpi-pill-card.blue,
+.kpi-pill-card.yellow,
+.kpi-pill-card.green {
+    border-left-color: var(--brand-blue);
 }
 
-.kpi-icon {
-    width: 44px;
-    height: 44px;
-    background: rgba(116, 169, 211, 0.1);
-    border-radius: var(--radius);
+.kpi-pill-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    background: var(--brand-blue-bg);
+    color: var(--brand-blue);
 }
 
-.kpi-icon i {
-    font-size: 22px;
-    color: var(--azul);
+.red .kpi-pill-icon,
+.blue .kpi-pill-icon,
+.yellow .kpi-pill-icon,
+.green .kpi-pill-icon {
+    background: var(--brand-blue-bg);
+    color: var(--brand-blue);
 }
 
-.kpi-value {
-    font-size: 32px;
+.kpi-pill-data {
+    display: flex;
+    flex-direction: column;
+}
+
+.kpi-pill-title {
+    font-size: 11px;
+    color: var(--text-muted);
     font-weight: 700;
-    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
 }
 
-.kpi-trend {
-    font-size: 13px;
-    color: var(--texto-claro);
+.kpi-pill-data h3 {
+    margin: 3px 0;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--brand-blue-dark);
+    line-height: 1;
 }
 
-/* Cards */
+.kpi-pill-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Layout Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 22px;
+    align-items: start;
+}
+
+.dash-col-main, .dash-col-side {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+/* Cards Estándar */
 .card {
-    background: var(--blanco);
+    background: var(--bg-card);
     border-radius: var(--radius-lg);
-    padding: 24px;
-    box-shadow: var(--sombra);
+    padding: 20px;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-color);
 }
 
 .card-header {
@@ -109,36 +171,147 @@
 }
 
 .card-header h3 {
-    font-size: 18px;
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--brand-blue-dark);
+    margin: 0;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
-.card-header h3 i {
-    color: var(--azul);
-}
+.card-header h3 i { color: var(--brand-blue); }
 
 .btn-link {
-    color: var(--azul);
-    font-size: 14px;
-    font-weight: 500;
-    transition: var(--transition);
+    color: var(--brand-blue);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+}
+.btn-link:hover { text-decoration: underline; }
+
+/* Hero Summary Card Institucional (Degradado con los Azules del Logo) */
+.hero-summary-card {
+    background: linear-gradient(135deg, var(--brand-blue) 0%, var(--brand-blue-dark) 100%);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px;
+    color: #ffffff;
+    box-shadow: 0 8px 24px -4px rgba(43, 98, 150, 0.35);
 }
 
-.btn-link:hover {
-    color: var(--azul-oscuro);
-    text-decoration: underline;
+.hero-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
 }
 
-/* Gráficos */
-.chart-container {
-    height: 220px;
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.18);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--brand-blue-soft);
+    margin-bottom: 6px;
+}
+
+.hero-text-side h2 {
+    margin: 0 0 4px 0;
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.hero-text-side p {
+    margin: 0;
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.hero-metrics {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.18);
+    border-radius: var(--radius-md);
+    padding: 12px 18px;
+    gap: 16px;
+}
+
+.hero-metric-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hm-val {
+    font-size: 20px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1;
+}
+
+.hm-lbl {
+    font-size: 11px;
+    opacity: 0.88;
+    margin-top: 4px;
+    white-space: nowrap;
+}
+
+.hero-divider {
+    width: 1px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.22);
+}
+
+/* Grid Doble Interno */
+.grid-card-twin {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.chart-wrapper {
+    height: 190px;
     position: relative;
 }
 
-/* Últimas rutas */
+/* Cobertura de Operaciones (Barras Unificadas en Azul) */
+.progress-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.prog-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.prog-labels strong { color: var(--text-dark); }
+
+.prog-bar {
+    height: 8px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.prog-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.8s ease-out;
+}
+
+/* Todas las barras en el azul del logo */
+.bg-green, .bg-red, .bg-blue { background-color: var(--brand-blue); }
+
+/* Tabla de Últimas Rutas */
 .ultimas-rutas {
     display: flex;
     flex-direction: column;
@@ -150,115 +323,93 @@
     justify-content: space-between;
     align-items: center;
     padding: 10px 14px;
-    background: var(--gris);
+    background: #f8fafc;
     border-radius: var(--radius-sm);
-    transition: var(--transition);
+    border: 1px solid var(--border-color);
 }
 
-.ultima-ruta-item:hover {
-    background: rgba(116, 169, 211, 0.08);
-}
-
-.ultima-ruta-item .ruta-info {
+.ruta-info {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
-.ultima-ruta-item .ruta-color {
-    width: 16px;
-    height: 16px;
+/* Conserva el punto con el color específico asignado a cada línea */
+.ruta-color {
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    border: 1px solid var(--borde);
-    flex-shrink: 0;
 }
 
-.ultima-ruta-item .ruta-nombre {
-    font-weight: 500;
-    font-size: 14px;
-}
-
-.ultima-ruta-item .ruta-linea {
+.ruta-nombre {
     font-size: 13px;
-    color: var(--texto-claro);
+    font-weight: 700;
+    color: var(--text-dark);
 }
 
-.ultima-ruta-item .ruta-estado {
+.ruta-linea {
     font-size: 12px;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-weight: 500;
+    color: var(--text-muted);
 }
 
-.ultima-ruta-item .ruta-estado.activa {
-    background: rgba(16, 185, 129, 0.12);
-    color: #10b981;
+.ruta-estado {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 700;
 }
 
-.ultima-ruta-item .ruta-estado.inactiva {
-    background: rgba(239, 68, 68, 0.12);
-    color: #ef4444;
+.ruta-estado.activa { background: var(--brand-blue-bg); color: var(--brand-blue); }
+.ruta-estado.inactiva { background: #f1f5f9; color: var(--text-muted); }
+
+/* Sidebar Estado de Líneas */
+.lineas-status-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.linea-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: #f8fafc;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    font-size: 12px;
+}
+
+.linea-item-name {
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.linea-item-badge {
+    background: var(--brand-blue-bg);
+    color: var(--brand-blue);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 11px;
 }
 
 .loading-text {
-    color: var(--texto-claro);
+    font-size: 12px;
+    color: var(--text-muted);
     text-align: center;
-    padding: 20px;
-    font-size: 14px;
+    padding: 10px;
 }
 
-/* Mapa dashboard */
-.mapa-dashboard-card {
-    margin-top: 24px;
+/* RESPONSIVE */
+@media (max-width: 1100px) {
+    .kpi-banner-grid { grid-template-columns: repeat(2, 1fr); }
+    .dashboard-grid { grid-template-columns: 1fr; }
 }
 
-/* Tabla resumen */
-#tablaLineasResumen {
-    font-size: 14px;
-}
-
-#tablaLineasResumen td {
-    padding: 10px 14px;
-}
-
-.color-dot {
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    border: 1px solid var(--borde);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .dashboard-welcome {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .dashboard-fecha {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .kpi-card {
-        padding: 16px 18px;
-    }
-
-    .kpi-value {
-        font-size: 24px;
-    }
-
-    .chart-container {
-        height: 180px;
-    }
-
-    .ultima-ruta-item {
-        flex-wrap: wrap;
-        gap: 6px;
-    }
-
-    .ultima-ruta-item .ruta-info {
-        width: 100%;
-    }
+@media (max-width: 650px) {
+    .kpi-banner-grid { grid-template-columns: 1fr; }
+    .grid-card-twin { grid-template-columns: 1fr; }
+    .hero-body { flex-direction: column; align-items: flex-start; }
+    .hero-metrics { width: 100%; justify-content: space-around; box-sizing: border-box; }
 }

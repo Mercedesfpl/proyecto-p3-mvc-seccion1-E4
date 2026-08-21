@@ -340,3 +340,100 @@ def update_ruta(id_ruta):
 def delete_ruta(id_ruta):
     from app.controllers.rutaControllers import delete_ruta
     return delete_ruta(id_ruta)
+
+# ========== CRUD DE DETECCIONES ==========
+
+@admin_scope.route("/detecciones", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_detecciones():
+    from app.controllers.deteccionControllers import get_all_detecciones
+    return get_all_detecciones()
+
+@admin_scope.route("/detecciones/<int:id_deteccion>", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_deteccion(id_deteccion):
+    from app.controllers.deteccionControllers import get_deteccion_by_id
+    return get_deteccion_by_id(id_deteccion)
+
+@admin_scope.route("/detecciones/vehiculo/<int:id_vehiculo>", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_detecciones_vehiculo(id_vehiculo):
+    from app.controllers.deteccionControllers import get_detecciones_by_vehiculo
+    return get_detecciones_by_vehiculo(id_vehiculo)
+
+@admin_scope.route("/detecciones/parada/<int:id_parada>", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_detecciones_parada(id_parada):
+    from app.controllers.deteccionControllers import get_detecciones_by_parada
+    return get_detecciones_by_parada(id_parada)
+
+@admin_scope.route("/detecciones/alertas", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_alertas():
+    from app.controllers.deteccionControllers import get_alertas
+    return get_alertas()
+
+@admin_scope.route("/detecciones", methods=["POST"])
+@jwt_required()
+@role_required("admin")
+def create_deteccion():
+    from flask import request
+    from app.controllers.deteccionControllers import create_deteccion
+    data = request.get_json()
+    return create_deteccion()
+
+@admin_scope.route("/detecciones/<int:id_deteccion>", methods=["DELETE"])
+@jwt_required()
+@role_required("admin")
+def delete_deteccion(id_deteccion):
+    from app.controllers.deteccionControllers import delete_deteccion
+    return delete_deteccion(id_deteccion)
+
+# ========== CRUD BÁSICO ESP32 ==========
+
+@admin_scope.route("/esp32", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_esp32():
+    from app.controllers.esp32Controllers import get_all_esp32
+    return get_all_esp32()
+
+@admin_scope.route("/esp32/<int:id_esp32>", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_esp32_id(id_esp32):
+    from app.controllers.esp32Controllers import get_esp32_by_id
+    return get_esp32_by_id(id_esp32)
+
+@admin_scope.route("/esp32", methods=["POST"])
+@jwt_required()
+@role_required("admin")
+def create_esp32():
+    from app.controllers.esp32Controllers import create_esp32
+    return create_esp32()
+
+@admin_scope.route("/esp32/<int:id_esp32>", methods=["PUT"])
+@jwt_required()
+@role_required("admin")
+def update_esp32(id_esp32):
+    from app.controllers.esp32Controllers import update_esp32
+    return update_esp32(id_esp32)
+
+@admin_scope.route("/esp32/<int:id_esp32>", methods=["DELETE"])
+@jwt_required()
+@role_required("admin")
+def delete_esp32(id_esp32):
+    from app.controllers.esp32Controllers import delete_esp32
+    return delete_esp32(id_esp32)
+
+# Vista de la página
+@admin_scope.route("/esp32-page", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def esp32_page():
+    return render_template("pages/esp32.html")

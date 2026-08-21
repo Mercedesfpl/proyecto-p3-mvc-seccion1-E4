@@ -18,6 +18,12 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.css" />
 
+    <!-- ====== SWEETALERT2 CSS ====== -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+    <!-- ====== HEADER (Sidebar) ====== -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}">
+
     <!-- ====== ESTILOS DE LA PÁGINA ====== -->
     {% block styles %}{% endblock %}
 
@@ -34,9 +40,10 @@
     <!-- Contenido principal -->
     <main class="main-content">{% block content %}{% endblock %}</main>
 
-    <!-- Toast para notificaciones -->
-    <div id="toastMessage" class="toast-message"></div>
-
+    <!-- ====== SWEETALERT2 JS + HELPER GLOBAL ====== -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
+    
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.js"></script>
 
