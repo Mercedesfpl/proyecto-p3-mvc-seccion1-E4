@@ -2,11 +2,13 @@
 from app.models.models import Usuario, PreRegistro
 from ..extensions import db
 
+
 class UserRepository:
-    #Maneja todas las consultas a la base de datos para Usuarios
+    # Maneja todas las consultas a la base de datos para Usuarios
 
     @staticmethod
     def get_by_email(email):
+
         return Usuario.query.filter_by(email=email).first()
 
     @staticmethod
@@ -14,7 +16,6 @@ class UserRepository:
         if id_usuario is None:
             return None
         return Usuario.query.get(id_usuario)
-        
 
     @staticmethod
     def get_pre_register_by_id(id_usuario):
@@ -26,7 +27,7 @@ class UserRepository:
 
     @staticmethod
     def is_first_user():
-        #Verifica si es el primer usuario del sistema
+        # Verifica si es el primer usuario del sistema
         return Usuario.query.count() == 0
 
     @staticmethod

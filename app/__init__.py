@@ -1,22 +1,26 @@
 from flask import Flask
+from flask_cors import CORS
 from config import Config
-from .extensions import db, login_manager, migrate, mail, socketio, limiter, jwt
-from flask_jwt_extended import JWTManager
+from .extensions import db, login_manager, migrate, mail, socketio, limiter, jwt, cors
+
 from .models.models import Usuario
 from .routes import auth_scope, errors_scope, admin_scope, user_scope
+
 
 def create_app():
     # Configuracion inicial de la aplicacion
     app = Flask(
-        __name__, template_folder=Config.TEMPLATE_FOLDER, static_folder=Config.STATIC_FOLDER
+        __name__,
+        template_folder=Config.TEMPLATE_FOLDER,
+        static_folder=Config.STATIC_FOLDER,
     )
     app.config.from_object(Config)
+    CORS(app)
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
     mail.init_app(app)
-    jwt = JWTManager(app)
-    socketio.init_app(app, cors_allowed_origins='*', async_mode='threading')
+    socketio.init_app(app, cors_allowed_origins="*", async_mode="threading")
     limiter.init_app(app)
     jwt.init_app(app)
 
@@ -30,9 +34,6 @@ def create_app():
     app.register_blueprint(admin_scope, url_prefix="/admin")
     app.register_blueprint(user_scope, url_prefix="/")
 
-    with app.app_context():
-        db.create_all()
+    # from .routes import websocket_events
 
-    #from .routes import websocket_events
-    
     return app

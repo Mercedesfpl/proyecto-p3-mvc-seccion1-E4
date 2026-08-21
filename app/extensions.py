@@ -7,6 +7,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_jwt_extended import JWTManager
 from flask import jsonify, request, redirect, url_for, flash
+from flask_cors import CORS
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -15,6 +16,7 @@ mail = Mail()
 socketio = SocketIO()
 limiter = Limiter(key_func=get_remote_address)
 jwt = JWTManager()
+cors = CORS(supports_credentials=True)
 
 
 # ==============================================================================
