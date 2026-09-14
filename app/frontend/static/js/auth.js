@@ -298,9 +298,24 @@ if (loginForm) {
       const data = await response.json(); // Solo una vez
 
       if (response.ok) {
+        if (data.data && data.data.access_token) {
+          localStorage.setItem("access_token", data.data.access_token);
+        }
+
         if (data.data && data.data.rol) {
           localStorage.setItem("user_rol", data.data.rol);
           document.body.setAttribute("data-user-rol", data.data.rol);
+        }
+        //GUARDAR Y APLICAR TEMA desde el backend
+        if (data.data && data.data.tema) {
+          const tema = data.data.tema;
+          localStorage.setItem("theme", tema);
+          // Aplicar inmediatamente
+          if (tema === "oscuro") {
+            document.body.classList.add("dark-mode");
+          } else {
+            document.body.classList.remove("dark-mode");
+          }
         }
         window.location.href = data.data?.redirect || "/admin/dashboard";
       } else {

@@ -37,13 +37,15 @@ def login(usuario):
         else:
             redirect_url = "/home"
 
-        # ✅ 4. Construir response_body ANTES de imprimirlo
+        # 4. Construir response_body ANTES de imprimirlo
         response_body = {
             "success": True,
             "message": "Login exitoso",
             "data": {
                 "redirect": redirect_url,
-                "rol": user.rol
+                "rol": user.rol,
+                "tema": user.tema or 'claro',
+                "access_token": access_token,
             }
         }
         

@@ -13,7 +13,7 @@ class Ruta(db.Model):
     
     def to_dict(self):
         return {
-            "id_ruta": self.id_ruta,
+            "id_ruta": self.id,
             "nombre": self.nombre,
             "status": self.status,
             "id_linea": self.id_linea

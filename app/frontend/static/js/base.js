@@ -307,11 +307,37 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // aplica el modo oscuro
 document.addEventListener("DOMContentLoaded", function () {
-  // Cargar tema guardado en localStorage
-  const tema = localStorage.getItem("theme") || "claro";
+  // 1. Aplicar tema desde localStorage inmediatamente (sin esperar)
+  const temaCached = localStorage.getItem("theme") || "claro";
+  aplicarTema(temaCached);
+
+  // 2. Luego, si hay token, consultar el backend para sincronizar
+  const token = localStorage.getItem("access_token");
+  if (token) {
+    fetch("/api/perfil", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.data && data.data.tema) {
+          const temaBackend = data.data.tema;
+          // Si el backend tiene un tema diferente, actualizar
+          if (temaBackend !== temaCached) {
+            aplicarTema(temaBackend);
+            localStorage.setItem("theme", temaBackend);
+          }
+        }
+      })
+      .catch(() => {
+        // Si falla, mantener el tema de localStorage
+      });
+  }
+});
+
+function aplicarTema(tema) {
   if (tema === "oscuro") {
     document.body.classList.add("dark-mode");
   } else {
     document.body.classList.remove("dark-mode");
   }
-});
+}

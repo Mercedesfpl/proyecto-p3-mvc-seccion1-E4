@@ -11,6 +11,7 @@ class Parada(db.Model):
     coordenadas = db.Column(db.String(100), nullable=False)  # "latitud,longitud"
     status = db.Column(db.String(20), default="activa")  # 'activa', 'inactiva'
     created_at = db.Column(db.DateTime, default=datetime.now)
+    id_ruta = db.Column(db.Integer, db.ForeignKey('rutas.id'), nullable=True)
 
     def to_dict(self):
         return {
@@ -18,5 +19,6 @@ class Parada(db.Model):
             "nombre": self.nombre,
             "coordenadas": self.coordenadas,
             "status": self.status,
+            "id_ruta": self.id_ruta,
             "created_at": self.created_at.isoformat() if self.created_at else None
         }

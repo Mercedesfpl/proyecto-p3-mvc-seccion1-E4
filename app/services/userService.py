@@ -44,7 +44,8 @@ class UserService:
                 identity=str(user.id), additional_claims=datos_adicionales
             )
         
-            return {"access_token": access_token}
+            return {"access_token": access_token, 
+                    "tema": user.tema or 'claro'}
         else:
             user.intentos_fallidos += 1
             UserRepository.update(user)
@@ -285,6 +286,7 @@ class UserService:
             "nombre": usuario.nombre,
             "email": usuario.email,
             "rol": usuario.rol,
+            "tema": usuario.tema or 'claro',
         }
     
     @staticmethod

@@ -293,21 +293,21 @@ def delete_bus(id_vehiculo):
 
 @admin_scope.route("/rutas/api", methods=["GET"])  # Usamos /rutas/api para no chocar con la vista
 @jwt_required()
-@role_required("admin")
+#@role_required("admin")
 def get_rutas_api():
     from app.controllers.rutaControllers import get_all_rutas
     return get_all_rutas()
 
 @admin_scope.route("/rutas/<int:id_ruta>", methods=["GET"])
 @jwt_required()
-@role_required("admin")
+#@role_required("admin")
 def get_ruta(id_ruta):
     from app.controllers.rutaControllers import get_ruta_by_id
     return get_ruta_by_id(id_ruta)
 
 @admin_scope.route("/rutas", methods=["POST"])
 @jwt_required()
-@role_required("admin")
+#@role_required("admin")
 def create_ruta():
     from flask import request
     from app.controllers.rutaControllers import create_ruta
@@ -316,7 +316,7 @@ def create_ruta():
 
 @admin_scope.route("/rutas/<int:id_ruta>", methods=["PUT"])
 @jwt_required()
-@role_required("admin")
+#@role_required("admin")
 def update_ruta(id_ruta):
     from flask import request
     from app.controllers.rutaControllers import update_ruta
@@ -325,7 +325,7 @@ def update_ruta(id_ruta):
 
 @admin_scope.route("/rutas/<int:id_ruta>", methods=["DELETE"])
 @jwt_required()
-@role_required("admin")
+#@role_required("admin")
 def delete_ruta(id_ruta):
     from app.controllers.rutaControllers import delete_ruta
     return delete_ruta(id_ruta)

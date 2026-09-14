@@ -11,7 +11,7 @@ class Config:
    DB_PASSWORD = os.getenv("DB_PASSWORD", "")
    DB_HOST = os.getenv("DB_HOST", "localhost")
    DB_PORT = os.getenv("DB_PORT", "5432")
-   DB_NAME = os.getenv("DB_NAME", "transport_db")
+   DB_NAME = os.getenv("DB_NAME", "bus_tracker")
 
     # Codificar la contraseña para evitar problemas de caracteres especiales
    DB_PASSWORD_ENCODED = quote_plus(DB_PASSWORD)
