@@ -50,7 +50,12 @@ def handle_bad_request(error: Exception) -> Response:
 
 @errors_scope.app_errorhandler(ResourceNotFound)
 def handle_not_found(error):
-    return jsonify({"ErrorType": type(error).__name__, "Message": str(error)}), 404
+    return (
+        jsonify(
+            {"success": False, "ErrorType": type(error).__name__, "Message": str(error)}
+        ),
+        404,
+    )
 
 
 @errors_scope.app_errorhandler(ResourceAlreadyExists)
@@ -60,7 +65,12 @@ def handle_conflict(error):
 
 @errors_scope.app_errorhandler(ResourceNotValid)
 def handle_bad_request(error):
-    return jsonify({"ErrorType": type(error).__name__, "Message": str(error)}), 400
+    return (
+        jsonify(
+            {"success": False, "ErrorType": type(error).__name__, "Message": str(error)}
+        ),
+        400,
+    )
 
 
 @errors_scope.app_errorhandler(Unauthorized)

@@ -48,6 +48,12 @@ function cerrarModalUnidad() {
     .querySelectorAll(".is-invalid")
     .forEach((el) => el.classList.remove("is-invalid"));
 }
+function getCookie(name) {
+  return document.cookie
+    .split("; ")
+    .find((r) => r.startsWith(name + "="))
+    ?.split("=")[1];
+}
 
 // ============================================================
 // 3. CARGAR TABLA DE BUSES
@@ -57,6 +63,7 @@ async function cargarBuses() {
     const response = await fetch("/admin/buses");
     const data = await response.json();
     const tbody = document.getElementById("unidadesTableBody");
+    console.log("Los datos del bus>>>>>>>", data);
     if (!tbody) return;
 
     if (data.success && data.data && data.data.length > 0) {
@@ -134,7 +141,7 @@ async function cargarSelectsModal() {
       select.innerHTML = '<option value="">Seleccione una línea...</option>';
       dataLineas.data.forEach((linea) => {
         const opt = document.createElement("option");
-        opt.value = linea.id_linea;
+        opt.value = linea.id;
         opt.textContent = linea.nombre;
         select.appendChild(opt);
       });
@@ -212,9 +219,16 @@ async function guardarNuevaUnidad(e) {
   document.getElementById("guardarUnidadBtn").disabled = true;
 
   try {
-    const response = await fetch("/admin/buses", {
+    const csrfToken = getCookie("csrf_access_token");
+    console.log("csrfToken--->", csrfToken);
+
+    const response = await fetch("/admin/save-bus", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      credentials: "include", // 🔑 envía cookies
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-TOKEN": csrfToken, // 🔑 valor real, no "undefined"
+      },
       body: JSON.stringify(data),
     });
 
@@ -232,7 +246,7 @@ async function guardarNuevaUnidad(e) {
     }
   } catch (error) {
     console.error("Error al guardar unidad:", error);
-    mostrarNotificacion("Error de conexión al servidor", "danger");
+    mostrarNotificacion("Error de conexión al servidorrrrr", "danger");
   } finally {
     loadingUnidad = false;
     document.getElementById("guardarUnidadBtn").disabled = false;

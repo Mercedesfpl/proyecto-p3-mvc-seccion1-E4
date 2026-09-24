@@ -41,6 +41,13 @@ function cerrarModalRuta() {
   editandoIdRuta = null;
   document.getElementById("guardarRutaBtn").disabled = false;
 }
+//Paso uno 🔽
+function getCookie(name) {
+  return document.cookie
+    .split("; ")
+    .find((r) => r.startsWith(name + "="))
+    ?.split("=")[1];
+}
 
 // ============================================================
 // 3. CARGAR SELECTS (líneas)
@@ -54,7 +61,7 @@ async function cargarSelectsRuta() {
       select.innerHTML = '<option value="">Seleccione una línea...</option>';
       data.data.forEach((linea) => {
         const opt = document.createElement("option");
-        opt.value = linea.id_linea;
+        opt.value = linea.id;
         opt.textContent = linea.nombre;
         select.appendChild(opt);
       });
@@ -97,11 +104,23 @@ async function guardarRuta(e) {
 
   loadingRuta = true;
   document.getElementById("guardarRutaBtn").disabled = true;
+  /*Primero se copian la funcion getCookien al inicio de la pagina ver  paso 1
+luego llaman a la funcion y lo asignan a una variable----> const csrfToken = getCookie("csrf_access_token"); ver paso 2
+incluyen los headers de autorizacion ver paso 3
+*/
 
   try {
+    //Paso dos 🔽
+    const csrfToken = getCookie("csrf_access_token");
+    console.log("csrfToken--->", csrfToken);
     const response = await fetch("/admin/rutas", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      //Paso tres 🔽
+
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-TOKEN": csrfToken, // 🔑 valor real, no "undefined"
+      },
       body: JSON.stringify(data),
     });
 
