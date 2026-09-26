@@ -1,793 +1,439 @@
-// frontend/static/js/pages/rutas.js
+// ============================================================
+// PÁGINA DE RUTAS - CRUD completo (con modal)
+// ============================================================
 
 let editandoIdRuta = null;
 let loadingRuta = false;
 let rutas = [];
 let lineas = [];
-let paradasDisponibles = [];
-let paradasSeleccionadasIds = [];
-let mapaPrincipal = null;
-let mapaModal = null;
-let paginaActual = 1;
-let controlesRuta = [];
-const registrosPorPagina = 5;
-let rutasFiltradas = [];
 
-// ========== MAPA PRINCIPAL ==========
-
-function destruirMapaPrincipal() {
-    if (mapaPrincipal) {
-        mapaPrincipal.off();
-        mapaPrincipal.remove();
-        mapaPrincipal = null;
-    }
-    const container = document.getElementById('mapa-rutas-principal');
-    if (container) {
-        container.innerHTML = '';
-    }
+// ============================================================
+// 1. NOTIFICACIONES (reutiliza showToast si existe)
+// ============================================================
+function mostrarNotificacion(mensaje, tipo = "success") {
+  if (typeof showToast === "function") {
+    showToast(mensaje, tipo);
+    return;
+  }
+  if (tipo === "success") alert("✅ " + mensaje);
+  else if (tipo === "warning") alert("⚠️ " + mensaje);
+  else if (tipo === "danger") alert("❌ " + mensaje);
+  else alert("ℹ️ " + mensaje);
 }
 
-function inicializarMapaPrincipal() {
-    destruirMapaPrincipal();
-
-    const container = document.getElementById('mapa-rutas-principal');
-    if (!container) return;
-
-    container.innerHTML = '';
-
-    mapaPrincipal = L.map('mapa-rutas-principal').setView([10.3447, -67.0400], 11);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(mapaPrincipal);
-
-    setTimeout(() => {
-        if (mapaPrincipal) mapaPrincipal.invalidateSize();
-    }, 300);
-}
-
-function actualizarMapaPrincipal(rutasData) {
-    if (!mapaPrincipal) return;
-
-    // Limpiar controles anteriores
-    if (controlesRuta.length > 0) {
-        controlesRuta.forEach(control => {
-            try {
-                mapaPrincipal.removeControl(control);
-            } catch (e) {}
-        });
-        controlesRuta = [];
-    }
-
-    mapaPrincipal.eachLayer(function(layer) {
-        if (layer instanceof L.Marker || 
-            layer instanceof L.Polyline || 
-            layer instanceof L.CircleMarker) {
-            mapaPrincipal.removeLayer(layer);
-        }
-    });
-
-    if (!rutasData || rutasData.length === 0) {
-        const contador = document.getElementById('contadorRutas');
-        if (contador) contador.textContent = '0 rutas';
-        return;
-    }
-
-    rutasData.forEach((ruta, index) => {
-        const color = ruta.color || '#74A9D3';
-
-        if (ruta.paradas && ruta.paradas.length >= 2) {
-            const paradasOrdenadas = [...ruta.paradas].sort((a, b) => a.orden - b.orden);
-            
-            const waypoints = paradasOrdenadas.map(p => {
-                const coords = p.coordenadas.split(',');
-                return L.latLng(parseFloat(coords[0].trim()), parseFloat(coords[1].trim()));
-            });
-
-            if (typeof L.Routing !== 'undefined' && waypoints.length >= 2) {
-                try {
-                    const rutaControl = L.Routing.control({
-                        waypoints: waypoints,
-                        routeWhileDragging: false,
-                        showAlternatives: false,
-                        fitSelectedRoutes: false,
-                        lineOptions: {
-                            styles: [{ color: color, weight: 4, opacity: 0.8 }],
-                            extendToWaypoints: false,
-                            missingRouteTolerance: 0
-                        },
-                        router: L.Routing.osrmv1({
-                            serviceUrl: 'https://router.project-osrm.org/route/v1/'
-                        }),
-                        show: false
-                    }).addTo(mapaPrincipal);
-                    controlesRuta.push(rutaControl);
-                } catch (e) {
-                    dibujarLineaRecta(mapaPrincipal, waypoints, color);
-                }
-            } else {
-                dibujarLineaRecta(mapaPrincipal, waypoints, color);
-            }
-
-            waypoints.forEach((coord, i) => {
-                const parada = paradasOrdenadas[i];
-                const marker = L.circleMarker(coord, {
-                    radius: 6,
-                    fillColor: color,
-                    color: '#fff',
-                    weight: 2,
-                    opacity: 1,
-                    fillOpacity: 0.9
-                }).addTo(mapaPrincipal);
-
-                marker.bindPopup(`
-                    <strong>${parada.nombre}</strong>
-                    <br>Orden: ${i + 1}
-                    <br>Ruta: ${ruta.nombre}
-                `);
-            });
-        }
-    });
-
-    const contador = document.getElementById('contadorRutas');
-    if (contador) {
-        contador.textContent = `${rutasData.length} rutas`;
-    }
-}
-
-function dibujarLineaRecta(mapa, waypoints, color) {
-    if (waypoints.length < 2) return;
-    const coords = waypoints.map(w => w);
-    L.polyline(coords, {
-        color: color,
-        weight: 3,
-        opacity: 0.7,
-        dashArray: '5, 10'
-    }).addTo(mapa);
-}
-
-// ========== MAPA EN MODAL ==========
-
-function inicializarMapaModal() {
-    const container = document.getElementById('mapa-rutas-modal');
-    if (!container) return;
-
-    if (mapaModal) {
-        mapaModal.off();
-        mapaModal.remove();
-        mapaModal = null;
-    }
-
-    container.innerHTML = '';
-
-    mapaModal = L.map('mapa-rutas-modal').setView([10.3447, -67.0400], 12);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(mapaModal);
-
-    setTimeout(() => {
-        if (mapaModal) mapaModal.invalidateSize();
-    }, 300);
-}
-
-function actualizarMapaModal(paradasIds) {
-    if (!mapaModal) return;
-
-    mapaModal.eachLayer(function(layer) {
-        if (layer instanceof L.Marker || layer instanceof L.Polyline) {
-            mapaModal.removeLayer(layer);
-        }
-    });
-
-    if (!paradasIds || paradasIds.length === 0) return;
-
-    const paradasSeleccionadas = paradasIds
-        .map(id => paradasDisponibles.find(p => p.id === id))
-        .filter(Boolean);
-
-    if (paradasSeleccionadas.length === 0) return;
-
-    const coords = paradasSeleccionadas.map(p => {
-        const partes = p.coordenadas ? p.coordenadas.split(',') : [];
-        if (partes.length === 2) {
-            const lat = parseFloat(partes[0].trim());
-            const lng = parseFloat(partes[1].trim());
-            if (!isNaN(lat) && !isNaN(lng)) {
-                return [lat, lng];
-            }
-        }
-        return null;
-    }).filter(c => c !== null);
-
-    if (coords.length === 0) return;
-
-    const bounds = L.latLngBounds(coords);
-    mapaModal.fitBounds(bounds, { padding: [30, 30] });
-
-    coords.forEach((coord, i) => {
-        const parada = paradasSeleccionadas[i];
-        L.marker(coord, {
-            icon: L.divIcon({
-                className: 'custom-marker',
-                html: `
-                    <div style="
-                        background: #4285f4;
-                        width: 20px;
-                        height: 20px;
-                        border-radius: 50%;
-                        border: 2px solid white;
-                        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        color: white;
-                        font-size: 10px;
-                        font-weight: bold;
-                    ">
-                        ${i + 1}
-                    </div>
-                `,
-                iconSize: [20, 20],
-                iconAnchor: [10, 10]
-            })
-        }).addTo(mapaModal).bindPopup(`
-            <strong>${parada.nombre}</strong>
-            <br>Orden: ${i + 1}
-            <br>Coordenadas: ${parada.coordenadas}
-        `);
-    });
-
-    if (coords.length > 1) {
-        L.polyline(coords, {
-            color: '#4285f4',
-            weight: 3,
-            opacity: 0.7,
-            dashArray: '8, 8'
-        }).addTo(mapaModal);
-    }
-}
-
-// ========== EXPANDIR MAPA ==========
-
-function toggleExpandirMapa() {
-    const mapa = document.getElementById('mapa-rutas-principal');
-    const btn = document.getElementById('btnExpandirMapa');
-    const icono = btn.querySelector('i');
-    
-    mapa.classList.toggle('expanded');
-    
-    if (mapa.classList.contains('expanded')) {
-        icono.classList.remove('fa-expand');
-        icono.classList.add('fa-compress');
-        btn.title = 'Reducir mapa';
-    } else {
-        icono.classList.remove('fa-compress');
-        icono.classList.add('fa-expand');
-        btn.title = 'Expandir mapa';
-    }
-    
-    setTimeout(() => {
-        if (mapaPrincipal) mapaPrincipal.invalidateSize();
-    }, 350);
-}
-
-// ========== MODAL ==========
-
-function abrirModalRuta(titulo = 'Nueva Ruta', data = null) {
-    const modal = document.getElementById('modalNuevaRuta');
-    if (!modal) return;
-
-    document.getElementById('modalRutaTitle').textContent = titulo;
-    document.getElementById('formNuevaRuta').reset();
-    document.getElementById('status_ruta').value = 'activa';
-    paradasSeleccionadasIds = [];
-
-    if (data) {
-        document.getElementById('nombre_ruta').value = data.nombre || '';
-        document.getElementById('id_linea_ruta').value = data.id_linea || '';
-        document.getElementById('status_ruta').value = data.status || 'activa';
-        
-        if (data.paradas) {
-            paradasSeleccionadasIds = data.paradas.map(p => p.id);
-        }
-    } else {
-        editandoIdRuta = null;
-    }
-
-    cargarSelectoresRuta();
-    renderizarListasParadas();
-    inicializarMapaModal();
-
-    modal.classList.add('show');
-    document.body.style.overflow = 'hidden';
-    document.getElementById('guardarRutaBtn').disabled = false;
+// ============================================================
+// 2. MODAL (abrir / cerrar)
+// ============================================================
+function abrirModalRuta(titulo = "Nueva Ruta") {
+  const modal = document.getElementById("modalNuevaRuta");
+  document.getElementById("formNuevaRuta").reset();
+  document
+    .querySelectorAll(".is-invalid")
+    .forEach((el) => el.classList.remove("is-invalid"));
+  cargarSelectsRuta();
+  modal.classList.add("show");
+  document.getElementById("guardarRutaBtn").disabled = false;
 }
 
 function cerrarModalRuta() {
-    const modal = document.getElementById('modalNuevaRuta');
-    if (modal) modal.classList.remove('show');
-    document.body.style.overflow = '';
-    editandoIdRuta = null;
-    
-    const btnGuardar = document.getElementById('guardarRutaBtn');
-    if (btnGuardar) btnGuardar.disabled = false;
-
-    if (mapaModal) {
-        mapaModal.off();
-        mapaModal.remove();
-        mapaModal = null;
-    }
+  const modal = document.getElementById("modalNuevaRuta");
+  modal.classList.remove("show");
+  editandoIdRuta = null;
+  document.getElementById("guardarRutaBtn").disabled = false;
+}
+//Paso uno 🔽
+function getCookie(name) {
+  return document.cookie
+    .split("; ")
+    .find((r) => r.startsWith(name + "="))
+    ?.split("=")[1];
 }
 
-// ========== PARADAS ==========
+// ============================================================
+// 3. CARGAR SELECTS (líneas)
+// ============================================================
+async function cargarSelectsRuta() {
+  try {
+    const resp = await fetch("/admin/lineas");
+    const data = await resp.json();
+    if (data.success) {
+      const select = document.getElementById("id_linea_ruta");
+      select.innerHTML = '<option value="">Seleccione una línea...</option>';
+      data.data.forEach((linea) => {
+        const opt = document.createElement("option");
+        opt.value = linea.id;
+        opt.textContent = linea.nombre;
+        select.appendChild(opt);
+      });
+    }
+  } catch (error) {
+    console.error("Error al cargar líneas:", error);
+    mostrarNotificacion("Error al cargar líneas", "danger");
+  }
+}
 
-function renderizarListasParadas() {
-    const disponiblesContainer = document.getElementById('listaDisponibles');
-    const seleccionadasContainer = document.getElementById('listaSeleccionadas');
-    const contadorDisponibles = document.getElementById('contadorDisponibles');
-    const contadorSeleccionadas = document.getElementById('contadorSeleccionadas');
-    const contadorModal = document.getElementById('contadorParadasSeleccionadas');
+// ============================================================
+// 4. GUARDAR RUTA (POST /admin/rutas)
+// ============================================================
+async function guardarRuta(e) {
+  if (e) e.preventDefault();
+  if (loadingRuta) return;
 
-    if (!disponiblesContainer || !seleccionadasContainer) return;
+  const form = document.getElementById("formNuevaRuta");
+  const formData = new FormData(form);
+  const data = Object.fromEntries(formData.entries());
 
-    const disponibles = paradasDisponibles.filter(p => !paradasSeleccionadasIds.includes(p.id));
-    
-    if (disponibles.length === 0) {
-        disponiblesContainer.innerHTML = `<div class="item-vacio">No hay paradas disponibles</div>`;
+  // Validación
+  let valid = true;
+  document
+    .querySelectorAll(".is-invalid")
+    .forEach((el) => el.classList.remove("is-invalid"));
+
+  if (!data.nombre || !data.nombre.trim()) {
+    document.getElementById("nombre_ruta").classList.add("is-invalid");
+    valid = false;
+  }
+  if (!data.id_linea) {
+    document.getElementById("id_linea_ruta").classList.add("is-invalid");
+    valid = false;
+  }
+  if (!valid) {
+    mostrarNotificacion("Complete los campos obligatorios (*)", "warning");
+    return;
+  }
+
+  loadingRuta = true;
+  document.getElementById("guardarRutaBtn").disabled = true;
+  /*Primero se copian la funcion getCookien al inicio de la pagina ver  paso 1
+luego llaman a la funcion y lo asignan a una variable----> const csrfToken = getCookie("csrf_access_token"); ver paso 2
+incluyen los headers de autorizacion ver paso 3
+*/
+
+  try {
+    //Paso dos 🔽
+    const csrfToken = getCookie("csrf_access_token");
+    console.log("csrfToken--->", csrfToken);
+    const response = await fetch("/admin/rutas", {
+      method: "POST",
+      //Paso tres 🔽
+
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-TOKEN": csrfToken, // 🔑 valor real, no "undefined"
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      mostrarNotificacion("Ruta creada exitosamente", "success");
+      cerrarModalRuta();
+      cargarDatos(); // Recargar lista
     } else {
-        disponiblesContainer.innerHTML = disponibles.map(p => `
-            <div class="item-parada" data-id="${p.id}">
-                <span class="nombre-parada">${p.nombre}</span>
-                <button class="btn-agregar-item" data-id="${p.id}" title="Agregar parada al final de la lista">
-                    <i class="fas fa-plus"></i> Agregar
-                </button>
-            </div>
-        `).join('');
+      mostrarNotificacion(result.message || "Error al crear la ruta", "danger");
     }
-
-    const seleccionadas = paradasSeleccionadasIds
-        .map(id => paradasDisponibles.find(p => p.id === id))
-        .filter(Boolean);
-    
-    if (seleccionadas.length === 0) {
-        seleccionadasContainer.innerHTML = `<div class="item-vacio">No hay paradas seleccionadas</div>`;
-    } else {
-        seleccionadasContainer.innerHTML = seleccionadas.map((p, index) => `
-            <div class="item-parada seleccionado" data-id="${p.id}">
-                <span class="numero-orden">${index + 1}</span>
-                <span class="nombre-parada">${p.nombre}</span>
-                <button class="btn-quitar-item" data-id="${p.id}" title="Quitar parada de la lista">
-                    <i class="fas fa-times"></i> Quitar
-                </button>
-            </div>
-        `).join('');
-    }
-
-    if (contadorDisponibles) contadorDisponibles.textContent = `${disponibles.length} disponibles`;
-    if (contadorSeleccionadas) contadorSeleccionadas.textContent = `${seleccionadas.length} paradas`;
-    if (contadorModal) contadorModal.textContent = `${seleccionadas.length} paradas`;
-
-    document.querySelectorAll('#listaDisponibles .btn-agregar-item').forEach(btn => {
-        btn.onclick = handleAgregarParada;
-    });
-
-    document.querySelectorAll('#listaSeleccionadas .btn-quitar-item').forEach(btn => {
-        btn.onclick = handleQuitarParada;
-    });
-
-    const btnAgregarTodas = document.getElementById('btnAgregarTodasParadas');
-    if (btnAgregarTodas) btnAgregarTodas.onclick = handleAgregarTodas;
-
-    const btnQuitarTodas = document.getElementById('btnQuitarTodasParadas');
-    if (btnQuitarTodas) btnQuitarTodas.onclick = handleQuitarTodas;
-
-    actualizarMapaModal(paradasSeleccionadasIds);
+  } catch (error) {
+    console.error("Error al guardar ruta:", error);
+    mostrarNotificacion("Error de conexión al servidor", "danger");
+  } finally {
+    loadingRuta = false;
+    document.getElementById("guardarRutaBtn").disabled = false;
+  }
 }
 
-function handleAgregarParada(e) {
-    const id = parseInt(e.currentTarget.dataset.id);
-    if (paradasSeleccionadasIds.includes(id)) {
-        showToast('Esta parada ya está en la lista', 'warning');
-        return;
-    }
-    paradasSeleccionadasIds.push(id);
-    renderizarListasParadas();
-    showToast('Parada agregada', 'success');
-}
-
-function handleQuitarParada(e) {
-    const id = parseInt(e.currentTarget.dataset.id);
-    paradasSeleccionadasIds = paradasSeleccionadasIds.filter(p => p !== id);
-    renderizarListasParadas();
-    showToast('Parada quitada', 'success');
-}
-
-function handleAgregarTodas() {
-    const disponibles = paradasDisponibles.filter(p => !paradasSeleccionadasIds.includes(p.id));
-    if (disponibles.length === 0) {
-        showToast('No hay paradas disponibles para agregar', 'warning');
-        return;
-    }
-    disponibles.forEach(p => paradasSeleccionadasIds.push(p.id));
-    renderizarListasParadas();
-    showToast(`${disponibles.length} parada(s) agregadas`, 'success');
-}
-
-function handleQuitarTodas() {
-    if (paradasSeleccionadasIds.length === 0) {
-        showToast('No hay paradas para quitar', 'warning');
-        return;
-    }
-    paradasSeleccionadasIds = [];
-    renderizarListasParadas();
-    showToast('Todas las paradas quitadas', 'success');
-}
-
-async function cargarSelectoresRuta() {
-    try {
-        const respLineas = await fetch('/admin/lineas', { credentials: 'include' });
-        const dataLineas = await respLineas.json();
-        if (dataLineas.success) {
-            lineas = dataLineas.data || [];
-            const select = document.getElementById('id_linea_ruta');
-            if (select) {
-                const currentValue = select.value;
-                select.innerHTML = '<option value="">Seleccione una línea...</option>';
-                lineas.forEach(linea => {
-                    const opt = document.createElement('option');
-                    opt.value = linea.id;
-                    opt.textContent = linea.nombre;
-                    select.appendChild(opt);
-                });
-                if (currentValue) select.value = currentValue;
-            }
-        }
-
-        const respParadas = await fetch('/admin/paradas-disponibles', { credentials: 'include' });
-        const dataParadas = await respParadas.json();
-        if (dataParadas.success) {
-            paradasDisponibles = dataParadas.data || [];
-            renderizarListasParadas();
-        }
-
-    } catch (error) {
-        console.error('Error al cargar selectores:', error);
-        showToast('Error al cargar líneas y paradas', 'error');
-    }
-}
-
-// ========== PAGINACIÓN Y BÚSQUEDA ==========
-
-function filtrarRutas() {
-    const busqueda = document.getElementById('searchRuta')?.value?.toLowerCase() || '';
-    const filterLinea = document.getElementById('filterLinea')?.value || '';
-    const filterEstado = document.getElementById('filterEstado')?.value || '';
-
-    rutasFiltradas = rutas.filter(ruta => {
-        const nombre = (ruta.nombre || '').toLowerCase();
-        const linea = ruta.linea_nombre || '';
-        const estado = ruta.status || '';
-
-        let coincide = true;
-        if (busqueda && !nombre.includes(busqueda)) coincide = false;
-        if (filterLinea && linea !== filterLinea) coincide = false;
-        if (filterEstado && estado !== filterEstado) coincide = false;
-        return coincide;
-    });
-
-    paginaActual = 1;
-    renderizarTablaRutas();
-    actualizarPaginacion();
-}
-
-function renderizarTablaRutas() {
-    const inicio = (paginaActual - 1) * registrosPorPagina;
-    const fin = inicio + registrosPorPagina;
-    const rutasPagina = rutasFiltradas.slice(inicio, fin);
-
-    const container = document.getElementById('tablaRutas');
-    if (!container) return;
-
-    if (rutasFiltradas.length === 0) {
-        container.innerHTML = `
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Línea</th>
-                        <th>Paradas</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="6" style="text-align: center; padding: 30px; color: var(--texto-claro);">
-                            No hay rutas que coincidan con la búsqueda
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        `;
-        return;
-    }
-
-    let html = `
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Línea</th>
-                    <th>Paradas</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-
-    rutasPagina.forEach(ruta => {
-        const rutaId = ruta.id || ruta.id_ruta;
-        if (!rutaId) return;
-
-        const statusClass = ruta.status === 'activa' ? 'active' : 'inactive';
-        const statusText = ruta.status === 'activa' ? 'Activa' : 'Inactiva';
-        const nombreLinea = ruta.linea_nombre || 'Sin línea';
-        const paradasCount = (ruta.paradas || []).length;
-
-        html += `
-            <tr>
-                <td>${rutaId}</td>
-                <td><strong>${ruta.nombre}</strong></td>
-                <td>${nombreLinea}</td>
-                <td>${paradasCount}</td>
-                <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                <td>
-                    <button class="btn-edit" onclick="editarRuta(${rutaId})" title="Editar">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn-delete" onclick="eliminarRuta(${rutaId})" title="Eliminar">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
-        `;
-    });
-
-    html += `</tbody></table>`;
-    container.innerHTML = html;
-}
-
-function actualizarPaginacion() {
-    const totalPaginas = Math.ceil(rutasFiltradas.length / registrosPorPagina) || 1;
-    const btnAnterior = document.getElementById('btnAnterior');
-    const btnSiguiente = document.getElementById('btnSiguiente');
-    const infoPagina = document.getElementById('infoPagina');
-
-    if (btnAnterior) btnAnterior.disabled = paginaActual <= 1;
-    if (btnSiguiente) btnSiguiente.disabled = paginaActual >= totalPaginas;
-    if (infoPagina) infoPagina.textContent = `Página ${paginaActual} de ${totalPaginas}`;
-}
-
-function irPagina(direccion) {
-    const totalPaginas = Math.ceil(rutasFiltradas.length / registrosPorPagina) || 1;
-    const nuevaPagina = paginaActual + direccion;
-    if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
-        paginaActual = nuevaPagina;
-        renderizarTablaRutas();
-        actualizarPaginacion();
-    }
-}
-
-// ========== CRUD ==========
-
-async function cargarRutas() {
-    try {
-        const response = await fetch('/admin/rutas/api', { credentials: 'include' });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data = await response.json();
-        
-        if (data.success && data.data) {
-            rutas = data.data || [];
-        } else {
-            rutas = [];
-        }
-
-        rutas = rutas.map(r => ({
-            ...r,
-            id: r.id || r.id_ruta || null
-        }));
-
-        rutasFiltradas = [...rutas];
-        renderizarTablaRutas();
-        actualizarPaginacion();
-        actualizarMapaPrincipal(rutas);
-
-    } catch (error) {
-        console.error('Error al cargar rutas:', error);
-        showToast('Error al cargar rutas', 'error');
-    }
-}
-
-async function editarRuta(id) {
-    if (!id) {
-        showToast('ID de ruta inválido', 'error');
-        return;
-    }
-    
-    try {
-        const response = await fetch(`/admin/rutas/${id}`, { credentials: 'include' });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data = await response.json();
-        if (!data.data) throw new Error('Datos inválidos');
-
-        const ruta = data.data;
-        editandoIdRuta = parseInt(id) || parseInt(ruta.id) || parseInt(ruta.id_ruta) || null;
-        await cargarSelectoresRuta();
-        abrirModalRuta('Editar Ruta', data.data);
-
-    } catch (error) {
-        console.error('Error al cargar ruta:', error);
-        showToast('Error al cargar la ruta', 'error');
-    }
-}
-
+// ============================================================
+// 5. ELIMINAR RUTA (DELETE)
+// ============================================================
 async function eliminarRuta(id) {
-    if (!id) {
-        showToast('ID de ruta inválido', 'error');
-        return;
+  if (!confirm(`¿Está seguro de eliminar la ruta ID: ${id}?`)) return;
+
+  try {
+    const response = await fetch(`/admin/rutas/${id}`, {
+      method: "DELETE",
+    });
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      mostrarNotificacion("Ruta eliminada exitosamente", "success");
+      cargarDatos();
+    } else {
+      mostrarNotificacion(result.message || "Error al eliminar", "danger");
     }
-    
-    const confirmado = await confirmDelete(
-        '¿Eliminar ruta?',
-        'Esta acción eliminará la ruta del sistema y no se podrá deshacer.',
-        'Sí, eliminar'
-    );
-
-    if (!confirmado) return;
-
-    try {
-        const response = await fetch(`/admin/rutas/${id}`, {
-            method: 'DELETE',
-            credentials: 'include'
-        });
-        const data = await response.json();
-
-        if (response.ok && data.success) {
-            showToast('Ruta eliminada exitosamente', 'success');
-            cargarRutas();
-        } else {
-            const msg = data.error || data.message || 'No se puede eliminar la ruta debido a dependencias con el sistema.';
-            showAlert('No se puede eliminar', msg, 'error');
-        }
-    } catch (error) {
-        console.error('Error al eliminar ruta:', error);
-        showToast('Error de conexión al servidor', 'error');
-    }
+  } catch (error) {
+    console.error("Error al eliminar ruta:", error);
+    mostrarNotificacion("Error de conexión al servidor", "danger");
+  }
 }
 
-// ========== INICIALIZACIÓN Y EVENTOS ==========
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar mapa principal
-    inicializarMapaPrincipal();
-
-    // Expandir mapa
-    const btnExpandir = document.getElementById('btnExpandirMapa');
-    if (btnExpandir) btnExpandir.addEventListener('click', toggleExpandirMapa);
-
-    // Filtros
-    document.getElementById('searchRuta')?.addEventListener('input', filtrarRutas);
-    document.getElementById('filterLinea')?.addEventListener('change', filtrarRutas);
-    document.getElementById('filterEstado')?.addEventListener('change', filtrarRutas);
-
-    // Paginación
-    document.getElementById('btnAnterior')?.addEventListener('click', function() { irPagina(-1); });
-    document.getElementById('btnSiguiente')?.addEventListener('click', function() { irPagina(1); });
-
-    // Formulario
-    const formRuta = document.getElementById('formNuevaRuta');
-    if (formRuta) {
-        formRuta.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            if (loadingRuta) return;
-            loadingRuta = true;
-            
-            const btnGuardar = document.getElementById('guardarRutaBtn');
-            if (btnGuardar) btnGuardar.disabled = true;
-
-            const datos = {
-                nombre: document.getElementById('nombre_ruta').value.trim(),
-                id_linea: parseInt(document.getElementById('id_linea_ruta').value),
-                status: document.getElementById('status_ruta').value,
-                paradas_ids: paradasSeleccionadasIds
-            };
-
-            if (!datos.nombre) {
-                showToast('El nombre es obligatorio', 'error');
-                loadingRuta = false;
-                if (btnGuardar) btnGuardar.disabled = false;
-                return;
-            }
-
-            if (!datos.id_linea) {
-                showToast('Debes seleccionar una línea', 'error');
-                loadingRuta = false;
-                if (btnGuardar) btnGuardar.disabled = false;
-                return;
-            }
-
-            if (datos.paradas_ids.length === 0) {
-                showToast('Debes seleccionar al menos una parada', 'error');
-                loadingRuta = false;
-                if (btnGuardar) btnGuardar.disabled = false;
-                return;
-            }
-
-            const url = editandoIdRuta ? `/admin/rutas/${editandoIdRuta}` : '/admin/rutas';
-            const method = editandoIdRuta ? 'PUT' : 'POST';
-
-            try {
-                const response = await fetch(url, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify(datos)
-                });
-
-                const data = await response.json();
-
-                if (response.ok && data.success) {
-                    showToast(editandoIdRuta ? 'Ruta actualizada' : 'Ruta creada exitosamente', 'success');
-                    cerrarModalRuta();
-                    cargarRutas();
-                } else {
-                    const msg = data.error || data.message || 'Error al guardar la ruta';
-                    showAlert('Error en la operación', msg, 'error');
-                }
-            } catch (error) {
-                console.error('Error al guardar ruta:', error);
-                showToast('Error de conexión al servidor', 'error');
-            } finally {
-                loadingRuta = false;
-                if (btnGuardar) btnGuardar.disabled = false;
-            }
-        });
-    }
-
-    // Botón nueva ruta
-    const btnNueva = document.getElementById('btnNuevaRuta');
-    if (btnNueva) {
-        btnNueva.addEventListener('click', function() {
-            cargarSelectoresRuta();
-            abrirModalRuta('Nueva Ruta');
-        });
-    }
-
-    window.onclick = function(event) {
-        const modal = document.getElementById('modalNuevaRuta');
-        if (event.target === modal) {
-            cerrarModalRuta();
+// ============================================================
+// 6. CARGAR DATOS (rutas y líneas) - SIN BORRAR ESTÁTICOS
+// ============================================================
+function cargarDatos() {
+  // Obtener rutas (usando el endpoint correcto)
+  fetch("/admin/rutas/api")
+    .then((response) => {
+      if (!response.ok) throw new Error("Error al cargar rutas");
+      return response.json();
+    })
+    .then((data) => {
+      if (data.success) {
+        const lista = data.data || [];
+        // Solo renderizar si HAY datos reales (si no, mantener los estáticos)
+        if (lista.length > 0) {
+          rutas = lista;
+          renderizarRutas(rutas);
+          actualizarKPIs(rutas);
+        } else {
+          // No hay datos, mantener los estáticos, pero actualizar KPIs con ceros
+          console.log(
+            "No hay rutas en el backend, se mantienen los estáticos.",
+          );
+          // Opcional: puedes actualizar KPIs a 0 o dejarlos como están
+          // actualizarKPIs([]);
         }
-    };
-
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            const modal = document.getElementById('modalNuevaRuta');
-            if (modal && modal.classList.contains('show')) {
-                cerrarModalRuta();
-            }
-        }
+      }
+    })
+    .catch((error) => {
+      console.error("Error al cargar rutas:", error);
+      mostrarNotificacion(
+        "No se pudieron cargar las rutas del servidor. Mostrando datos de prueba.",
+        "warning",
+      );
     });
 
-    cargarRutas();
+  // Obtener líneas para el filtro (siempre se actualiza)
+  fetch("/admin/lineas")
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        lineas = data.data || [];
+        llenarFiltroLineas(lineas);
+      }
+    })
+    .catch((error) => console.error("Error al cargar líneas:", error));
+}
+
+// ============================================================
+// 7. RENDERIZAR TARJETAS DE RUTAS (REEMPLAZA las estáticas)
+// ============================================================
+function renderizarRutas(listaRutas) {
+  const grid = document.getElementById("rutasGrid");
+  if (!grid) return;
+
+  // Si no hay rutas, NO BORRAMOS los estáticos, simplemente no hacemos nada.
+  if (listaRutas.length === 0) {
+    console.log("No se renderizan tarjetas porque no hay datos.");
+    return;
+  }
+
+  let html = "";
+  listaRutas.forEach((ruta) => {
+    const statusClass = ruta.status === "activa" ? "active" : "inactive";
+    const statusText = ruta.status === "activa" ? "Activa" : "Inactiva";
+    const nombreLinea = ruta.linea ? ruta.linea.nombre : "Sin línea";
+
+    html += `
+        <div class="ruta-card">
+            <div class="ruta-header">
+                <div class="ruta-title">
+                    <i class="fas fa-route"></i>
+                    <h3>${ruta.nombre}</h3>
+                </div>
+                <div class="ruta-header-right">
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                    <button class="btn-expand" data-id="${ruta.id_ruta}">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="ruta-expandable" id="expandable-${ruta.id_ruta}" style="display: none">
+                <div class="ruta-info">
+                    <div class="info-row">
+                        <span class="info-label">Línea</span>
+                        <span class="info-value">${nombreLinea}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">ID</span>
+                        <span class="info-value">#${ruta.id_ruta}</span>
+                    </div>
+                </div>
+                <div class="ruta-footer">
+                    <button class="btn-ver" data-id="${ruta.id_ruta}">
+                        Ver detalle <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        `;
+  });
+
+  grid.innerHTML = html;
+  inicializarExpandibles();
+  asignarEventosRutas();
+}
+
+// ============================================================
+// 8. ACTUALIZAR KPIs
+// ============================================================
+function actualizarKPIs(listaRutas) {
+  const total = listaRutas.length;
+  const activas = listaRutas.filter((r) => r.status === "activa").length;
+  document.getElementById("totalRutas").textContent = total;
+  document.getElementById("rutasActivas").textContent = activas;
+
+  // Puedes agregar fetch para paradas y buses si los endpoints existen
+  // fetch('/admin/paradas').then(...)
+  // fetch('/admin/buses').then(...)
+}
+
+// ============================================================
+// 9. LLENAR FILTRO DE LÍNEAS
+// ============================================================
+function llenarFiltroLineas(listaLineas) {
+  const select = document.getElementById("filterLinea");
+  if (!select) return;
+  select.innerHTML = `<option value="">Todas las líneas</option>`;
+  listaLineas.forEach((linea) => {
+    const option = document.createElement("option");
+    option.value = linea.id_linea;
+    option.textContent = linea.nombre;
+    select.appendChild(option);
+  });
+}
+
+// ============================================================
+// 10. EVENTOS DE EXPANSIÓN (acordeón)
+// ============================================================
+function inicializarExpandibles() {
+  document.querySelectorAll(".btn-expand").forEach((btn) => {
+    btn.removeEventListener("click", handleExpand);
+    btn.addEventListener("click", handleExpand);
+  });
+}
+
+function handleExpand(e) {
+  e.stopPropagation();
+  const id = this.getAttribute("data-id");
+  const expandable = document.getElementById(`expandable-${id}`);
+  const icon = this.querySelector("i");
+  if (!expandable) return;
+  if (expandable.style.display === "none") {
+    expandable.style.display = "block";
+    if (icon) icon.style.transform = "rotate(180deg)";
+  } else {
+    expandable.style.display = "none";
+    if (icon) icon.style.transform = "rotate(0deg)";
+  }
+}
+
+// ============================================================
+// 11. ASIGNAR EVENTOS A BOTONES DE LAS TARJETAS
+// ============================================================
+function asignarEventosRutas() {
+  // Botones "Ver detalle"
+  document.querySelectorAll(".btn-ver").forEach((btn) => {
+    btn.removeEventListener("click", handleVerDetalle);
+    btn.addEventListener("click", handleVerDetalle);
+  });
+}
+
+function handleVerDetalle(e) {
+  e.stopPropagation();
+  const id = this.getAttribute("data-id");
+  // Aquí puedes abrir un modal de detalle o redirigir
+  alert(`Ver detalle de ruta ID: ${id} (en desarrollo)`);
+}
+
+// ============================================================
+// 12. FILTROS Y BÚSQUEDA
+// ============================================================
+function aplicarFiltros() {
+  const searchTerm =
+    document.getElementById("searchRuta")?.value?.toLowerCase() || "";
+  const filterLinea = document.getElementById("filterLinea")?.value || "";
+  const filterEstado = document.getElementById("filterEstado")?.value || "";
+
+  const cards = document.querySelectorAll(".ruta-card");
+  cards.forEach((card) => {
+    const title =
+      card.querySelector(".ruta-title h3")?.textContent?.toLowerCase() || "";
+    const lineaElement = card.querySelector(
+      ".info-row:first-child .info-value",
+    );
+    const linea = lineaElement ? lineaElement.textContent : "";
+    const statusSpan = card.querySelector(".status-badge");
+    const estado = statusSpan ? statusSpan.textContent : "";
+
+    let visible = true;
+    if (searchTerm && !title.includes(searchTerm)) visible = false;
+    if (
+      filterLinea &&
+      linea !== filterLinea &&
+      !card.querySelector(`[data-linea-id="${filterLinea}"]`)
+    )
+      visible = false;
+    if (filterEstado) {
+      if (filterEstado === "Activas" && estado !== "Activa") visible = false;
+      if (
+        filterEstado === "Inactivas" &&
+        estado !== "Inactiva" &&
+        estado !== "Mantenimiento"
+      )
+        visible = false;
+    }
+    card.style.display = visible ? "block" : "none";
+  });
+}
+
+// ============================================================
+// 13. INICIALIZACIÓN
+// ============================================================
+document.addEventListener("DOMContentLoaded", function () {
+  // Botón "Nueva Ruta"
+  const nuevaRutaBtn = document.getElementById("nuevaRutaBtn");
+  if (nuevaRutaBtn) {
+    nuevaRutaBtn.onclick = function () {
+      editandoIdRuta = null;
+      abrirModalRuta();
+    };
+  }
+
+  // Formulario (submit)
+  const form = document.getElementById("formNuevaRuta");
+  if (form) {
+    form.onsubmit = guardarRuta;
+  }
+
+  // Cerrar modal al hacer clic fuera
+  window.onclick = function (event) {
+    const modal = document.getElementById("modalNuevaRuta");
+    if (event.target === modal) {
+      cerrarModalRuta();
+    }
+  };
+
+  // Cerrar con tecla Escape
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      const modal = document.getElementById("modalNuevaRuta");
+      if (modal.classList.contains("show")) {
+        cerrarModalRuta();
+      }
+    }
+  });
+
+  // Eventos de filtros
+  document
+    .getElementById("searchRuta")
+    ?.addEventListener("input", aplicarFiltros);
+  document
+    .getElementById("filterLinea")
+    ?.addEventListener("change", aplicarFiltros);
+  document
+    .getElementById("filterEstado")
+    ?.addEventListener("change", aplicarFiltros);
+
+  // Cargar datos iniciales
+  cargarDatos();
 });

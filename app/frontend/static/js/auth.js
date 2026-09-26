@@ -289,24 +289,53 @@ if (loginForm) {
     const password = document.getElementById("password").value;
 
     try {
+      console.log("Llamando al api");
       const response = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ email, password }),
       });
+      console.log("asinnando la repuesta a la variable al api");
+
       const data = await response.json(); // Solo una vez
+      console.log("datos, mensaje>>>>>>>>>", data.message);
 
       if (response.ok) {
+        console.log("LA respuesta es ok los datos son >>>>>>>>>>>>>>", data);
+
+        if (data.data && data.data.access_token) {
+          console.log("Hay datos y hat acces token");
+
+          localStorage.setItem("access_token", data.data.access_token);
+        }
+
         if (data.data && data.data.rol) {
+          console.log("Hay datos y hay rol");
+
           localStorage.setItem("user_rol", data.data.rol);
           document.body.setAttribute("data-user-rol", data.data.rol);
         }
+        //GUARDAR Y APLICAR TEMA desde el backend
+        if (data.data && data.data.tema) {
+          console.log("Hay datos y tema");
+
+          const tema = data.data.tema;
+          localStorage.setItem("theme", tema);
+          // Aplicar inmediatamente
+          if (tema === "oscuro") {
+            document.body.classList.add("dark-mode");
+          } else {
+            document.body.classList.remove("dark-mode");
+          }
+        }
+        console.log("datos>>>>>>>>>", data);
         window.location.href = data.data?.redirect || "/admin/dashboard";
       } else {
         showToast(data.message || "Error al iniciar sesión", "error");
       }
     } catch (error) {
+      console.log("datos>>>>>>>>>", data);
       console.error("Error de conexión:", error);
       showToast("No se pudo conectar con el servidor", "error");
     }

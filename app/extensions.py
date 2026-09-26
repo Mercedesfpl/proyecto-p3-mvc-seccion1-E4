@@ -16,7 +16,7 @@ mail = Mail()
 socketio = SocketIO()
 limiter = Limiter(key_func=get_remote_address)
 jwt = JWTManager()
-cors = CORS(supports_credentials=True)
+cors = CORS()
 
 
 # ==============================================================================

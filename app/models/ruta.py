@@ -1,5 +1,3 @@
-# app/models/ruta.py
-
 from app.extensions import db
 
 class Ruta(db.Model):
@@ -15,10 +13,8 @@ class Ruta(db.Model):
     
     def to_dict(self):
         return {
-            "id": self.id,
+            "id_ruta": self.id,
             "nombre": self.nombre,
             "status": self.status,
-            "id_linea": self.id_linea,
-            "linea_nombre": self.linea.nombre if self.linea else None,
-            "paradas": []
+            "id_linea": self.id_linea
         }

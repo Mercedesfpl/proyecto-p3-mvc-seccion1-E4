@@ -1,8 +1,13 @@
 # admin.py
 from flask import Blueprint, url_for, redirect, render_template, jsonify, request
 
-from flask_jwt_extended import jwt_required, get_jwt
-from ..controllers import userControllers, lineaControllers, busControllers, rutaControllers
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from ..controllers import (
+    userControllers,
+    lineaControllers,
+    busControllers,
+    rutaControllers,
+)
 from app.decorators.role_decorator import role_required
 
 admin_scope = Blueprint("admin", __name__)
@@ -39,10 +44,12 @@ def rutas_show():
 def perfil_show():
     return userControllers.show_miPerfil()
 
+
 @admin_scope.route("/configuración", methods=["GET"])
 @jwt_required()
 def configuracion_show():
     return userControllers.show_configuracion()
+
 
 @admin_scope.route("/form-muestra", methods=["GET"])
 @jwt_required()
@@ -91,7 +98,7 @@ def get_linea(id_linea):
 def create_linea():
 
     data = request.get_json()
-    return lineaControllers.create_linea()
+    return lineaControllers.create_linea(data)
 
 
 @admin_scope.route("/lineas/<int:id_linea>", methods=["PUT"])
@@ -100,7 +107,7 @@ def create_linea():
 def update_linea(id_linea):
 
     data = request.get_json()
-    return lineaControllers.update_linea(id_linea)
+    return lineaControllers.update_linea(id_linea, data)
 
 
 @admin_scope.route("/lineas/<int:id_linea>", methods=["DELETE"])
@@ -200,12 +207,6 @@ def get_paradas():
 
     return get_all_paradas()
 
-@admin_scope.route("/paradas-disponibles", methods=["GET"])
-@jwt_required()
-@role_required("admin")
-def get_paradas_disponibles():
-    from app.controllers.paradaControllers import get_paradas_disponibles
-    return get_paradas_disponibles()
 
 @admin_scope.route("/paradas/<int:id_parada>", methods=["GET"])
 @jwt_required()
@@ -224,6 +225,7 @@ def create_parada():
     from app.controllers.paradaControllers import create_parada
 
     data = request.get_json()
+    print("datos en el la ruta de parad", data)
     return create_parada(data)
 
 
@@ -235,7 +237,7 @@ def update_parada(id_parada):
     from app.controllers.paradaControllers import update_parada
 
     data = request.get_json()
-    return update_parada(id_parada)
+    return update_parada(id_parada, data)
 
 
 @admin_scope.route("/paradas/<int:id_parada>", methods=["DELETE"])
@@ -253,30 +255,40 @@ def delete_parada(id_parada):
 def paradas_page():
     return render_template("pages/paradas.html")
 
-# ========== CRUD DE BUSES (FLOTA) ==========
+
+# ******************** CRUD DE BUSES (FLOTAS)*********************
+
 
 @admin_scope.route("/buses", methods=["GET"])
 @jwt_required()
 @role_required("admin")
 def get_buses():
     from app.controllers.busControllers import get_all_buses
+
     return get_all_buses()
+
 
 @admin_scope.route("/buses/<int:id_vehiculo>", methods=["GET"])
 @jwt_required()
 @role_required("admin")
 def get_bus(id_vehiculo):
     from app.controllers.busControllers import get_bus_by_id
+
     return get_bus_by_id(id_vehiculo)
 
-@admin_scope.route("/buses", methods=["POST"])
+
+@admin_scope.route("/save-bus", methods=["POST"])
 @jwt_required()
 @role_required("admin")
 def create_bus():
-    from flask import request
+
     from app.controllers.busControllers import create_bus
+
     data = request.get_json()
+    user_id = get_jwt_identity()
+    print("Id-------en ruta------>", user_id)
     return create_bus(data)
+
 
 @admin_scope.route("/buses/<int:id_vehiculo>", methods=["PUT"])
 @jwt_required()
@@ -284,156 +296,69 @@ def create_bus():
 def update_bus(id_vehiculo):
     from flask import request
     from app.controllers.busControllers import update_bus
+
     data = request.get_json()
     return update_bus(id_vehiculo, data)
+
 
 @admin_scope.route("/buses/<int:id_vehiculo>", methods=["DELETE"])
 @jwt_required()
 @role_required("admin")
 def delete_bus(id_vehiculo):
     from app.controllers.busControllers import delete_bus
+
     return delete_bus(id_vehiculo)
 
-@admin_scope.route("/flota-page", methods=["GET"])
-@jwt_required()
-@role_required("admin")
-def flota_page():
-    return render_template("pages/flota.html")
 
-#*********************************** CRUD DE RUTAS**********************************
+# *********************************** CRUD DE RUTAS**********************************
 
-@admin_scope.route("/rutas/api", methods=["GET"])  # Usamos /rutas/api para no chocar con la vista
+
+@admin_scope.route(
+    "/rutas/api", methods=["GET"]
+)  # Usamos /rutas/api para no chocar con la vista
 @jwt_required()
-@role_required("admin")
+# @role_required("admin")
 def get_rutas_api():
     from app.controllers.rutaControllers import get_all_rutas
+
     return get_all_rutas()
+
 
 @admin_scope.route("/rutas/<int:id_ruta>", methods=["GET"])
 @jwt_required()
-@role_required("admin")
+# @role_required("admin")
 def get_ruta(id_ruta):
     from app.controllers.rutaControllers import get_ruta_by_id
+
     return get_ruta_by_id(id_ruta)
+
 
 @admin_scope.route("/rutas", methods=["POST"])
 @jwt_required()
-@role_required("admin")
+# @role_required("admin")
 def create_ruta():
     from flask import request
     from app.controllers.rutaControllers import create_ruta
+
     data = request.get_json()
-    return create_ruta()
+    return create_ruta(data)
+
 
 @admin_scope.route("/rutas/<int:id_ruta>", methods=["PUT"])
 @jwt_required()
-@role_required("admin")
+# @role_required("admin")
 def update_ruta(id_ruta):
     from flask import request
     from app.controllers.rutaControllers import update_ruta
+
     data = request.get_json()
-    return update_ruta(id_ruta)
+    return update_ruta(id_ruta, data)
+
 
 @admin_scope.route("/rutas/<int:id_ruta>", methods=["DELETE"])
 @jwt_required()
-@role_required("admin")
+# @role_required("admin")
 def delete_ruta(id_ruta):
     from app.controllers.rutaControllers import delete_ruta
+
     return delete_ruta(id_ruta)
-
-# ========== CRUD DE DETECCIONES ==========
-
-@admin_scope.route("/detecciones", methods=["GET"])
-@jwt_required()
-@role_required("admin")
-def get_detecciones():
-    from app.controllers.deteccionControllers import get_all_detecciones
-    return get_all_detecciones()
-
-@admin_scope.route("/detecciones/<int:id_deteccion>", methods=["GET"])
-@jwt_required()
-@role_required("admin")
-def get_deteccion(id_deteccion):
-    from app.controllers.deteccionControllers import get_deteccion_by_id
-    return get_deteccion_by_id(id_deteccion)
-
-@admin_scope.route("/detecciones/vehiculo/<int:id_vehiculo>", methods=["GET"])
-@jwt_required()
-@role_required("admin")
-def get_detecciones_vehiculo(id_vehiculo):
-    from app.controllers.deteccionControllers import get_detecciones_by_vehiculo
-    return get_detecciones_by_vehiculo(id_vehiculo)
-
-@admin_scope.route("/detecciones/parada/<int:id_parada>", methods=["GET"])
-@jwt_required()
-@role_required("admin")
-def get_detecciones_parada(id_parada):
-    from app.controllers.deteccionControllers import get_detecciones_by_parada
-    return get_detecciones_by_parada(id_parada)
-
-@admin_scope.route("/detecciones/alertas", methods=["GET"])
-@jwt_required()
-@role_required("admin")
-def get_alertas():
-    from app.controllers.deteccionControllers import get_alertas
-    return get_alertas()
-
-@admin_scope.route("/detecciones", methods=["POST"])
-@jwt_required()
-@role_required("admin")
-def create_deteccion():
-    from flask import request
-    from app.controllers.deteccionControllers import create_deteccion
-    data = request.get_json()
-    return create_deteccion()
-
-@admin_scope.route("/detecciones/<int:id_deteccion>", methods=["DELETE"])
-@jwt_required()
-@role_required("admin")
-def delete_deteccion(id_deteccion):
-    from app.controllers.deteccionControllers import delete_deteccion
-    return delete_deteccion(id_deteccion)
-
-# ========== CRUD BÁSICO ESP32 ==========
-
-@admin_scope.route("/esp32", methods=["GET"])
-@jwt_required()
-@role_required("admin")
-def get_esp32():
-    from app.controllers.esp32Controllers import get_all_esp32
-    return get_all_esp32()
-
-@admin_scope.route("/esp32/<int:id_esp32>", methods=["GET"])
-@jwt_required()
-@role_required("admin")
-def get_esp32_id(id_esp32):
-    from app.controllers.esp32Controllers import get_esp32_by_id
-    return get_esp32_by_id(id_esp32)
-
-@admin_scope.route("/esp32", methods=["POST"])
-@jwt_required()
-@role_required("admin")
-def create_esp32():
-    from app.controllers.esp32Controllers import create_esp32
-    return create_esp32()
-
-@admin_scope.route("/esp32/<int:id_esp32>", methods=["PUT"])
-@jwt_required()
-@role_required("admin")
-def update_esp32(id_esp32):
-    from app.controllers.esp32Controllers import update_esp32
-    return update_esp32(id_esp32)
-
-@admin_scope.route("/esp32/<int:id_esp32>", methods=["DELETE"])
-@jwt_required()
-@role_required("admin")
-def delete_esp32(id_esp32):
-    from app.controllers.esp32Controllers import delete_esp32
-    return delete_esp32(id_esp32)
-
-# Vista de la página
-@admin_scope.route("/esp32-page", methods=["GET"])
-@jwt_required()
-@role_required("admin")
-def esp32_page():
-    return render_template("pages/esp32.html")

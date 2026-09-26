@@ -1,6 +1,6 @@
 # app/controllers/userControllers.py
 from flask import jsonify, request, render_template, make_response
-from flask_jwt_extended import get_jwt_identity, create_access_token
+from flask_jwt_extended import get_jwt_identity, set_access_cookies
 from app.services.userService import UserService
 from app.repositories.userRepository import UserRepository
 from app.models.userModels import UserSession
@@ -27,6 +27,7 @@ def login(usuario):
             raise UserNotFound("Usuario no registrado")
 
         access_token = result.get("access_token")
+        refresh_token = result.get("refresh_token")
 
         if not access_token:
             raise Exception("No se pudo obtener el token de acceso")
@@ -38,24 +39,21 @@ def login(usuario):
         else:
             redirect_url = "/home"
 
-        # Construir response_body ANTES de imprimirlo
+        # 4. Construir response_body ANTES de imprimirlo
         response_body = {
             "success": True,
             "message": "Login exitoso",
-            "data": {"redirect": redirect_url, "rol": user.rol, "nombre": user.nombre},
-            "token": access_token,
+            "data": {
+                "redirect": redirect_url,
+                "rol": user.rol,
+                "tema": user.tema or "claro",
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+            },
         }
 
         response = make_response(jsonify(response_body), 200)
-
-        response.set_cookie(
-            "access_token",
-            access_token,
-            httponly=True,
-            secure=False,
-            samesite="Lax",
-            path="/",
-        )
+        set_access_cookies(response, access_token)
 
         return response
 
@@ -63,9 +61,7 @@ def login(usuario):
         import traceback
 
         print("Error inesperado:", traceback.format_exc())
-        return error_response(
-            error=str(e), message="Error al iniciar sesión", status_code=500
-        )
+        return error_response(error=str(e), message=f"{e}", status_code=500)
 
     except UserNotFound as e:
         return error_response(
