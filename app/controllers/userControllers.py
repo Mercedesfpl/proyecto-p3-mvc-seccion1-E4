@@ -256,6 +256,8 @@ def show_miPerfil():
 def show_configuracion():
     return render_template("pages/configuracion.html")
 
+def show_esp32():
+    return render_template("pages/esp32.html")
 
 # ========== OPCIONES DE PERFIL DE USUARIO ==========
 

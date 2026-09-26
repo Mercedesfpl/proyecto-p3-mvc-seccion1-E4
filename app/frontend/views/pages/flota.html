@@ -11,7 +11,7 @@
 {% block content %}
 <div class="page-header">
     <h1>Gestión de Flota</h1>
-    <button class="btn-add" id="btnNuevaUnidad">
+    <button class="btn-add" id="nuevaUnidadBtn">
         <i class="fas fa-plus"></i> Nueva Unidad
     </button>
 </div>
@@ -33,7 +33,51 @@
             </select>
         </div>
     </div>
-    <div id="tablaUnidades"></div>
+    <div class="tabla-container">
+    <div class="tabla-toolbar">
+        <div class="tabla-busqueda">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchUnidad" placeholder="Buscar por placa o línea...">
+        </div>
+        <div class="filter-group">
+            <select class="filter-select" id="filterLinea">
+                <option value="">Todas las líneas</option>
+            </select>
+            <select class="filter-select" id="filterEstado">
+                <option value="">Todos los estados</option>
+                <option value="activa">Activa</option>
+                <option value="inactiva">Inactiva</option>
+            </select>
+        </div>
+    </div>
+
+    <table class="tabla-unidades">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Placa</th>
+                <th>Línea / Ruta</th>
+                <th>Secretario</th>
+                <th>Estado</th>
+                <th>Ubicación</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="unidadesTableBody">
+            <!-- Aquí se llenan los buses -->
+        </tbody>
+    </table>
+
+    <div class="tabla-paginacion" id="paginacionUnidades">
+        <button id="btnAnterior" disabled>
+            <i class="fas fa-chevron-left"></i> Anterior
+        </button>
+        <span class="info-pagina" id="infoPagina">Página 1 de 1</span>
+        <button id="btnSiguiente" disabled>
+            Siguiente <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+</div>
     <div class="tabla-paginacion" id="paginacionUnidades">
         <button id="btnAnterior" disabled>
             <i class="fas fa-chevron-left"></i> Anterior
@@ -87,7 +131,7 @@
                 La placa debe ser única.
             </div>
 
-            <button type="submit" class="btn-guardar" id="guardarUnidadBtn">
+            <button class="btn-add" id="nuevaRutaBtn">
                 <i class="fas fa-save"></i> Guardar Unidad
             </button>
         </form>
