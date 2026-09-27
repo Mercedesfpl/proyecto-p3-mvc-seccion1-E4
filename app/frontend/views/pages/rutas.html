@@ -14,7 +14,7 @@
 {% block content %}
 <div class="page-header">
     <h1>Gestión de Rutas</h1>
-    <button class="btn-add" id="nuevaRutaBtn">
+    <button class="btn-add" id="btnNuevaRuta">
         <i class="fas fa-plus"></i> Nueva Ruta
     </button>
 </div>
@@ -39,21 +39,7 @@
                     </select>
                 </div>
             </div>
-            <table class="tabla-rutas">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Línea</th>
-                        <th>Paradas</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="rutasTableBody">
-                    <!-- Aquí se llenan las rutas -->
-                </tbody>
-            </table>
+            <div id="tablaRutas"></div>
             <div class="tabla-paginacion" id="paginacionRutas">
                 <button id="btnAnterior" disabled>
                     <i class="fas fa-chevron-left"></i> Anterior

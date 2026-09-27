@@ -1,5 +1,94 @@
 /* frontend/static/css/pages/paradas.css */
 
+/* ============================================
+   LAYOUT PARADAS (mapa a la derecha)
+   ============================================ */
+.layout-mapa-derecha {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.tabla-wrapper {
+    flex: 1.3;
+    min-width: 0;
+}
+
+.mapa-wrapper {
+    flex: 1;
+    min-width: 0;
+}
+
+.mapa-container {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+.mapa-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #eaecef;
+}
+
+.mapa-header h3 {
+    font-size: 15px;
+    color: #1a3a5c;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.mapa-acciones {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mapa-contador {
+    font-size: 12px;
+    color: #6b7280;
+    background: #f0f2f5;
+    padding: 3px 10px;
+    border-radius: 12px;
+}
+
+.btn-expandir {
+    background: #f0f2f5;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.btn-expandir:hover {
+    background: #e1e5eb;
+}
+
+.mapa-principal {
+    height: 540px;
+    width: 100%;
+    transition: height 0.3s ease;
+}
+
+.mapa-principal.expanded {
+    height: 780px;
+}
+
+/* ============================================
+   MODAL NUEVA/EDITAR PARADA
+   ============================================ */
+#paradaModal .modal-content {
+    max-width: 600px;
+    width: 90%;
+}
+
 .coordenadas-input-wrapper {
     display: flex;
     gap: 8px;
@@ -8,18 +97,22 @@
 
 .coordenadas-input-wrapper input {
     flex: 1;
+    padding: 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 13px;
 }
 
 .btn-mapa {
-    background: var(--azul);
+    background: #1a73e8;
     color: white;
-    padding: 10px 16px;
-    border-radius: 40px;
+    padding: 8px 14px;
+    border-radius: 6px;
     border: none;
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
-    transition: var(--transition);
+    transition: background 0.15s;
     white-space: nowrap;
     display: inline-flex;
     align-items: center;
@@ -27,20 +120,20 @@
 }
 
 .btn-mapa:hover {
-    background: var(--azul-oscuro);
+    background: #1660c9;
 }
 
 #map-container {
     height: 250px;
     width: 100%;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--borde);
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
     margin-top: 8px;
 }
 
 .mapa-ayuda {
     font-size: 12px;
-    color: var(--texto-claro);
+    color: #6b7280;
     margin-top: 6px;
     display: flex;
     align-items: center;
@@ -48,5 +141,163 @@
 }
 
 .required {
-    color: var(--rojo);
+    color: #dc2626;
+}
+
+/* ============================================
+   MODAL VER PARADA (igual que Flota/Rutas)
+   ============================================ */
+.detalle-parada {
+    padding: 6px 4px;
+}
+
+.detalle-parada .detalle-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    background: #f0f7ff;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.detalle-parada .detalle-icono {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #1a73e8;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.detalle-parada .detalle-titulo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.detalle-parada .detalle-id {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a3a5c;
+    letter-spacing: 0.5px;
+}
+
+.detalle-parada .detalle-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.detalle-parada .detalle-item {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 12px;
+    background: #fafbfc;
+    border: 1px solid #eaecef;
+    border-radius: 8px;
+}
+
+.detalle-parada .detalle-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.detalle-parada .detalle-label i {
+    color: #1a73e8;
+    font-size: 12px;
+}
+
+.detalle-parada .detalle-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+    word-break: break-word;
+}
+
+.detalle-parada .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1px solid #eaecef;
+}
+
+.btn-editar-ver {
+    background: #1a73e8;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s;
+}
+
+.btn-editar-ver:hover {
+    background: #1660c9;
+}
+
+.btn-cerrar {
+    background: #f0f2f5;
+    color: #333;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s;
+}
+
+.btn-cerrar:hover {
+    background: #e1e5eb;
+}
+
+/* ============================================
+   MODO OSCURO
+   ============================================ */
+body.dark-mode .mapa-container {
+    background: #1c1f24;
+}
+body.dark-mode .mapa-header {
+    border-bottom-color: #2c3138;
+}
+body.dark-mode .mapa-header h3 {
+    color: #e5eefc;
+}
+body.dark-mode .mapa-contador,
+body.dark-mode .btn-expandir {
+    background: #2c3138;
+    color: #e5e7eb;
+}
+body.dark-mode .detalle-parada .detalle-header {
+    background: #1e2a3a;
+}
+body.dark-mode .detalle-parada .detalle-id {
+    color: #e5eefc;
+}
+body.dark-mode .detalle-parada .detalle-item {
+    background: #1c1f24;
+    border-color: #2c3138;
+}
+body.dark-mode .detalle-parada .detalle-value {
+    color: #e5e7eb;
+}
+body.dark-mode .detalle-parada .detalle-label {
+    color: #9ca3af;
 }

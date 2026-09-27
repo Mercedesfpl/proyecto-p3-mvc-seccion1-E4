@@ -369,6 +369,13 @@ async function verUnidad(id) {
     document.getElementById("verBusUbicacion").textContent  = bus.ubicacion || "No asignada";
     document.getElementById("verBusFecha").textContent      = fechaCreacion;
 
+        const estadoBadge = document.getElementById("verBusEstadoBadge");
+        if (estadoBadge) {
+          estadoBadge.className = "status-badge";
+          if (bus.status === "activa")         estadoBadge.classList.add("status-active");
+          else if (bus.status === "inactiva")  estadoBadge.classList.add("status-inactive");
+          else                                  estadoBadge.classList.add("status-warning");
+        }
     // Mostrar modal
     document.getElementById("modalVerUnidad").classList.add("show");
   } catch (error) {
