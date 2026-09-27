@@ -8,7 +8,7 @@ class Bus(db.Model):
     id_vehiculo = db.Column(db.Integer, primary_key=True)
     placa = db.Column(db.String(15), unique=True, nullable=False)
     status = db.Column(db.String(20), default="activa")
-    ubicacion = db.Column(db.String(150), nullable=True)   # NUEVO (opcional)
+    ubicacion = db.Column(db.String(150), nullable=True)   # NUEVO (opcional ???)
     created_at = db.Column(db.DateTime, default=datetime.now)
 
     id_ruta = db.Column(db.Integer, db.ForeignKey("rutas.id"), nullable=True)

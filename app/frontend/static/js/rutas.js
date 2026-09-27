@@ -124,7 +124,7 @@ incluyen los headers de autorizacion ver paso 3
 
       headers: {
         "Content-Type": "application/json",
-        "X-CSRF-TOKEN": csrfToken, // 🔑 valor real, no "undefined"
+        "X-CSRF-TOKEN": csrfToken, //  valor real, no "undefined"
       },
       body: JSON.stringify(data),
     });

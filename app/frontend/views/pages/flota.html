@@ -33,33 +33,14 @@
             </select>
         </div>
     </div>
-    <div class="tabla-container">
-    <div class="tabla-toolbar">
-        <div class="tabla-busqueda">
-            <i class="fas fa-search"></i>
-            <input type="text" id="searchUnidad" placeholder="Buscar por placa o línea...">
-        </div>
-        <div class="filter-group">
-            <select class="filter-select" id="filterLinea">
-                <option value="">Todas las líneas</option>
-            </select>
-            <select class="filter-select" id="filterEstado">
-                <option value="">Todos los estados</option>
-                <option value="activa">Activa</option>
-                <option value="inactiva">Inactiva</option>
-            </select>
-        </div>
-    </div>
 
-    <table class="tabla-unidades">
+    <table class="data-table">
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Placa</th>
                 <th>Línea / Ruta</th>
-                <th>Secretario</th>
                 <th>Estado</th>
-                <th>Ubicación</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -68,16 +49,6 @@
         </tbody>
     </table>
 
-    <div class="tabla-paginacion" id="paginacionUnidades">
-        <button id="btnAnterior" disabled>
-            <i class="fas fa-chevron-left"></i> Anterior
-        </button>
-        <span class="info-pagina" id="infoPagina">Página 1 de 1</span>
-        <button id="btnSiguiente" disabled>
-            Siguiente <i class="fas fa-chevron-right"></i>
-        </button>
-    </div>
-</div>
     <div class="tabla-paginacion" id="paginacionUnidades">
         <button id="btnAnterior" disabled>
             <i class="fas fa-chevron-left"></i> Anterior
@@ -131,12 +102,70 @@
                 La placa debe ser única.
             </div>
 
-            <button class="btn-add" id="nuevaRutaBtn">
+            <button type="submit" class="btn-guardar" id="guardarUnidadBtn">
                 <i class="fas fa-save"></i> Guardar Unidad
             </button>
         </form>
     </div>
 </div>
+
+<!-- MODAL VER UNIDAD -->
+<div id="modalVerUnidad" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-info-circle"></i> Detalle de la Unidad</h2>
+            <span class="modal-close" onclick="cerrarModalVerUnidad()">&times;</span>
+        </div>
+
+        <div class="detalle-bus">
+            <div class="detalle-header">
+                <span class="detalle-id" id="verBusId">BUS-000</span>
+                <span class="status-badge" id="verBusEstadoBadge">
+                    <span id="verBusEstado">-</span>
+                </span>
+            </div>
+
+            <div class="detalle-grid">
+                <div class="detalle-item">
+                    <span class="detalle-label"><i class="fas fa-id-card"></i> Placa</span>
+                    <span class="detalle-value" id="verBusPlaca">-</span>
+                </div>
+
+                <div class="detalle-item">
+                    <span class="detalle-label"><i class="fas fa-route"></i> Ruta</span>
+                    <span class="detalle-value" id="verBusRuta">-</span>
+                </div>
+
+                <div class="detalle-item">
+                    <span class="detalle-label"><i class="fas fa-sitemap"></i> Línea</span>
+                    <span class="detalle-value" id="verBusLinea">-</span>
+                </div>
+
+                <div class="detalle-item">
+                    <span class="detalle-label"><i class="fas fa-user-tie"></i> Secretario</span>
+                    <span class="detalle-value" id="verBusSecretario">-</span>
+                </div>
+
+                <div class="detalle-item">
+                    <span class="detalle-label"><i class="fas fa-map-marker-alt"></i> Ubicación</span>
+                    <span class="detalle-value" id="verBusUbicacion">-</span>
+                </div>
+
+                <div class="detalle-item">
+                    <span class="detalle-label"><i class="fas fa-calendar-plus"></i> Fecha de creación</span>
+                    <span class="detalle-value" id="verBusFecha">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-cerrar" onclick="cerrarModalVerUnidad()">
+                <i class="fas fa-times"></i> Cerrar
+            </button>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
