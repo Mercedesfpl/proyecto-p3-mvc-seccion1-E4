@@ -1,4 +1,10 @@
 // frontend/static/js/base.js
+function getCookie(name) {
+  return document.cookie
+    .split("; ")
+    .find((r) => r.startsWith(name + "="))
+    ?.split("=")[1];
+}
 
 window.mostrarToast = function (message, type = "error") {
   // Tu implementación actual de toast
@@ -160,12 +166,6 @@ window.fetch = async function (...args) {
       alert(mensaje);
     }
 
-    // Redirigir después de un pequeño retraso para ver el toast
-    const redirectUrl = errorData.redirect_url || "/";
-    setTimeout(() => {
-      window.location.href = redirectUrl;
-    }, 1500);
-
     throw new Error("No autorizado");
   }
   return response;
@@ -177,7 +177,15 @@ if (logoutBtn) {
   logoutBtn.addEventListener("click", async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("/api/logout", { method: "POST" });
+      const csrfToken = getCookie("csrf_access_token");
+      const response = await fetch("/api/logout", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": csrfToken, // 🔑 valor real, no "undefined"
+        },
+      });
       if (response.ok) {
         window.location.href = "/";
       } else {

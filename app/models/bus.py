@@ -20,7 +20,10 @@ class Bus(db.Model):
             "id_vehiculo": self.id_vehiculo,
             "placa": self.placa,
             "id_linea": self.id_linea,
+            "linea_nombre": self.linea.nombre if self.linea else None,
             "id_ruta": self.id_ruta,
+            "ruta_nombre": self.ruta.nombre if self.ruta else None,
             "id_secretario": self.id_secretario,
+            "secretario_nombre": self.secretario.nombre if self.secretario else None, 
             "status": self.status
         }

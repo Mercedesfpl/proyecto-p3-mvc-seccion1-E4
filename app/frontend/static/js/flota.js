@@ -21,28 +21,51 @@ function mostrarNotificacion(mensaje, tipo = "success") {
   else alert("ℹ️ " + mensaje);
 }
 
+function getCookie(name) {
+  return document.cookie
+    .split("; ")
+    .find((r) => r.startsWith(name + "="))
+    ?.split("=")[1];
+}
+
 // ============================================================
 // 2. ABRIR / CERRAR MODAL (igual que en personas)
 // ============================================================
-function abrirModalUnidad(titulo = "Nueva Unidad") {
+function abrirModalUnidad(data = null) {
   const modal = document.getElementById("modalNuevaUnidad");
-  // Limpiar formulario
-  document.getElementById("formNuevaUnidad").reset();
+  const form = document.getElementById("formNuevaUnidad");
+  form.reset();
   document
     .querySelectorAll(".is-invalid")
     .forEach((el) => el.classList.remove("is-invalid"));
-  // Cargar selects
-  cargarSelectsModal();
-  // Mostrar modal
+
+  if (data) {
+    //modo edición
+    editandoIdUnidad = data.id_vehiculo;
+    document.getElementById("placa").value = data.placa || "";
+    document.getElementById("id_linea").value = data.id_linea || "";
+    document.getElementById("id_ruta").value = data.id_ruta || "";
+    document.getElementById("id_secretario").value = data.id_secretario || "";
+    document.getElementById("status").value = data.status || "";
+    document.querySelector("#modalNuevaUnidad h2").innerHTML =
+      '<i class="fas fa-bus"></i> Editar unidad';
+  } else {
+    //modo creación
+    editandoIdUnidad = null;
+    document.querySelector("#modalNuevaUnidad h2").innerHTML =
+      '<i class="fas fa-bus"></i> Nueva unidad';
+  }
+
   modal.classList.add("show");
+  document.body.style.overflow = "hidden";
   document.getElementById("guardarUnidadBtn").disabled = false;
 }
 
 function cerrarModalUnidad() {
   const modal = document.getElementById("modalNuevaUnidad");
   modal.classList.remove("show");
+  document.body.style.overflow = "";
   editandoIdUnidad = null;
-  document.getElementById("guardarUnidadBtn").disabled = false;
   document.getElementById("formNuevaUnidad").reset();
   document
     .querySelectorAll(".is-invalid")
@@ -54,70 +77,61 @@ function cerrarModalUnidad() {
 // ============================================================
 async function cargarBuses() {
   try {
-    const response = await fetch("/admin/buses");
+    const response = await fetch("/admin/buses", { credentials: "include" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
+    const buses = data.data || [];
     const tbody = document.getElementById("unidadesTableBody");
     if (!tbody) return;
 
-    if (data.success && data.data && data.data.length > 0) {
-      tbody.innerHTML = "";
-      data.data.forEach((bus) => {
-        const nombreLinea = bus.linea ? bus.linea.nombre : "Sin línea";
-        const nombreRuta = bus.ruta ? bus.ruta.nombre : "Sin ruta";
-        const nombreSecretario = bus.secretario
-          ? bus.secretario.nombre
-          : "Sin secretario";
+    if (buses.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;">No hay unidades registradas</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = buses
+      .map((bus) => {
+        //Usamos los campos planos que devuelve el backend
+        const nombreLinea = bus.linea_nombre || "Sin Línea";
+        const nombreRuta = bus.ruta_nombre || "Sin ruta";
+        const nombreSecretario = bus.secretario_nombre || "Sin secretario";
 
         let statusClass = "status-active";
         let statusText = "Activo";
         if (bus.status === "inactiva") {
           statusClass = "status-inactive";
           statusText = "Inactivo";
-        } else if (bus.status === "en_servicio") {
-          statusClass = "status-warning";
-          statusText = "En servicio";
         }
 
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-                    <td><strong>BUS-${String(bus.id_vehiculo).padStart(3, "0")}</strong></td>
-                    <td>${bus.placa}</td>
-                    <td>${nombreLinea} / ${nombreRuta}</td>
-                    <td>${nombreSecretario}</td>
-                    <td>
-                        <span class="status-badge ${statusClass}">
-                            <i class="fas fa-circle"></i> ${statusText}
-                        </span>
-                    </td>
-                    <td>${bus.ubicacion || "No asignada"}</td>
-                    <td class="action-buttons">
-                        <button class="action-btn view" data-id="${bus.id_vehiculo}">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button class="action-btn edit" data-id="${bus.id_vehiculo}">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="action-btn delete" data-id="${bus.id_vehiculo}">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                `;
-        tbody.appendChild(tr);
-      });
-    } else {
-      // Mantener datos estáticos (no borrar)
-      console.log(
-        "No se cargaron datos del backend, se mantienen los estáticos",
-      );
-    }
-    // Asignar eventos a los botones de la tabla
+        return `
+          <tr>
+            <td><strong>BUS-${String(bus.id_vehiculo).padStart(3, "0")}</strong></td>
+            <td>${bus.placa}</td>
+            <td>${nombreLinea}</td>
+            <td>${nombreRuta}</td>
+            <td>${nombreSecretario}</td>
+            <td>
+              <span class="status-badge ${statusClass}">
+                <i class="fas fa-circle"></i> ${statusText}
+              </span>
+            </td>
+            <td class="action-buttons">
+              <button class="action-btn edit" data-id="${bus.id_vehiculo}" title="Editar">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="action-btn delete" data-id="${bus.id_vehiculo}" title="Eliminar">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      })
+      .join("");
+
     asignarEventosTabla();
   } catch (error) {
     console.error("Error al cargar buses:", error);
-    mostrarNotificacion(
-      "No se pudieron cargar datos del servidor. Mostrando datos de prueba.",
-      "warning",
-    );
+    mostrarNotificacion("Error al cargar las unidades", "danger");
   }
 }
 
@@ -127,47 +141,45 @@ async function cargarBuses() {
 async function cargarSelectsModal() {
   try {
     // Líneas
-    const respLineas = await fetch("/admin/lineas");
+    const respLineas = await fetch("/admin/lineas", { credentials: "include" });
     const dataLineas = await respLineas.json();
-    if (dataLineas.success) {
-      const select = document.getElementById("id_linea");
-      select.innerHTML = '<option value="">Seleccione una línea...</option>';
-      dataLineas.data.forEach((linea) => {
-        const opt = document.createElement("option");
-        opt.value = linea.id_linea;
-        opt.textContent = linea.nombre;
-        select.appendChild(opt);
-      });
-    }
+    const selectLinea = document.getElementById("id_linea");
+    selectLinea.innerHTML = '<option value="">Seleccione una línea...</option>';
+    (dataLineas.data || []).forEach((linea) => {
+      const opt = document.createElement("option");
+      opt.value = linea.id;
+      opt.textContent = linea.nombre;
+      selectLinea.appendChild(opt);
+    });
 
     // Rutas
-    const respRutas = await fetch("/admin/rutas/api");
+    const respRutas = await fetch("/admin/rutas/api", {
+      credentials: "include",
+    });
     const dataRutas = await respRutas.json();
-    if (dataRutas.success) {
-      const select = document.getElementById("id_ruta");
-      select.innerHTML = '<option value="">Sin ruta asignada</option>';
-      dataRutas.data.forEach((ruta) => {
-        const opt = document.createElement("option");
-        opt.value = ruta.id_ruta;
-        opt.textContent = ruta.nombre;
-        select.appendChild(opt);
-      });
-    }
+    const selectRuta = document.getElementById("id_ruta");
+    selectRuta.innerHTML = '<option value="">Sin ruta asignada...</option>';
+    (dataRutas.data || []).forEach((ruta) => {
+      const opt = document.createElement("option");
+      opt.value = ruta.id_ruta;
+      opt.textContent = ruta.nombre;
+      selectRuta.appendChild(opt);
+    });
 
     // Secretarios
-    const respSecretarios = await fetch("/admin/secretarios/select");
+    const respSecretarios = await fetch("/admin/secretarios/select", {
+      credentials: "include",
+    });
     const dataSecretarios = await respSecretarios.json();
-    if (dataSecretarios.success) {
-      const select = document.getElementById("id_secretario");
-      select.innerHTML =
-        '<option value="">Seleccione un secretario...</option>';
-      dataSecretarios.data.forEach((sec) => {
-        const opt = document.createElement("option");
-        opt.value = sec.id;
-        opt.textContent = `${sec.nombre} ${sec.apellido || ""}`.trim();
-        select.appendChild(opt);
-      });
-    }
+    const selectSecretario = document.getElementById("id_secretario");
+    selectSecretario.innerHTML =
+      '<option value="">Seleccione un secretario...</option>';
+    (dataSecretarios.data || []).forEach((sec) => {
+      const opt = document.createElement("option");
+      opt.value = sec.id;
+      opt.textContent = sec.nombre;
+      selectSecretario.appendChild(opt);
+    });
   } catch (error) {
     console.error("Error al cargar selects:", error);
     mostrarNotificacion("Error al cargar datos del formulario", "danger");
@@ -212,16 +224,31 @@ async function guardarNuevaUnidad(e) {
   document.getElementById("guardarUnidadBtn").disabled = true;
 
   try {
-    const response = await fetch("/admin/buses", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const csrfToken = getCookie("csrf_access_token");
+    console.log("csrfToken--->", csrfToken);
+
+    const url = editandoIdUnidad
+      ? `/admin/buses/${editandoIdUnidad}`
+      : "/admin/buses";
+    const method = editandoIdUnidad ? "PUT" : "POST";
+
+    const response = await fetch(url, {
+      method: method,
+      credentials: "include", // 🔑 envía cookies
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-TOKEN": csrfToken, // 🔑 valor real, no "undefined"
+      },
       body: JSON.stringify(data),
     });
 
     const result = await response.json();
 
     if (response.ok && result.success) {
-      mostrarNotificacion("Unidad creada exitosamente", "success");
+      mostrarNotificacion(
+        editandoIdUnidad ? "Unidad actualizada" : "Unidad creada exitosamente",
+        "success",
+      );
       cerrarModalUnidad();
       cargarBuses();
     } else {
@@ -232,7 +259,7 @@ async function guardarNuevaUnidad(e) {
     }
   } catch (error) {
     console.error("Error al guardar unidad:", error);
-    mostrarNotificacion("Error de conexión al servidor", "danger");
+    mostrarNotificacion("Error de conexión al servidorrrrr", "danger");
   } finally {
     loadingUnidad = false;
     document.getElementById("guardarUnidadBtn").disabled = false;
@@ -240,14 +267,41 @@ async function guardarNuevaUnidad(e) {
 }
 
 // ============================================================
-// 6. ELIMINAR UNIDAD (DELETE)
+// 6. EDITAR UNIDAD
+// ============================================================
+async function editarUnidad(id) {
+  try {
+    const response = await fetch(`/admin/buses/${id}`, {
+      credentials: "include",
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    if (!data.data) throw new Error("Datos inválidos");
+
+    //Aseguramos que los selects estén cargados antes de abrir el modal
+    await cargarSelectsModal();
+    abrirModalUnidad(data.data);
+  } catch (error) {
+    console.error("Error al cargar la unidad:", error);
+    mostrarNotificacion("Error al cargar la unidad", "danger");
+  }
+}
+
+// ============================================================
+// 7. ELIMINAR UNIDAD (DELETE)
 // ============================================================
 async function eliminarUnidad(id) {
   if (!confirm(`¿Está seguro de eliminar la unidad ID: ${id}?`)) return;
 
   try {
+    const csrfToken = getCookie("csrf_access_token");
     const response = await fetch(`/admin/buses/${id}`, {
       method: "DELETE",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-TOKEN": csrfToken,
+      },
     });
     const result = await response.json();
 
@@ -264,22 +318,14 @@ async function eliminarUnidad(id) {
 }
 
 // ============================================================
-// 7. ASIGNAR EVENTOS A BOTONES DE LA TABLA
+// 8. ASIGNAR EVENTOS A BOTONES DE LA TABLA
 // ============================================================
 function asignarEventosTabla() {
-  document.querySelectorAll(".action-btn.view").forEach((btn) => {
-    btn.onclick = function (e) {
-      e.stopPropagation();
-      const id = this.getAttribute("data-id");
-      alert(`Ver detalle de unidad ID: ${id} (en desarrollo)`);
-    };
-  });
-
   document.querySelectorAll(".action-btn.edit").forEach((btn) => {
     btn.onclick = function (e) {
       e.stopPropagation();
       const id = this.getAttribute("data-id");
-      alert(`Editar unidad ID: ${id} (en desarrollo)`);
+      editarUnidad(id);
     };
   });
 
@@ -296,6 +342,12 @@ function asignarEventosTabla() {
 // 8. INICIALIZAR EVENTOS
 // ============================================================
 document.addEventListener("DOMContentLoaded", function () {
+  //Cargar los selects al inicio (para que estén listos al abrir el modal)
+  cargarSelectsModal();
+
+  //cargar tabla
+  cargarBuses();
+
   // Botón "Nueva Unidad"
   const nuevaUnidadBtn = document.getElementById("nuevaUnidadBtn");
   if (nuevaUnidadBtn) {

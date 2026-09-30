@@ -19,7 +19,7 @@ class RutaRepository:
     def existentePorNombre(nombre, id_linea, exclude_id=None):
         query = Ruta.query.filter_by(nombre=nombre, id_linea=id_linea)
         if exclude_id:
-            query = query.filter(Ruta.id_ruta != exclude_id)
+            query = query.filter(Ruta.id != exclude_id)
         return query.first() is not None
     
     @staticmethod
