@@ -136,7 +136,7 @@ async function cargarLineas() {
   if (tbody) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="7" class="tabla-cargando">
+        <td colspan="6" class="tabla-cargando">
           <i class="fas fa-spinner fa-spin"></i> Cargando...
         </td>
       </tr>`;
@@ -157,7 +157,7 @@ async function cargarLineas() {
     if (tbody) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="7" class="tabla-vacia">Error al cargar datos</td>
+          <td colspan="6" class="tabla-vacia">Error al cargar datos</td>
         </tr>`;
     }
   }
@@ -171,7 +171,7 @@ function renderizarPagina() {
   if (lineasFiltradas.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="7" class="tabla-vacia">No hay líneas que coincidan</td>
+        <td colspan="6" class="tabla-vacia">No hay líneas que coincidan</td>
       </tr>`;
     actualizarControlesPaginacion(0);
     return;
@@ -195,7 +195,6 @@ function renderizarPagina() {
       <td>${linea.nombre}</td>
       <td>${linea.presidente || "-"}</td>
       <td>${linea.secretario_nombre || "-"}</td>
-      <td>${linea.rif}</td>
       <td>
         <span style="display:inline-block;width:24px;height:24px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 0 0 1px #cbd5e1;"></span>
       </td>

@@ -1,5 +1,3 @@
-<!-- app/frontend/views/pages/flota.html -->
-
 {% extends 'layouts/base.html' %}
 
 {% block title %}Flota{% endblock %}
@@ -60,7 +58,7 @@
     </div>
 </div>
 
-<!-- MODAL NUEVA UNIDAD -->
+<!-- MODAL NUEVA / EDITAR UNIDAD -->
 <div id="modalNuevaUnidad" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -130,27 +128,22 @@
                     <span class="detalle-label"><i class="fas fa-id-card"></i> Placa</span>
                     <span class="detalle-value" id="verBusPlaca">-</span>
                 </div>
-
                 <div class="detalle-item">
                     <span class="detalle-label"><i class="fas fa-route"></i> Ruta</span>
                     <span class="detalle-value" id="verBusRuta">-</span>
                 </div>
-
                 <div class="detalle-item">
                     <span class="detalle-label"><i class="fas fa-sitemap"></i> Línea</span>
                     <span class="detalle-value" id="verBusLinea">-</span>
                 </div>
-
                 <div class="detalle-item">
                     <span class="detalle-label"><i class="fas fa-user-tie"></i> Secretario</span>
                     <span class="detalle-value" id="verBusSecretario">-</span>
                 </div>
-
                 <div class="detalle-item">
                     <span class="detalle-label"><i class="fas fa-map-marker-alt"></i> Ubicación</span>
                     <span class="detalle-value" id="verBusUbicacion">-</span>
                 </div>
-
                 <div class="detalle-item">
                     <span class="detalle-label"><i class="fas fa-calendar-plus"></i> Fecha de creación</span>
                     <span class="detalle-value" id="verBusFecha">-</span>
@@ -165,7 +158,6 @@
         </div>
     </div>
 </div>
-
 {% endblock %}
 
 {% block scripts %}

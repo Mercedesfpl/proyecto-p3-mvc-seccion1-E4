@@ -368,7 +368,7 @@ async function cargarParadas() {
   if (tbody) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="5" class="tabla-cargando">
+        <td colspan="4" class="tabla-cargando">
           <i class="fas fa-spinner fa-spin"></i> Cargando...
         </td>
       </tr>`;
@@ -389,7 +389,7 @@ async function cargarParadas() {
     if (tbody) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="5" class="tabla-vacia">Error al cargar datos</td>
+          <td colspan="4" class="tabla-vacia">Error al cargar datos</td>
         </tr>`;
     }
   }
@@ -405,7 +405,7 @@ function renderizarPagina() {
   if (paradasFiltradas.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="5" class="tabla-vacia">No hay paradas registradas</td>
+        <td colspan="4" class="tabla-vacia">No hay paradas registradas</td>
       </tr>`;
     actualizarControlesPaginacion(0);
     return;
@@ -425,7 +425,6 @@ function renderizarPagina() {
     tr.innerHTML = `
       <td><strong>PARADA-${String(p.id).padStart(3, "0")}</strong></td>
       <td>${p.nombre}</td>
-      <td>${p.coordenadas}</td>
       <td>
         <span class="status-badge ${statusClass}">
           <i class="fas fa-circle"></i> ${statusText}

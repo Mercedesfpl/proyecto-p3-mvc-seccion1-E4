@@ -1,5 +1,3 @@
-<!-- app/frontend/views/pages/paradas.html -->
-
 {% extends 'layouts/base.html' %}
 
 {% block title %}Gestión de Paradas{% endblock %}
@@ -41,7 +39,6 @@
                     <tr>
                         <th>ID</th>
                         <th>Nombre</th>
-                        <th>Coordenadas</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
@@ -156,12 +153,10 @@
                     <span class="detalle-label"><i class="fas fa-signature"></i> Nombre</span>
                     <span class="detalle-value" id="verParadaNombre">-</span>
                 </div>
-
                 <div class="detalle-item">
                     <span class="detalle-label"><i class="fas fa-map-marker-alt"></i> Coordenadas</span>
                     <span class="detalle-value" id="verParadaCoordenadas">-</span>
                 </div>
-
                 <div class="detalle-item">
                     <span class="detalle-label"><i class="fas fa-calendar-plus"></i> Fecha de creación</span>
                     <span class="detalle-value" id="verParadaFecha">-</span>
