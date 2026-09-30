@@ -55,20 +55,15 @@ class LineaFactory:
 
     @staticmethod
     def crear_linea(data, color=None):
-        nombre = data.get("nombre")
-        if not nombre:
-            raise ResourceNotValid("Lineas", "El nombre es requerido")
-        rif = data.get("rif")
-        if not rif:
-            raise ResourceNotValid("Lineas", "El rif es requerido")
-        presidente_id = data.get("presidente_id")
-        if not presidente_id:
-            raise ResourceNotValid("Lineas", "Debes seleccionar un presidente")
+        nombre = LineaFactory._validar_nombre(data.get("nombre"))
+        rif = LineaFactory._validar_rif(data.get("rif"))           
+        presidente_id = LineaFactory._validar_id(data.get("presidente_id"), "presidente_id")
+        secretario_id = LineaFactory._validar_id(data.get("secretario_id"), "secretario_id")
 
         return Linea(
-            nombre=nombre.strip(),
-            rif=rif.strip(),
+            nombre=nombre,
+            rif=rif,
             presidente_id=presidente_id,
-            secretario_id=data.get("secretario_id"),
-            color=color or '#74A9D3'
+            secretario_id=secretario_id,
+            color=color or data.get("color") or '#74A9D3'
         )

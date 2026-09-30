@@ -1,48 +1,89 @@
 /* frontend/static/css/pages/rutas.css */
 
-/* ===== TABLA DE RUTAS (Ajuste flexible de columnas) ===== */
-#tablaRutas table,
-.tabla-container table {
-    width: 100%;
-    table-layout: auto;
+/* ============================================
+   LAYOUT RUTAS (mapa a la derecha)
+   ============================================ */
+.layout-mapa-derecha {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
 }
 
-/* Reducir el ancho de la columna de ID (primera columna) */
-#tablaRutas th:first-child,
-#tablaRutas td:first-child,
-.tabla-container th:first-child,
-.tabla-container td:first-child {
-    width: 60px;
-    max-width: 70px;
-    text-align: center;
+.tabla-wrapper {
+    flex: 1.3;
+    min-width: 0;
 }
 
-/* Garantizar espacio visible para las Acciones (última columna) */
-#tablaRutas th:last-child,
-#tablaRutas td:last-child,
-.tabla-container th:last-child,
-.tabla-container td:last-child {
-    width: 110px;
-    min-width: 110px;
-    text-align: center;
-    white-space: nowrap;
+.mapa-wrapper {
+    flex: 1;
+    min-width: 0;
 }
 
-/* Estilo para los botones de acción dentro de la tabla */
-#tablaRutas .btn-edit,
-#tablaRutas .btn-delete,
-.tabla-container .btn-edit,
-.tabla-container .btn-delete {
-    display: inline-flex;
+.mapa-container {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+.mapa-header {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    padding: 6px;
-    margin: 0 2px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #eaecef;
 }
 
+.mapa-header h3 {
+    font-size: 15px;
+    color: #1a3a5c;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
 
-/* ===== MODAL NUEVA RUTA (Estructura de 2 columnas) ===== */
+.mapa-acciones {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
+.mapa-contador {
+    font-size: 12px;
+    color: #6b7280;
+    background: #f0f2f5;
+    padding: 3px 10px;
+    border-radius: 12px;
+}
+
+.btn-expandir {
+    background: #f0f2f5;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.btn-expandir:hover {
+    background: #e1e5eb;
+}
+
+.mapa-principal {
+    height: 540px;
+    width: 100%;
+    transition: height 0.3s ease;
+}
+
+.mapa-principal.expanded {
+    height: 780px;
+}
+
+/* ============================================
+   MODAL NUEVA RUTA (2 columnas)
+   ============================================ */
 #modalNuevaRuta .modal-content {
     max-width: 900px;
     width: 90%;
@@ -71,36 +112,16 @@
     border: 1px solid #d1d5db;
 }
 
-/* Formulario */
-.form-row {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 12px;
-}
-
-.form-group {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 12px;
-}
-
-.form-group label {
+.mapa-label {
+    font-size: 12px;
     font-weight: 600;
-    font-size: 13px;
-    margin-bottom: 4px;
+    color: #374151;
+    margin-bottom: 6px;
 }
 
-.form-group input,
-.form-group select {
-    padding: 8px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-size: 13px;
-}
-
-/* ===== SECTOR DE PARADAS (Lado a Lado) ===== */
-
+/* ============================================
+   PARADAS (disponibles vs seleccionadas)
+   ============================================ */
 .paradas-lista-container {
     display: flex !important;
     gap: 10px !important;
@@ -138,7 +159,6 @@
     font-size: 10px;
 }
 
-/* Lista con Scroll Interno */
 .lista-items {
     max-height: 180px;
     overflow-y: auto;
@@ -148,7 +168,6 @@
     padding-right: 4px;
 }
 
-/* Tarjeta de cada parada */
 .item-parada {
     display: flex;
     justify-content: space-between;
@@ -189,8 +208,7 @@
     padding: 15px 0;
 }
 
-/* Botones dentro de las tarjetas */
-.btn-agregar-item, 
+.btn-agregar-item,
 .btn-quitar-item {
     border: none;
     background: transparent;
@@ -202,7 +220,6 @@
 .btn-agregar-item { color: #2563eb; }
 .btn-quitar-item { color: #dc2626; }
 
-/* Botones "Agregar todas" y "Quitar todas" */
 .btn-agregar-todas,
 .btn-quitar-todas {
     margin-top: 8px;
@@ -216,3 +233,204 @@
 
 .btn-agregar-todas { background-color: #dbeafe; color: #1e40af; }
 .btn-quitar-todas { background-color: #fee2e2; color: #991b1b; }
+
+/* ============================================
+   MODAL VER RUTA (igual que Flota)
+   ============================================ */
+.detalle-ruta {
+    padding: 6px 4px;
+}
+
+.detalle-ruta .detalle-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    background: #f0f7ff;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.detalle-ruta .detalle-icono {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #1a73e8;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.detalle-ruta .detalle-titulo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.detalle-ruta .detalle-id {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a3a5c;
+    letter-spacing: 0.5px;
+}
+
+.detalle-ruta .detalle-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.detalle-ruta .detalle-item {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 12px;
+    background: #fafbfc;
+    border: 1px solid #eaecef;
+    border-radius: 8px;
+}
+
+.detalle-ruta .detalle-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.detalle-ruta .detalle-label i {
+    color: #1a73e8;
+    font-size: 12px;
+}
+
+.detalle-ruta .detalle-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+    word-break: break-word;
+}
+
+.detalle-paradas {
+    padding: 12px 14px;
+    background: #fafbfc;
+    border: 1px solid #eaecef;
+    border-radius: 8px;
+}
+
+.lista-paradas-detalle {
+    margin: 8px 0 0 0;
+    padding-left: 20px;
+}
+
+.lista-paradas-detalle li {
+    font-size: 13px;
+    color: #374151;
+    padding: 4px 0;
+    border-bottom: 1px solid #f0f2f5;
+}
+
+.lista-paradas-detalle li:last-child {
+    border-bottom: none;
+}
+
+.lista-paradas-detalle .item-vacio {
+    color: #9ca3af;
+    font-style: italic;
+    list-style: none;
+    padding-left: 0;
+}
+
+.detalle-ruta .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1px solid #eaecef;
+}
+
+.btn-editar-ver {
+    background: #1a73e8;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s;
+}
+
+.btn-editar-ver:hover {
+    background: #1660c9;
+}
+
+.btn-cerrar {
+    background: #f0f2f5;
+    color: #333;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s;
+}
+
+.btn-cerrar:hover {
+    background: #e1e5eb;
+}
+
+/* ============================================
+   MODO OSCURO
+   ============================================ */
+body.dark-mode .mapa-container {
+    background: #1c1f24;
+}
+body.dark-mode .mapa-header {
+    border-bottom-color: #2c3138;
+}
+body.dark-mode .mapa-header h3 {
+    color: #e5eefc;
+}
+body.dark-mode .mapa-contador,
+body.dark-mode .btn-expandir {
+    background: #2c3138;
+    color: #e5e7eb;
+}
+body.dark-mode .detalle-ruta .detalle-header {
+    background: #1e2a3a;
+}
+body.dark-mode .detalle-ruta .detalle-id {
+    color: #e5eefc;
+}
+body.dark-mode .detalle-ruta .detalle-item,
+body.dark-mode .detalle-paradas {
+    background: #1c1f24;
+    border-color: #2c3138;
+}
+body.dark-mode .detalle-ruta .detalle-value,
+body.dark-mode .lista-paradas-detalle li {
+    color: #e5e7eb;
+}
+body.dark-mode .detalle-ruta .detalle-label {
+    color: #9ca3af;
+}
+body.dark-mode .paradas-disponibles,
+body.dark-mode .paradas-seleccionadas {
+    background: #1c1f24;
+    border-color: #2c3138;
+}
+body.dark-mode .item-parada {
+    background: #252a31;
+    border-color: #2c3138;
+    color: #e5e7eb;
+}

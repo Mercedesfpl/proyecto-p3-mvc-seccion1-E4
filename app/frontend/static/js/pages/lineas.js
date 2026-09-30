@@ -1,16 +1,34 @@
 // frontend/static/js/pages/lineas.js
-// ========================================
-// PÁGINA DE LÍNEAS - CRUD Y PALETA
-// ========================================
 
 let editandoId = null;
 let loading = false;
 let presidentes = [];
 let secretarios = [];
+let todasLasLineas = [];
+let lineasFiltradas = [];
+let paginaActual = 1;
+const itemsPorPagina = 10;
+let idLineaViendo = null;
 
-// ========== MANEJO DE SELECCIÓN DE COLOR ==========
+// ========== HELPERS ==========
+function mostrarNotificacion(mensaje, tipo = "success") {
+  if (typeof showToast === "function") {
+    showToast(mensaje, tipo);
+    return;
+  }
+  alert(mensaje);
+}
+
+function getCookie(name) {
+  return document.cookie
+    .split("; ")
+    .find((r) => r.startsWith(name + "="))
+    ?.split("=")[1];
+}
+
+// ========== SELECCIÓN DE COLOR ==========
 function seleccionarColor(hexColor) {
-  const hex = hexColor.toUpperCase();
+  const hex = (hexColor || "").toUpperCase();
   const inputColor = document.getElementById("color_linea");
   const colorHexText = document.getElementById("colorHex");
   const customPicker = document.getElementById("customColorPicker");
@@ -19,9 +37,7 @@ function seleccionarColor(hexColor) {
   if (colorHexText) colorHexText.textContent = hex;
   if (customPicker) customPicker.value = hex;
 
-  // Marcar/Desmarcar swatches
-  const swatches = document.querySelectorAll(".color-swatch");
-  swatches.forEach(swatch => {
+  document.querySelectorAll(".color-swatch").forEach((swatch) => {
     if (swatch.dataset.color && swatch.dataset.color.toUpperCase() === hex) {
       swatch.classList.add("active");
     } else {
@@ -33,15 +49,11 @@ function seleccionarColor(hexColor) {
 // ========== CARGAR SELECTORES ==========
 async function cargarSelectores() {
   try {
-    const responsePres = await fetch("/admin/personas/select", {
-      credentials: "include",
-    });
+    const responsePres = await fetch("/admin/personas/select", { credentials: "include" });
     const dataPres = await responsePres.json();
     presidentes = dataPres.data || [];
 
-    const responseSec = await fetch("/admin/secretarios/select", {
-      credentials: "include",
-    });
+    const responseSec = await fetch("/admin/secretarios/select", { credentials: "include" });
     const dataSec = await responseSec.json();
     secretarios = dataSec.data || [];
 
@@ -52,7 +64,7 @@ async function cargarSelectores() {
         if (p.rol === "presidente") {
           const option = document.createElement("option");
           option.value = p.id;
-          option.textContent = `${p.nombre} - ${p.cedula}`;
+          option.textContent = `${p.nombre} - ${p.cedula || ""}`;
           selectPres.appendChild(option);
         }
       });
@@ -64,31 +76,30 @@ async function cargarSelectores() {
       secretarios.forEach((s) => {
         const option = document.createElement("option");
         option.value = s.id;
-        option.textContent = `${s.nombre} - ${s.apellido}`;
+        option.textContent = `${s.nombre} ${s.apellido || ""}`.trim();
         selectSec.appendChild(option);
       });
     }
   } catch (error) {
     console.error("Error al cargar selectores:", error);
-    showToast("Error al cargar presidentes y secretarios", "error");
+    mostrarNotificacion("Error al cargar presidentes y secretarios", "danger");
   }
 }
 
-// ========== MODAL ==========
+// ========== MODAL NUEVA/EDITAR ==========
 function abrirModal(titulo, data = null) {
   const modal = document.getElementById("lineaModal");
   if (!modal) return;
 
   document.getElementById("modalTitle").textContent = titulo;
   document.getElementById("lineaForm").reset();
-  
+
   const selectPres = document.getElementById("presidente_id");
   const selectSec = document.getElementById("secretario_id");
   if (selectPres) selectPres.value = "";
   if (selectSec) selectSec.value = "";
-  
-  // Establecer color inicial o cargado
-  const colorInicial = (data && data.color) ? data.color : "#74A9D3";
+
+  const colorInicial = data && data.color ? data.color : "#74A9D3";
   seleccionarColor(colorInicial);
 
   if (data) {
@@ -100,7 +111,7 @@ function abrirModal(titulo, data = null) {
 
   modal.classList.add("show");
   document.body.style.overflow = "hidden";
-  
+
   const btnGuardar = document.getElementById("btnGuardar");
   if (btnGuardar) btnGuardar.disabled = false;
 
@@ -115,98 +126,205 @@ function cerrarModal() {
   if (modal) modal.classList.remove("show");
   document.body.style.overflow = "";
   editandoId = null;
-  
   const btnGuardar = document.getElementById("btnGuardar");
   if (btnGuardar) btnGuardar.disabled = false;
 }
 
-// Cerrar con ESC
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") cerrarModal();
-});
-
-// ========== CARGAR LÍNEAS ==========
+// ========== CARGAR DATOS ==========
 async function cargarLineas() {
+  const tbody = document.getElementById("lineasTableBody");
+  if (tbody) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" class="tabla-cargando">
+          <i class="fas fa-spinner fa-spin"></i> Cargando...
+        </td>
+      </tr>`;
+  }
+
   try {
-    const response = await fetch("/admin/lineas", {
-      credentials: "include",
-    });
-
+    const response = await fetch("/admin/lineas", { credentials: "include" });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
     const data = await response.json();
-    const lineas = data.data || [];
 
-    const tablaHtml = `
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Presidente</th>
-            <th>Secretario</th>
-            <th>RIF</th>
-            <th>Color</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${lineas
-            .map(
-              (linea) => `
-              <tr>
-                <td>${linea.id}</td>
-                <td><strong>${linea.nombre}</strong></td>
-                <td>${linea.presidente ? linea.presidente : "-"}</td>
-                <td>${linea.secretario_nombre || "-"}</td>
-                <td>${linea.rif}</td>
-                <td>
-                  <span style="display: inline-block; width: 24px; height: 24px; border-radius: 50%; background: ${linea.color || '#74A9D3'}; border: 2px solid #fff; box-shadow: 0 0 0 1px #cbd5e1;"></span>
-                </td>
-                <td>
-                  <button class="btn-edit" onclick="editarLinea(${linea.id})" title="Editar">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button class="btn-delete" onclick="eliminarLinea(${linea.id})" title="Eliminar">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </td>
-              </tr>
-            `
-            )
-            .join("")}
-          ${
-            lineas.length === 0
-              ? `
-              <tr>
-                <td colspan="7" style="text-align: center; padding: 30px; color: var(--texto-claro);">
-                  No hay líneas registradas
-                </td>
-              </tr>
-            `
-              : ""
-          }
-        </tbody>
-      </table>
-    `;
-
-    const contenedorTabla = document.getElementById("tablaLineas");
-    if (contenedorTabla) contenedorTabla.innerHTML = tablaHtml;
+    todasLasLineas = data.data || [];
+    lineasFiltradas = [...todasLasLineas];
+    paginaActual = 1;
+    renderizarPagina();
   } catch (error) {
     console.error("Error al cargar líneas:", error);
-    showToast("Error al cargar líneas", "error");
+    mostrarNotificacion("Error al cargar líneas", "danger");
+    if (tbody) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" class="tabla-vacia">Error al cargar datos</td>
+        </tr>`;
+    }
   }
+}
+
+// ========== RENDERIZAR PÁGINA ==========
+function renderizarPagina() {
+  const tbody = document.getElementById("lineasTableBody");
+  if (!tbody) return;
+
+  if (lineasFiltradas.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" class="tabla-vacia">No hay líneas que coincidan</td>
+      </tr>`;
+    actualizarControlesPaginacion(0);
+    return;
+  }
+
+  const inicio = (paginaActual - 1) * itemsPorPagina;
+  const fin = inicio + itemsPorPagina;
+  const pagina = lineasFiltradas.slice(inicio, fin);
+
+  tbody.innerHTML = "";
+  pagina.forEach((linea) => {
+    const suspendida = linea.suspendido === true;
+    const statusClass = suspendida ? "status-inactive" : "status-active";
+    const statusText = suspendida ? "Suspendida" : "Activa";
+    const color = linea.color || "#74A9D3";
+
+    const tr = document.createElement("tr");
+    tr.setAttribute("data-status", suspendida ? "suspendida" : "activa");
+    tr.innerHTML = `
+      <td><strong>LÍNEA-${String(linea.id).padStart(3, "0")}</strong></td>
+      <td>${linea.nombre}</td>
+      <td>${linea.presidente || "-"}</td>
+      <td>${linea.secretario_nombre || "-"}</td>
+      <td>${linea.rif}</td>
+      <td>
+        <span style="display:inline-block;width:24px;height:24px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 0 0 1px #cbd5e1;"></span>
+      </td>
+      <td class="action-buttons">
+        <button class="action-btn view" data-id="${linea.id}" title="Ver">
+          <i class="fas fa-eye"></i>
+        </button>
+        <button class="action-btn edit" data-id="${linea.id}" title="Editar">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="action-btn delete" data-id="${linea.id}" title="Eliminar">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  asignarEventosTabla();
+  actualizarControlesPaginacion(lineasFiltradas.length);
+}
+
+function actualizarControlesPaginacion(totalItems) {
+  const totalPaginas = Math.max(1, Math.ceil(totalItems / itemsPorPagina));
+  const info = document.getElementById("infoPagina");
+  const btnPrev = document.getElementById("btnAnterior");
+  const btnNext = document.getElementById("btnSiguiente");
+
+  if (info) info.textContent = `Página ${paginaActual} de ${totalPaginas}`;
+  if (btnPrev) btnPrev.disabled = paginaActual === 1;
+  if (btnNext) btnNext.disabled = paginaActual >= totalPaginas;
+}
+
+// ========== EVENTOS DE LA TABLA ==========
+function asignarEventosTabla() {
+  document.querySelectorAll(".action-btn.view").forEach((btn) => {
+    btn.onclick = function (e) {
+      e.stopPropagation();
+      verLinea(this.getAttribute("data-id"));
+    };
+  });
+
+  document.querySelectorAll(".action-btn.edit").forEach((btn) => {
+    btn.onclick = function (e) {
+      e.stopPropagation();
+      editarLinea(this.getAttribute("data-id"));
+    };
+  });
+
+  document.querySelectorAll(".action-btn.delete").forEach((btn) => {
+    btn.onclick = function (e) {
+      e.stopPropagation();
+      eliminarLinea(this.getAttribute("data-id"));
+    };
+  });
+}
+
+// ========== VER LÍNEA ==========
+async function verLinea(id) {
+  try {
+    const resp = await fetch(`/admin/lineas/${id}`, { credentials: "include" });
+    const result = await resp.json();
+    if (!result.success) {
+      mostrarNotificacion(result.message || "Línea no encontrada", "danger");
+      return;
+    }
+    const linea = result.data;
+    idLineaViendo = id;
+
+    const suspendida = linea.suspendido === true;
+    const statusText = suspendida ? "Suspendida" : "Activa";
+    const color = linea.color || "#74A9D3";
+
+    document.getElementById("verLineaId").textContent = `LÍNEA-${String(linea.id).padStart(3, "0")}`;
+    document.getElementById("verLineaNombre").textContent = linea.nombre || "-";
+    document.getElementById("verLineaRif").textContent = linea.rif || "-";
+    document.getElementById("verLineaPresidente").textContent =
+      linea.presidente?.nombre || linea.presidente || "-";
+    document.getElementById("verLineaSecretario").textContent =
+      linea.secretario_nombre || "-";
+    document.getElementById("verLineaColor").textContent = color;
+
+    let fechaCreacion = "No disponible";
+    if (linea.created_at) {
+      const d = new Date(linea.created_at);
+      if (!isNaN(d.getTime())) {
+        fechaCreacion = new Intl.DateTimeFormat("es-VE", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        }).format(d);
+      }
+    }
+    document.getElementById("verLineaFecha").textContent = fechaCreacion;
+
+    document.getElementById("verLineaEstado").textContent = statusText;
+    const badge = document.getElementById("verLineaEstadoBadge");
+    badge.className = "status-badge";
+    badge.classList.add(suspendida ? "status-inactive" : "status-active");
+
+    const icono = document.getElementById("verLineaIcono");
+    if (icono) icono.style.background = color;
+
+    document.getElementById("modalVerLinea").classList.add("show");
+  } catch (error) {
+    console.error("Error al ver línea:", error);
+    mostrarNotificacion("Error de conexión al servidor", "danger");
+  }
+}
+
+function cerrarModalVerLinea() {
+  document.getElementById("modalVerLinea").classList.remove("show");
+  idLineaViendo = null;
+}
+
+function editarDesdeVerLinea() {
+  const id = idLineaViendo;
+  cerrarModalVerLinea();
+  if (id) editarLinea(id);
 }
 
 // ========== EDITAR LÍNEA ==========
 async function editarLinea(id) {
   try {
-    const response = await fetch(`/admin/lineas/${id}`, {
-      credentials: "include",
-    });
-
+    const response = await fetch(`/admin/lineas/${id}`, { credentials: "include" });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
     const data = await response.json();
     if (!data.data) throw new Error("Datos inválidos");
 
@@ -214,7 +332,6 @@ async function editarLinea(id) {
     editandoId = id;
 
     await cargarSelectores();
-
     abrirModal("Editar Línea", {
       nombre: linea.nombre || "",
       rif: linea.rif || "",
@@ -224,72 +341,87 @@ async function editarLinea(id) {
     });
   } catch (error) {
     console.error("Error al cargar línea:", error);
-    showToast("Error al cargar la línea", "error");
+    mostrarNotificacion("Error al cargar la línea", "danger");
   }
 }
 
 // ========== ELIMINAR LÍNEA ==========
 async function eliminarLinea(id) {
-  const confirmado = await confirmDelete(
-    "¿Estás seguro?",
-    "¿Deseas suspender/eliminar esta línea?",
-    "Sí, continuar"
-  );
-  if (!confirmado) return;
+  if (!confirm("¿Estás seguro de eliminar/suspender esta línea?")) return;
 
   try {
+    const csrfToken = getCookie("csrf_access_token");
     const response = await fetch(`/admin/lineas/${id}`, {
       method: "DELETE",
       credentials: "include",
+      headers: { "X-CSRF-TOKEN": csrfToken },
     });
-
     const data = await response.json();
 
     if (response.ok && data.success) {
-      showToast("Línea procesada exitosamente", "success");
+      mostrarNotificacion("Línea eliminada exitosamente", "success");
       cargarLineas();
     } else {
-      const msg = data.error || data.message || "No se puede eliminar la línea debido a dependencias activas.";
-      showAlert("No se puede eliminar", msg, "error");
+      mostrarNotificacion(
+        data.error || data.message || "No se puede eliminar la línea",
+        "danger"
+      );
     }
   } catch (error) {
     console.error("Error:", error);
-    showToast("Error de conexión al servidor", "error");
+    mostrarNotificacion("Error de conexión al servidor", "danger");
   }
+}
+
+// ========== FILTROS ==========
+function aplicarFiltros() {
+  const searchTerm = document.getElementById("searchLinea")?.value?.toLowerCase() || "";
+  const filterEstado = document.getElementById("filterEstado")?.value || "";
+
+  lineasFiltradas = todasLasLineas.filter((linea) => {
+    const nombre = (linea.nombre || "").toLowerCase();
+    const rif = (linea.rif || "").toLowerCase();
+    const suspendida = linea.suspendido === true;
+    const estado = suspendida ? "suspendida" : "activa";
+
+    if (searchTerm && !nombre.includes(searchTerm) && !rif.includes(searchTerm)) return false;
+    if (filterEstado && estado !== filterEstado) return false;
+    return true;
+  });
+
+  paginaActual = 1;
+  renderizarPagina();
 }
 
 // ========== INICIALIZACIÓN ==========
 document.addEventListener("DOMContentLoaded", async () => {
-  // Listeners para paleta de colores
+  // Paleta de colores
   const paletteContainer = document.getElementById("colorPalette");
   if (paletteContainer) {
     paletteContainer.addEventListener("click", (e) => {
       const button = e.target.closest(".color-swatch");
-      if (button && button.dataset.color) {
-        seleccionarColor(button.dataset.color);
-      }
+      if (button && button.dataset.color) seleccionarColor(button.dataset.color);
     });
   }
 
-  // Listener para el selector personalizado
   const customColorPicker = document.getElementById("customColorPicker");
   if (customColorPicker) {
-    customColorPicker.addEventListener("input", function() {
+    customColorPicker.addEventListener("input", function () {
       seleccionarColor(this.value);
     });
   }
 
   await cargarSelectores();
 
+  // Form submit
   const formLinea = document.getElementById("lineaForm");
   if (formLinea) {
     formLinea.addEventListener("submit", async (e) => {
       e.preventDefault();
-
       if (loading) return;
-      loading = true;
-      
+
       const btnGuardar = document.getElementById("btnGuardar");
+      loading = true;
       if (btnGuardar) btnGuardar.disabled = true;
 
       const datos = {
@@ -302,57 +434,39 @@ document.addEventListener("DOMContentLoaded", async () => {
         color: document.getElementById("color_linea").value,
       };
 
-      if (!datos.nombre) {
-        showToast("El nombre es obligatorio", "error");
-        loading = false;
-        if (btnGuardar) btnGuardar.disabled = false;
-        return;
-      }
-
-      if (!datos.rif) {
-        showToast("El RIF es obligatorio", "error");
-        loading = false;
-        if (btnGuardar) btnGuardar.disabled = false;
-        return;
-      }
-
-      if (!datos.presidente_id) {
-        showToast("Debes seleccionar un presidente", "error");
-        loading = false;
-        if (btnGuardar) btnGuardar.disabled = false;
-        return;
-      }
+      if (!datos.nombre) { mostrarNotificacion("El nombre es obligatorio", "warning"); loading = false; if (btnGuardar) btnGuardar.disabled = false; return; }
+      if (!datos.rif) { mostrarNotificacion("El RIF es obligatorio", "warning"); loading = false; if (btnGuardar) btnGuardar.disabled = false; return; }
+      if (!datos.presidente_id) { mostrarNotificacion("Debes seleccionar un presidente", "warning"); loading = false; if (btnGuardar) btnGuardar.disabled = false; return; }
 
       const url = editandoId ? `/admin/lineas/${editandoId}` : "/admin/lineas";
       const method = editandoId ? "PUT" : "POST";
+      const csrfToken = getCookie("csrf_access_token");
 
       try {
         const response = await fetch(url, {
-          method: method,
+          method,
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
-            Accept: "application/json",
+            "X-CSRF-TOKEN": csrfToken,
           },
-          credentials: "include",
           body: JSON.stringify(datos),
         });
 
         const data = await response.json();
-
         if (response.ok && data.success !== false) {
-          showToast(
+          mostrarNotificacion(
             editandoId ? "Línea actualizada" : "Línea creada exitosamente",
             "success"
           );
           cerrarModal();
           cargarLineas();
         } else {
-          const msg = data.error || data.message || "Error al procesar la solicitud";
-          showAlert("Error en la operación", msg, "error");
+          mostrarNotificacion(data.error || data.message || "Error al guardar", "danger");
         }
       } catch (error) {
         console.error("Error:", error);
-        showToast("Error de conexión al servidor", "error");
+        mostrarNotificacion("Error de conexión al servidor", "danger");
       } finally {
         loading = false;
         if (btnGuardar) btnGuardar.disabled = false;
@@ -360,6 +474,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  // Botón nueva línea
   const btnNueva = document.getElementById("btnNuevaLinea");
   if (btnNueva) {
     btnNueva.onclick = async () => {
@@ -369,12 +484,38 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
   }
 
-  window.onclick = (event) => {
+  // Cerrar modales con click fuera
+  window.addEventListener("click", (event) => {
     const modal = document.getElementById("lineaModal");
-    if (event.target === modal) {
-      cerrarModal();
+    if (event.target === modal) cerrarModal();
+
+    const modalVer = document.getElementById("modalVerLinea");
+    if (event.target === modalVer) cerrarModalVerLinea();
+  });
+
+  // Cerrar con Escape
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      const modal = document.getElementById("lineaModal");
+      if (modal && modal.classList.contains("show")) cerrarModal();
+
+      const modalVer = document.getElementById("modalVerLinea");
+      if (modalVer && modalVer.classList.contains("show")) cerrarModalVerLinea();
     }
-  };
+  });
+
+  // Paginación
+  document.getElementById("btnAnterior")?.addEventListener("click", () => {
+    if (paginaActual > 1) { paginaActual--; renderizarPagina(); }
+  });
+  document.getElementById("btnSiguiente")?.addEventListener("click", () => {
+    const totalPaginas = Math.max(1, Math.ceil(lineasFiltradas.length / itemsPorPagina));
+    if (paginaActual < totalPaginas) { paginaActual++; renderizarPagina(); }
+  });
+
+  // Filtros
+  document.getElementById("searchLinea")?.addEventListener("input", aplicarFiltros);
+  document.getElementById("filterEstado")?.addEventListener("change", aplicarFiltros);
 
   cargarLineas();
 });
