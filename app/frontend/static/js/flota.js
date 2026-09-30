@@ -24,16 +24,6 @@ function mostrarNotificacion(mensaje, tipo = "success") {
 }
 
 // ============================================================
-// 2. COOKIES
-// ============================================================
-function getCookie(name) {
-  return document.cookie
-    .split("; ")
-    .find((r) => r.startsWith(name + "="))
-    ?.split("=")[1];
-}
-
-// ============================================================
 // 3. MODAL
 // ============================================================
 async function abrirModalUnidad(titulo = "Nueva Unidad") {

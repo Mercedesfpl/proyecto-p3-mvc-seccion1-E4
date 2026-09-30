@@ -18,7 +18,7 @@ function mostrarNotificacion(mensaje, tipo = "success") {
   if (tipo === "success") alert("✅ " + mensaje);
   else if (tipo === "warning") alert("⚠️ " + mensaje);
   else if (tipo === "danger") alert("❌ " + mensaje);
-  else alert("ℹ️ " + mensaje);
+  else alert("ℹ " + mensaje);
 }
 
 // ============================================================
@@ -40,13 +40,6 @@ function cerrarModalRuta() {
   modal.classList.remove("show");
   editandoIdRuta = null;
   document.getElementById("guardarRutaBtn").disabled = false;
-}
-//Paso uno 🔽
-function getCookie(name) {
-  return document.cookie
-    .split("; ")
-    .find((r) => r.startsWith(name + "="))
-    ?.split("=")[1];
 }
 
 // ============================================================
@@ -110,16 +103,16 @@ incluyen los headers de autorizacion ver paso 3
 */
 
   try {
-    //Paso dos 🔽
+    //
     const csrfToken = getCookie("csrf_access_token");
     console.log("csrfToken--->", csrfToken);
     const response = await fetch("/admin/rutas", {
       method: "POST",
-      //Paso tres 🔽
+      //
 
       headers: {
         "Content-Type": "application/json",
-        "X-CSRF-TOKEN": csrfToken, // 🔑 valor real, no "undefined"
+        "X-CSRF-TOKEN": csrfToken, // 
       },
       body: JSON.stringify(data),
     });

@@ -1,15 +1,7 @@
 // frontend/static/js/auth.js
 
 // ========== FUNCIONES AUXILIARES ==========
-function showToast(message, type = "success") {
-  const toast = document.getElementById("toastMessage");
-  if (!toast) return;
-  toast.textContent = message;
-  toast.className = `toast-message ${type} show`;
-  setTimeout(() => {
-    toast.classList.remove("show");
-  }, 3000);
-}
+// showToast viene de notificaciones.js (SweetAlert2)
 
 function showStep(stepNumber) {
   const step1 = document.getElementById("step1");

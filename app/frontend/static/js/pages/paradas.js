@@ -15,12 +15,6 @@ let idParadaViendo = null;
 // ============================================================
 // 1. HELPERS (usa los de base.js si existen)
 // ============================================================
-function getCookie(name) {
-  return document.cookie
-    .split("; ")
-    .find((r) => r.startsWith(name + "="))
-    ?.split("=")[1];
-}
 
 function mostrarNotificacion(mensaje, tipo = "success") {
   if (typeof showToast === "function") {

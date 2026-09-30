@@ -1,4 +1,4 @@
-// frontend/static/js/notifications.js
+// frontend/static/js/notificationes.js
 
 // Paleta de colores ajustada a la interfaz (Dashboard Guaicaipuro)
 const COLOR_AZUL_PRIMARIO = '#6ba2d6';

@@ -3,7 +3,7 @@
 document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById("configForm");
 
-  // ✅ Función para aplicar el tema
+  //  Función para aplicar el tema
   function aplicarTema(tema) {
     if (tema === "oscuro") {
       document.body.classList.add("dark-mode");
@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
     localStorage.setItem("theme", tema);
   }
 
-  // ✅ Función para mostrar mensaje (con eliminación de duplicados)
+  // Función para mostrar mensaje (con eliminación de duplicados)
   function mostrarMensaje(mensaje, tipo = "success") {
     // Eliminar mensajes anteriores
     const mensajesAnteriores = form.querySelectorAll(".alert");
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setTimeout(() => alertDiv.remove(), 5000);
   }
 
-  // ✅ Cargar configuración desde el BACKEND
+  //  Cargar configuración desde el BACKEND
   async function cargarConfiguracion() {
     try {
       const token = localStorage.getItem("access_token");
@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // ✅ Guardar configuración en el BACKEND y en localStorage
+  //  Guardar configuración en el BACKEND y en localStorage
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
 

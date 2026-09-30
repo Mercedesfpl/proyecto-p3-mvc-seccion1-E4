@@ -1,23 +1,22 @@
 // frontend/static/js/base.js
-function getCookie(name) {
+window.getCookie = function (name) {
   return document.cookie
     .split("; ")
     .find((r) => r.startsWith(name + "="))
     ?.split("=")[1];
-}
+};
 
+// ========== TOAST GLOBAL ==========
+// Delega a showToast() que viene de notificaciones.js
+// (que usa SweetAlert2). Si no existe, usa fallback simple.
 window.mostrarToast = function (message, type = "error") {
-  // Tu implementación actual de toast
-  const toast = document.getElementById("toastMessage");
-  if (toast) {
-    toast.textContent = message;
-    toast.className = `toast ${type}`;
-    toast.style.display = "block";
-    setTimeout(() => (toast.style.display = "none"), 4000);
+  if (typeof window.showToast === "function") {
+    window.showToast(message, type);
   } else {
-    console.error("Toast element not found", message);
+    alert(message);
   }
 };
+
 document.addEventListener("DOMContentLoaded", function () {
   //  DROPDOWN DEL USUARIO (mostrar/ocultar)
   const userDropdown = document.getElementById("userDropdown");
@@ -198,15 +197,6 @@ if (logoutBtn) {
 }
 
 //  FUNCIONES COMUNES PARA TODOS LOS CRUD
-
-// Mostrar notificación
-function showToast(message, type = "success") {
-  const toast = document.getElementById("toastMessage");
-  if (!toast) return;
-  toast.textContent = message;
-  toast.className = `toast-message ${type} show`;
-  setTimeout(() => toast.classList.remove("show"), 3000);
-}
 
 // Petición genérica a la API
 async function fetchAPI(url, method = "GET", body = null) {
