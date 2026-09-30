@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="lineas-header">
+<div class="page-header">
     <h1>Gestión de Líneas</h1>
     <button class="btn-add" id="btnNuevaLinea">
         <i class="fas fa-plus"></i> Nueva Línea
@@ -15,10 +15,48 @@
 </div>
 
 <div class="tabla-container">
-    <div id="tablaLineas"></div>
+    <div class="tabla-toolbar">
+        <div class="tabla-busqueda">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchLinea" placeholder="Buscar por nombre o RIF...">
+        </div>
+        <div class="filter-group">
+            <select class="filter-select" id="filterEstado">
+                <option value="">Todas</option>
+                <option value="activa">Activas</option>
+                <option value="suspendida">Suspendidas</option>
+            </select>
+        </div>
+    </div>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Presidente</th>
+                <th>Secretario</th>
+                <th>Color</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="lineasTableBody">
+            <!-- Aquí se llenan las líneas -->
+        </tbody>
+    </table>
+
+    <div class="tabla-paginacion" id="paginacionLineas">
+        <button id="btnAnterior" disabled>
+            <i class="fas fa-chevron-left"></i> Anterior
+        </button>
+        <span class="info-pagina" id="infoPagina">Página 1 de 1</span>
+        <button id="btnSiguiente" disabled>
+            Siguiente <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
 </div>
 
-<!-- MODAL -->
+<!-- MODAL NUEVA/EDITAR LÍNEA -->
 <div id="lineaModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -40,13 +78,32 @@
                 <label>RIF <span class="required">*</span></label>
                 <input type="text" id="rif" placeholder="Ej: J-12345678-0" required>
             </div>
+
+            <!-- SECCIÓN DE SELECCIÓN DE COLOR -->
             <div class="form-group">
                 <label>Color de la Línea</label>
-                <div class="color-picker-wrapper">
-                    <input type="color" id="color_linea" name="color" value="#74A9D3">
-                    <span class="color-hex" id="colorHex">#74A9D3</span>
+
+                <input type="hidden" id="color_linea" name="color" value="#74A9D3">
+
+                <div class="color-palette-container" id="colorPalette">
+                    <button type="button" class="color-swatch active" data-color="#74A9D3" style="background-color: #74A9D3;" title="Azul institucional"></button>
+                    <button type="button" class="color-swatch" data-color="#95242A" style="background-color: #95242A;" title="Rojo institucional"></button>
+                    <button type="button" class="color-swatch" data-color="#F3B001" style="background-color: #F3B001;" title="Amarillo institucional"></button>
+                    <button type="button" class="color-swatch" data-color="#2E9D62" style="background-color: #2E9D62;" title="Verde institucional"></button>
+                    <button type="button" class="color-swatch" data-color="#8E44AD" style="background-color: #8E44AD;" title="Púrpura"></button>
+                    <button type="button" class="color-swatch" data-color="#E67E22" style="background-color: #E67E22;" title="Naranja"></button>
+                    <button type="button" class="color-swatch" data-color="#34495E" style="background-color: #34495E;" title="Gris Oscuro"></button>
                 </div>
-                <small>Color que identifica a la línea en el mapa</small>
+
+                <div class="color-custom-wrapper">
+                    <div class="color-custom-input">
+                        <input type="color" id="customColorPicker" value="#74A9D3">
+                        <span>Personalizado</span>
+                    </div>
+                    <span class="color-hex-badge" id="colorHex">#74A9D3</span>
+                </div>
+
+                <small><i class="fas fa-info-circle"></i> Selecciona un color de la paleta predefinida o crea uno personalizado para el mapa y reportes.</small>
             </div>
 
             <hr style="margin: 20px 0; border: 1px solid var(--borde);">
@@ -75,6 +132,66 @@
                 <i class="fas fa-save"></i> Guardar Línea
             </button>
         </form>
+    </div>
+</div>
+
+<!-- MODAL VER LÍNEA -->
+<div id="modalVerLinea" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-info-circle"></i> Detalle de la Línea</h2>
+            <span class="modal-close" onclick="cerrarModalVerLinea()">&times;</span>
+        </div>
+
+        <div class="detalle-linea">
+            <div class="detalle-header">
+                <div class="detalle-icono" id="verLineaIcono" style="background: #74A9D3;">
+                    <i class="fas fa-route"></i>
+                </div>
+                <div class="detalle-titulo">
+                    <span class="detalle-id" id="verLineaId">LÍNEA-000</span>
+                    <span class="status-badge" id="verLineaEstadoBadge">
+                        <span id="verLineaEstado">-</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="detalle-grid">
+                <div class="detalle-item">
+                    <span class="detalle-label"><i class="fas fa-signature"></i> Nombre</span>
+                    <span class="detalle-value" id="verLineaNombre">-</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label"><i class="fas fa-id-card"></i> RIF</span>
+                    <span class="detalle-value" id="verLineaRif">-</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label"><i class="fas fa-user-tie"></i> Presidente</span>
+                    <span class="detalle-value" id="verLineaPresidente">-</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label"><i class="fas fa-user-cog"></i> Secretario</span>
+                    <span class="detalle-value" id="verLineaSecretario">-</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label"><i class="fas fa-palette"></i> Color</span>
+                    <span class="detalle-value" id="verLineaColor">-</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label"><i class="fas fa-calendar-plus"></i> Fecha de creación</span>
+                    <span class="detalle-value" id="verLineaFecha">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-editar-ver" onclick="editarDesdeVerLinea()">
+                <i class="fas fa-edit"></i> Editar
+            </button>
+            <button class="btn-cerrar" onclick="cerrarModalVerLinea()">
+                <i class="fas fa-times"></i> Cerrar
+            </button>
+        </div>
     </div>
 </div>
 {% endblock %}

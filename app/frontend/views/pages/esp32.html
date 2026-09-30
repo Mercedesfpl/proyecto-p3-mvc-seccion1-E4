@@ -1,0 +1,165 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Dispositivos ESP32{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/esp32.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Gestión de Dispositivos ESP32</h1>
+    <button class="btn-add" id="btnNuevoEsp32">
+        <i class="fas fa-plus"></i> Nuevo ESP32
+    </button>
+</div>
+
+<div class="tabla-container">
+    <div class="tabla-toolbar">
+        <div class="tabla-busqueda">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchEsp32" placeholder="Buscar por MAC...">
+        </div>
+        <div class="filter-group">
+            <select class="filter-select" id="filterTipo">
+                <option value="">Todos los tipos</option>
+                <option value="bus">Bus</option>
+                <option value="parada">Parada</option>
+            </select>
+            <select class="filter-select" id="filterStatus">
+                <option value="">Todos los estados</option>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+            </select>
+        </div>
+    </div>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>MAC</th>
+                <th>Tipo</th>
+                <th>Firmware</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="esp32TableBody">
+            <!-- Aquí se llenan los dispositivos -->
+        </tbody>
+    </table>
+
+    <div class="tabla-paginacion" id="paginacionEsp32">
+        <button id="btnAnterior" disabled>
+            <i class="fas fa-chevron-left"></i> Anterior
+        </button>
+        <span class="info-pagina" id="infoPagina">Página 1 de 1</span>
+        <button id="btnSiguiente" disabled>
+            Siguiente <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+</div>
+
+<!-- MODAL NUEVO / EDITAR ESP32 -->
+<div id="modalEsp32" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-microchip"></i> <span id="modalTitle">Nuevo ESP32</span></h2>
+            <span class="modal-close" onclick="cerrarModal()">&times;</span>
+        </div>
+        <form id="formEsp32">
+            <input type="hidden" id="esp32Id" value="">
+
+            <div class="form-group">
+                <label>Dirección MAC <span class="required">*</span></label>
+                <input type="text" id="mac" placeholder="AA:BB:CC:DD:EE:FF" required>
+            </div>
+
+            <div class="form-group">
+                <label>Contraseña <span class="required">*</span></label>
+                <input type="password" id="password" placeholder="Mínimo 6 caracteres" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Tipo <span class="required">*</span></label>
+                    <select id="tipo_dispositivo" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="bus">Bus</option>
+                        <option value="parada">Parada</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Firmware</label>
+                    <input type="text" id="version_firmware" placeholder="1.0.0">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Estado</label>
+                <select id="status">
+                    <option value="activo">Activo</option>
+                    <option value="inactivo">Inactivo</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-guardar" id="btnGuardar">
+                <i class="fas fa-save"></i> Guardar
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL VER ESP32 -->
+<div id="modalVerEsp32" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-info-circle"></i> Detalle del Dispositivo</h2>
+            <span class="modal-close" onclick="cerrarModalVerEsp32()">&times;</span>
+        </div>
+
+        <div class="detalle-esp32">
+            <div class="detalle-header">
+                <div class="detalle-icono">
+                    <i class="fas fa-microchip"></i>
+                </div>
+                <div class="detalle-titulo">
+                    <span class="detalle-id" id="verEsp32Id">ESP32-000</span>
+                    <span class="status-badge" id="verEsp32EstadoBadge">
+                        <span id="verEsp32Estado">-</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="detalle-grid">
+                <div class="detalle-item">
+                    <span class="detalle-label"><i class="fas fa-network-wired"></i> Dirección MAC</span>
+                    <span class="detalle-value" id="verEsp32Mac">-</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label"><i class="fas fa-tag"></i> Tipo</span>
+                    <span class="detalle-value" id="verEsp32Tipo">-</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label"><i class="fas fa-code-branch"></i> Firmware</span>
+                    <span class="detalle-value" id="verEsp32Firmware">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-editar-ver" onclick="editarDesdeVerEsp32()">
+                <i class="fas fa-edit"></i> Editar
+            </button>
+            <button class="btn-cerrar" onclick="cerrarModalVerEsp32()">
+                <i class="fas fa-times"></i> Cerrar
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/esp32.js') }}"></script>
+{% endblock %}

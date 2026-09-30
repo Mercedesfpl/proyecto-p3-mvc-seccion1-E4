@@ -1,6 +1,4 @@
 # app/controllers/busControllers.py
-
-from flask import request, jsonify
 from app.services.busServices import BusServices
 from app.models.exceptions import ResourceNotFound, ResourceNotValid
 from app.helpers.makeResponse import success_response, error_response
@@ -26,8 +24,7 @@ def get_bus_by_id(id_vehiculo):
 
 def create_bus(data):
     try:
-        data = request.get_json()
-        bus = BusServices.create_bus(data)
+        bus = BusServices.create_bus(data)  
         return success_response(message="Bus creado exitosamente", data=bus.to_dict())
     except ResourceNotValid as e:
         return error_response(error=str(e), message=str(e), status_code=400)
@@ -39,7 +36,6 @@ def create_bus(data):
 
 def update_bus(id_vehiculo, data):
     try:
-        data = request.get_json()
         bus = BusServices.update_bus(id_vehiculo, data)
         return success_response(message="Bus actualizado exitosamente", data=bus.to_dict())
     except ResourceNotValid as e:

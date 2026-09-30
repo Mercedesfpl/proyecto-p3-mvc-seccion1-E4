@@ -1,130 +1,176 @@
-<!-- app/frontend/views/pages/dashboard.html -->
 {% extends "layouts/base.html" %}
 
 {% block title %}Dashboard{% endblock %}
 
 {% block styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/dashboard.css') }}">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.css" />
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-welcome">
-    <div>
-        <h1>Panel de Control</h1>
-        <p>Resumen general del sistema de transporte público</p>
-    </div>
-    <div class="dashboard-fecha">
-        <i class="fas fa-calendar-alt"></i>
-        <span id="fechaActual"></span>
-        <span class="separador">|</span>
-        <i class="fas fa-clock"></i>
-        <span id="reloj">00:00</span>
-    </div>
-</div>
+<div class="dashboard-page">
+    
+    <!-- Header Principal -->
+    <header class="dashboard-header">
+        <div class="header-title-box">
+            <h1 class="dash-title">Panel de Control General</h1>
+            <p class="dash-subtitle">Monitoreo e información en tiempo real del sistema de transporte</p>
+        </div>
+        
+        <div class="header-right-tools">
+            <div class="dash-fecha-pill">
+                <i class="fas fa-calendar-alt"></i>
+                <span id="fechaActual"></span>
+                <span class="separador">|</span>
+                <i class="fas fa-clock"></i>
+                <span id="reloj">00:00</span>
+            </div>
+        </div>
+    </header>
 
-<!-- KPIs -->
-<div class="grid-4">
-    <div class="kpi-card">
-        <div class="kpi-header">
-            <span>Líneas Registradas</span>
-            <div class="kpi-icon"><i class="fas fa-layer-group"></i></div>
+    <!-- Fila 1: KPIs Principales equilibrados -->
+    <div class="kpi-banner-grid">
+        <div class="kpi-pill-card red">
+            <div class="kpi-pill-icon"><i class="fas fa-bus"></i></div>
+            <div class="kpi-pill-data">
+                <span class="kpi-pill-title">Autobuses Activos</span>
+                <h3 id="totalBuses">0</h3>
+                <span class="kpi-pill-sub">Unidades registradas</span>
+            </div>
         </div>
-        <div class="kpi-value" id="totalLineas">0</div>
-        <div class="kpi-trend">Líneas activas en el sistema</div>
-    </div>
-    <div class="kpi-card">
-        <div class="kpi-header">
-            <span>Rutas Activas</span>
-            <div class="kpi-icon"><i class="fas fa-route"></i></div>
-        </div>
-        <div class="kpi-value" id="totalRutas">0</div>
-        <div class="kpi-trend">Rutas en operación</div>
-    </div>
-    <div class="kpi-card">
-        <div class="kpi-header">
-            <span>Paradas Registradas</span>
-            <div class="kpi-icon"><i class="fas fa-map-pin"></i></div>
-        </div>
-        <div class="kpi-value" id="totalParadas">0</div>
-        <div class="kpi-trend">Puntos de control</div>
-    </div>
-    <div class="kpi-card">
-        <div class="kpi-header">
-            <span>Autobuses Activos</span>
-            <div class="kpi-icon"><i class="fas fa-bus"></i></div>
-        </div>
-        <div class="kpi-value" id="totalBuses">0</div>
-        <div class="kpi-trend">Unidades en servicio</div>
-    </div>
-</div>
 
-<!-- Segunda fila de KPIs -->
-<div class="grid-4">
-    <div class="kpi-card">
-        <div class="kpi-header">
-            <span>Rutas Activas</span>
-            <div class="kpi-icon" style="background: rgba(16, 185, 129, 0.1);">
-                <i class="fas fa-check-circle" style="color: #10b981;"></i>
+        <div class="kpi-pill-card blue">
+            <div class="kpi-pill-icon"><i class="fas fa-layer-group"></i></div>
+            <div class="kpi-pill-data">
+                <span class="kpi-pill-title">Líneas Registradas</span>
+                <h3 id="totalLineas">0</h3>
+                <span class="kpi-pill-sub">Líneas operativas</span>
             </div>
         </div>
-        <div class="kpi-value" style="color: #10b981;" id="rutasActivas">0</div>
-        <div class="kpi-trend">En operación normal</div>
-    </div>
-    <div class="kpi-card">
-        <div class="kpi-header">
-            <span>Rutas Inactivas</span>
-            <div class="kpi-icon" style="background: rgba(239, 68, 68, 0.1);">
-                <i class="fas fa-ban" style="color: #ef4444;"></i>
-            </div>
-        </div>
-        <div class="kpi-value" style="color: #ef4444;" id="rutasInactivas">0</div>
-        <div class="kpi-trend">Fuera de servicio</div>
-    </div>
-    <div class="kpi-card">
-        <div class="kpi-header">
-            <span>Paradas Activas</span>
-            <div class="kpi-icon" style="background: rgba(52, 211, 153, 0.1);">
-                <i class="fas fa-circle" style="color: #34d399;"></i>
-            </div>
-        </div>
-        <div class="kpi-value" style="color: #34d399;" id="paradasActivas">0</div>
-        <div class="kpi-trend">Operativas</div>
-    </div>
-    <div class="kpi-card">
-        <div class="kpi-header">
-            <span>Personas Registradas</span>
-            <div class="kpi-icon" style="background: rgba(251, 191, 36, 0.1);">
-                <i class="fas fa-users" style="color: #fbbf24;"></i>
-            </div>
-        </div>
-        <div class="kpi-value" style="color: #fbbf24;" id="totalPersonas">0</div>
-        <div class="kpi-trend">Usuarios del sistema</div>
-    </div>
-</div>
 
-<!-- Gráficos y últimas rutas -->
-<div class="grid-2">
-    <!-- Gráfico de distribución -->
-    <div class="card">
-        <div class="card-header">
-            <h3><i class="fas fa-chart-pie"></i> Distribución de Rutas</h3>
+        <div class="kpi-pill-card yellow">
+            <div class="kpi-pill-icon"><i class="fas fa-route"></i></div>
+            <div class="kpi-pill-data">
+                <span class="kpi-pill-title">Rutas Totales</span>
+                <h3 id="totalRutas">0</h3>
+                <span class="kpi-pill-sub"><span id="rutasActivasCount">0</span> activas / <span id="rutasInactivasCount">0</span> inact.</span>
+            </div>
         </div>
-        <div class="chart-container">
-            <canvas id="distribucionChart"></canvas>
+
+        <div class="kpi-pill-card green">
+            <div class="kpi-pill-icon"><i class="fas fa-map-pin"></i></div>
+            <div class="kpi-pill-data">
+                <span class="kpi-pill-title">Paradas en Red</span>
+                <h3 id="totalParadas">0</h3>
+                <span class="kpi-pill-sub"><span id="paradasActivasCount">0</span> operativas</span>
+            </div>
         </div>
     </div>
 
-    <!-- Últimas rutas creadas -->
-    <div class="card">
-        <div class="card-header">
-            <h3><i class="fas fa-clock"></i> Últimas Rutas Creadas</h3>
-            <a href="/admin/rutas-page" class="btn-link">Ver todas →</a>
+    <!-- Layout Principal en Grid (68% / 32%) -->
+    <div class="dashboard-grid">
+        
+        <!-- COLUMNA IZQUIERDA -->
+        <div class="dash-col-main">
+            
+            <!-- Hero Card Informativo Institucional -->
+            <div class="hero-summary-card">
+                <div class="hero-body">
+                    <div class="hero-text-side">
+                        <span class="hero-badge"><i class="fas fa-shield-alt"></i> Red Institucional de Transporte</span>
+                        <h2>Resumen Operativo Global</h2>
+                        <p>Estado general del servicio de transporte y densidad de red.</p>
+                    </div>
+                    <div class="hero-metrics">
+                        <div class="hero-metric-item">
+                            <span class="hm-val" id="totalPersonas">0</span>
+                            <span class="hm-lbl"><i class="fas fa-users"></i> Usuarios</span>
+                        </div>
+                        <div class="hero-divider"></div>
+                        <div class="hero-metric-item">
+                            <span class="hm-val" id="porcentajeOperatividad">0%</span>
+                            <span class="hm-lbl"><i class="fas fa-chart-line"></i> Operatividad</span>
+                        </div>
+                        <div class="hero-divider"></div>
+                        <div class="hero-metric-item">
+                            <span class="hm-val" id="promedioBuses">0</span>
+                            <span class="hm-lbl"><i class="fas fa-bus-alt"></i> Buses / Ruta</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid Doble: Gráfico + Cobertura -->
+            <div class="grid-card-twin">
+                <div class="card card-chart">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-pie"></i> Distribución por Rutas</h3>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="distribucionChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card card-coverage">
+                    <div class="card-header">
+                        <h3><i class="fas fa-tasks"></i> Cobertura de Operaciones</h3>
+                    </div>
+                    <div class="progress-list">
+                        <div class="prog-group">
+                            <div class="prog-labels">
+                                <span>Rutas Activas</span>
+                                <strong id="lblPctRutas">0%</strong>
+                            </div>
+                            <div class="prog-bar"><div class="prog-fill bg-green" id="barRutasActivas"></div></div>
+                        </div>
+
+                        <div class="prog-group">
+                            <div class="prog-labels">
+                                <span>Rutas Inactivas</span>
+                                <strong id="lblPctInactivas">0%</strong>
+                            </div>
+                            <div class="prog-bar"><div class="prog-fill bg-red" id="barRutasInactivas"></div></div>
+                        </div>
+
+                        <div class="prog-group">
+                            <div class="prog-labels">
+                                <span>Paradas Operativas</span>
+                                <strong id="lblPctParadas">0%</strong>
+                            </div>
+                            <div class="prog-bar"><div class="prog-fill bg-blue" id="barParadasActivas"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Ultimas Rutas -->
+            <div class="card card-table">
+                <div class="card-header">
+                    <h3><i class="fas fa-history"></i> Últimas Rutas Registradas</h3>
+                    <a href="/admin/rutas-page" class="btn-link">Ver todas las rutas →</a>
+                </div>
+                <div class="ultimas-rutas" id="ultimasRutas">
+                    <div class="loading-text">Cargando información...</div>
+                </div>
+            </div>
+
         </div>
-        <div class="ultimas-rutas" id="ultimasRutas">
-            <div class="loading-text">Cargando rutas...</div>
+
+        <!-- COLUMNA DERECHA -->
+        <div class="dash-col-side">
+            
+            <!-- Resumen por Líneas -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-bus-map"></i> Estado de Líneas</h3>
+                </div>
+                <div class="lineas-status-list" id="lineasListSummary">
+                    <div class="loading-text">Cargando líneas...</div>
+                </div>
+            </div>
+
         </div>
+
     </div>
 </div>
 {% endblock %}

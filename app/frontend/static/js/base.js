@@ -1,19 +1,24 @@
 // frontend/static/js/base.js
+window.getCookie = function (name) {
+  return document.cookie
+    .split("; ")
+    .find((r) => r.startsWith(name + "="))
+    ?.split("=")[1];
+};
 
+// ========== TOAST GLOBAL ==========
+// Delega a showToast() que viene de notificaciones.js
+// (que usa SweetAlert2). Si no existe, usa fallback simple.
 window.mostrarToast = function (message, type = "error") {
-  // Tu implementación actual de toast
-  const toast = document.getElementById("toastMessage");
-  if (toast) {
-    toast.textContent = message;
-    toast.className = `toast ${type}`;
-    toast.style.display = "block";
-    setTimeout(() => (toast.style.display = "none"), 4000);
+  if (typeof window.showToast === "function") {
+    window.showToast(message, type);
   } else {
-    console.error("Toast element not found", message);
+    alert(message);
   }
 };
+
 document.addEventListener("DOMContentLoaded", function () {
-  //  DROPDOWN DEL USUARIO (mostrar/ocultar) 
+  //  DROPDOWN DEL USUARIO (mostrar/ocultar)
   const userDropdown = document.getElementById("userDropdown");
   const dropdownMenu = document.getElementById("dropdownMenu");
 
@@ -31,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  //  PANEL DE NOTIFICACIONES (mostrar/ocultar) 
+  //  PANEL DE NOTIFICACIONES (mostrar/ocultar)
   const notificationBtn = document.getElementById("notificationBtn");
   const notificationsPanel = document.getElementById("notificationsPanel");
 
@@ -49,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  //  CERRAR AL HACER CLIC FUERA 
+  //  CERRAR AL HACER CLIC FUERA
   document.addEventListener("click", function (e) {
     // Cerrar dropdown si se clica fuera
     if (dropdownMenu && dropdownMenu.style.display === "block") {
@@ -65,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  //  EFECTO: MARCAR NOTIFICACIONES COMO LEÍDAS 
+  //  EFECTO: MARCAR NOTIFICACIONES COMO LEÍDAS
   const markReadBtn = document.querySelector(".mark-read");
   if (markReadBtn) {
     markReadBtn.addEventListener("click", function () {
@@ -91,7 +96,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  //  EFECTO: HOVER EN TARJETAS 
+  //  EFECTO: HOVER EN TARJETAS
   const cards = document.querySelectorAll(".kpi-card, .card");
   cards.forEach((card) => {
     card.addEventListener("mouseenter", function () {
@@ -99,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  //  ANIMACIÓN  AL CARGAR LAS TARJETAS 
+  //  ANIMACIÓN  AL CARGAR LAS TARJETAS
   const kpis = document.querySelectorAll(".kpi-card");
   kpis.forEach((kpi, index) => {
     kpi.style.opacity = "0";
@@ -111,7 +116,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }, index * 50);
   });
 
-  //  EFECTO EN LOS FILTROS  
+  //  EFECTO EN LOS FILTROS
   const filterSelects = document.querySelectorAll(".filter-select");
   filterSelects.forEach((select) => {
     select.addEventListener("change", function () {
@@ -123,7 +128,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  //  EFECTO EN BOTONES 
+  //  EFECTO EN BOTONES
   const btns = document.querySelectorAll(".btn-primary, .btn-secondary");
   btns.forEach((btn) => {
     btn.addEventListener("click", function (e) {
@@ -160,24 +165,26 @@ window.fetch = async function (...args) {
       alert(mensaje);
     }
 
-    // Redirigir después de un pequeño retraso para ver el toast
-    const redirectUrl = errorData.redirect_url || "/";
-    setTimeout(() => {
-      window.location.href = redirectUrl;
-    }, 1500);
-
     throw new Error("No autorizado");
   }
   return response;
 };
 
-//  LOGOUT 
+//  LOGOUT
 const logoutBtn = document.getElementById("btn-logout");
 if (logoutBtn) {
   logoutBtn.addEventListener("click", async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("/api/logout", { method: "POST" });
+      const csrfToken = getCookie("csrf_access_token");
+      const response = await fetch("/api/logout", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": csrfToken, // 🔑 valor real, no "undefined"
+        },
+      });
       if (response.ok) {
         window.location.href = "/";
       } else {
@@ -189,107 +196,146 @@ if (logoutBtn) {
   });
 }
 
-//  FUNCIONES COMUNES PARA TODOS LOS CRUD 
-
-// Mostrar notificación
-function showToast(message, type = 'success') {
-    const toast = document.getElementById('toastMessage');
-    if (!toast) return;
-    toast.textContent = message;
-    toast.className = `toast-message ${type} show`;
-    setTimeout(() => toast.classList.remove('show'), 3000);
-}
+//  FUNCIONES COMUNES PARA TODOS LOS CRUD
 
 // Petición genérica a la API
-async function fetchAPI(url, method = 'GET', body = null) {
-    const options = {
-        method: method,
-        headers: { 'Content-Type': 'application/json' }
-    };
-    if (body) options.body = JSON.stringify(body);
-    
-    const response = await fetch(url, options);
-    const data = await response.json();
-    
-    if (!response.ok) {
-        throw new Error(data.message || data.error || 'Error en la petición');
-    }
-    return data;
+async function fetchAPI(url, method = "GET", body = null) {
+  const options = {
+    method: method,
+    headers: { "Content-Type": "application/json" },
+  };
+  if (body) options.body = JSON.stringify(body);
+
+  const response = await fetch(url, options);
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || data.error || "Error en la petición");
+  }
+  return data;
 }
 
 // Abrir modal genérico
 function openModal(title, fields, data = {}) {
-    const modal = document.getElementById('genericModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
-    
-    modalTitle.textContent = title;
-    
-    // Generar campos dinámicamente
-    modalBody.innerHTML = fields.map(field => `
+  const modal = document.getElementById("genericModal");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalBody = document.getElementById("modalBody");
+
+  modalTitle.textContent = title;
+
+  // Generar campos dinámicamente
+  modalBody.innerHTML = fields
+    .map(
+      (field) => `
         <div class="form-group">
             <label>${field.label}</label>
-            <input type="${field.type || 'text'}" 
+            <input type="${field.type || "text"}" 
                    id="${field.name}" 
                    name="${field.name}" 
                    class="form-input" 
-                   value="${data[field.name] || ''}"
-                   ${field.required ? 'required' : ''}>
+                   value="${data[field.name] || ""}"
+                   ${field.required ? "required" : ""}>
         </div>
-    `).join('');
-    
-    modal.style.display = 'block';
+    `,
+    )
+    .join("");
+
+  modal.style.display = "block";
 }
 
 // Cerrar modal
 function closeModal() {
-    document.getElementById('genericModal').style.display = 'none';
+  document.getElementById("genericModal").style.display = "none";
 }
 
 // Cargar datos en tabla genérica
 function renderTable(containerId, columns, data, actions = true) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    
-    const thead = `<thead><tr>${columns.map(col => `<th>${col.label}</th>`).join('')}${actions ? '<th>Acciones</th>' : ''}</tr></thead>`;
-    
-    const tbody = `<tbody>
-        ${data.map(row => `<tr>
-            ${columns.map(col => `<td>${row[col.field] || '-'}</td>`).join('')}
-            ${actions ? `<td>
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  const thead = `<thead><tr>${columns.map((col) => `<th>${col.label}</th>`).join("")}${actions ? "<th>Acciones</th>" : ""}</tr></thead>`;
+
+  const tbody = `<tbody>
+        ${data
+          .map(
+            (row) => `<tr>
+            ${columns.map((col) => `<td>${row[col.field] || "-"}</td>`).join("")}
+            ${
+              actions
+                ? `<td>
                 <button class="btn-edit" data-id="${row.id}"><i class="fas fa-edit"></i></button>
                 <button class="btn-delete" data-id="${row.id}"><i class="fas fa-trash"></i></button>
-            </td>` : ''}
-        </tr>`).join('')}
+            </td>`
+                : ""
+            }
+        </tr>`,
+          )
+          .join("")}
     </tbody>`;
-    
-    container.innerHTML = `<table class="data-table">${thead}${tbody}</table>`;
-}
 
+  container.innerHTML = `<table class="data-table">${thead}${tbody}</table>`;
+}
 
 // Obtener el rol del usuario actual (desde el DOM o desde una API)
 function getUserRole() {
-    // Opción 1: Si el rol está en un data attribute del body
-    const body = document.body;
-    if (body.getAttribute('data-user-rol')) {
-        return body.getAttribute('data-user-rol');
-    }
-    return null;
+  // Opción 1: Si el rol está en un data attribute del body
+  const body = document.body;
+  if (body.getAttribute("data-user-rol")) {
+    return body.getAttribute("data-user-rol");
+  }
+  return null;
 }
 
 // Mostrar/ocultar elementos según el rol
 function toggleAdminOnlyElements() {
-    const role = getUserRole();
-    const adminElements = document.querySelectorAll('.admin-only');
-    
-    if (role === 'admin') {
-        adminElements.forEach(el => el.style.display = '');
-    } else {
-        adminElements.forEach(el => el.style.display = 'none');
-    }
+  const role = getUserRole();
+  const adminElements = document.querySelectorAll(".admin-only");
+
+  if (role === "admin") {
+    adminElements.forEach((el) => (el.style.display = ""));
+  } else {
+    adminElements.forEach((el) => (el.style.display = "none"));
+  }
 }
 
 // Ejecutar cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', function() {
-    toggleAdminOnlyElements();
+document.addEventListener("DOMContentLoaded", function () {
+  toggleAdminOnlyElements();
 });
+
+// aplica el modo oscuro
+document.addEventListener("DOMContentLoaded", function () {
+  // 1. Aplicar tema desde localStorage inmediatamente (sin esperar)
+  const temaCached = localStorage.getItem("theme") || "claro";
+  aplicarTema(temaCached);
+
+  // 2. Luego, si hay token, consultar el backend para sincronizar
+  const token = localStorage.getItem("access_token");
+  if (token) {
+    fetch("/api/perfil", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.data && data.data.tema) {
+          const temaBackend = data.data.tema;
+          // Si el backend tiene un tema diferente, actualizar
+          if (temaBackend !== temaCached) {
+            aplicarTema(temaBackend);
+            localStorage.setItem("theme", temaBackend);
+          }
+        }
+      })
+      .catch(() => {
+        // Si falla, mantener el tema de localStorage
+      });
+  }
+});
+
+function aplicarTema(tema) {
+  if (tema === "oscuro") {
+    document.body.classList.add("dark-mode");
+  } else {
+    document.body.classList.remove("dark-mode");
+  }
+}

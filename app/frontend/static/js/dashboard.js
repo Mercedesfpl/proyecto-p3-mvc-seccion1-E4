@@ -1,5 +1,3 @@
-// frontend/static/js/pages/dashboard.js
-
 let chartDistribucion = null;
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -9,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const fechaElement = document.getElementById('fechaActual');
         if (fechaElement) {
             const ahora = new Date();
-            const opciones = { year: 'numeric', month: 'long', day: 'numeric' };
+            const opciones = { year: 'numeric', month: 'short', day: 'numeric' };
             fechaElement.textContent = ahora.toLocaleDateString('es-ES', opciones);
         }
     }
@@ -29,88 +27,84 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(actualizarReloj, 60000);
 
     // ========== CARGAR DATOS DEL DASHBOARD ==========
-
     async function cargarDatosDashboard() {
         try {
-            // Cargar líneas
-            const responseLineas = await fetch('/admin/lineas', { credentials: 'include' });
-            const dataLineas = await responseLineas.json();
-            const lineas = dataLineas.success ? dataLineas.data : [];
+            const [resLineas, resRutas, resParadas, resPersonas, resBuses] = await Promise.all([
+                fetch('/admin/lineas', { credentials: 'include' }).then(r => r.json()),
+                fetch('/admin/rutas/api', { credentials: 'include' }).then(r => r.json()),
+                fetch('/admin/paradas', { credentials: 'include' }).then(r => r.json()),
+                fetch('/admin/personas', { credentials: 'include' }).then(r => r.json()),
+                fetch('/admin/buses', { credentials: 'include' }).then(r => r.json())
+            ]);
 
-            // Cargar rutas
-            const responseRutas = await fetch('/admin/rutas/api', { credentials: 'include' });
-            const dataRutas = await responseRutas.json();
-            const rutas = dataRutas.success ? dataRutas.data : [];
+            const lineas = resLineas.success ? resLineas.data : [];
+            const rutas = resRutas.success ? resRutas.data : [];
+            const paradas = resParadas.success ? resParadas.data : [];
+            const personas = resPersonas.success ? resPersonas.data : [];
+            const buses = resBuses.success ? resBuses.data : [];
 
-            // Cargar paradas
-            const responseParadas = await fetch('/admin/paradas', { credentials: 'include' });
-            const dataParadas = await responseParadas.json();
-            const paradas = dataParadas.success ? dataParadas.data : [];
-
-            // Cargar personas
-            const responsePersonas = await fetch('/admin/personas', { credentials: 'include' });
-            const dataPersonas = await responsePersonas.json();
-            const personas = dataPersonas.success ? dataPersonas.data : [];
-
-            // Cargar buses
-            const responseBuses = await fetch('/admin/buses', { credentials: 'include' });
-            const dataBuses = await responseBuses.json();
-            const buses = dataBuses.success ? dataBuses.data : [];
-
-            // ========== ACTUALIZAR KPIs ==========
-            const totalLineas = lineas.length;
+            // Cifras Principales
+            const totalRutas = rutas.length;
             const rutasActivas = rutas.filter(r => r.status === 'activa').length;
             const rutasInactivas = rutas.filter(r => r.status === 'inactiva').length;
-            const totalRutas = rutas.length;
             const totalParadas = paradas.length;
             const paradasActivas = paradas.filter(p => p.status === 'activa').length;
-            const totalPersonas = personas.length;
-            const totalBuses = buses.length;
 
-            document.getElementById('totalLineas').textContent = totalLineas;
+            // Inserción KPI
+            document.getElementById('totalBuses').textContent = buses.length;
+            document.getElementById('totalLineas').textContent = lineas.length;
             document.getElementById('totalRutas').textContent = totalRutas;
-            document.getElementById('rutasActivas').textContent = rutasActivas;
-            document.getElementById('rutasInactivas').textContent = rutasInactivas;
+            document.getElementById('rutasActivasCount').textContent = rutasActivas;
+            document.getElementById('rutasInactivasCount').textContent = rutasInactivas;
             document.getElementById('totalParadas').textContent = totalParadas;
-            document.getElementById('paradasActivas').textContent = paradasActivas;
-            document.getElementById('totalPersonas').textContent = totalPersonas;
-            document.getElementById('totalBuses').textContent = totalBuses;
+            document.getElementById('paradasActivasCount').textContent = paradasActivas;
 
-            // ========== ACTUALIZAR GRÁFICO ==========
-            actualizarGrafico(rutas, lineas);
+            // Inserción Hero
+            document.getElementById('totalPersonas').textContent = personas.length;
+            
+            // Métricas
+            const pctRutasActivas = totalRutas > 0 ? Math.round((rutasActivas / totalRutas) * 100) : 0;
+            const pctRutasInactivas = totalRutas > 0 ? Math.round((rutasInactivas / totalRutas) * 100) : 0;
+            const pctParadasActivas = totalParadas > 0 ? Math.round((paradasActivas / totalParadas) * 100) : 0;
 
-            // ========== ACTUALIZAR ÚLTIMAS RUTAS ==========
+            document.getElementById('porcentajeOperatividad').textContent = `${pctRutasActivas}%`;
+            const prom = totalRutas > 0 ? (buses.length / totalRutas).toFixed(1) : 0;
+            document.getElementById('promedioBuses').textContent = prom;
+
+            // Barras
+            document.getElementById('barRutasActivas').style.width = `${pctRutasActivas}%`;
+            document.getElementById('lblPctRutas').textContent = `${pctRutasActivas}%`;
+
+            document.getElementById('barRutasInactivas').style.width = `${pctRutasInactivas}%`;
+            document.getElementById('lblPctInactivas').textContent = `${pctRutasInactivas}%`;
+
+            document.getElementById('barParadasActivas').style.width = `${pctParadasActivas}%`;
+            document.getElementById('lblPctParadas').textContent = `${pctParadasActivas}%`;
+
+            // Gráfico y listas
+            actualizarGrafico(rutas);
             actualizarUltimasRutas(rutas);
+            actualizarResumenLineas(rutas, lineas);
 
         } catch (error) {
             console.error('Error al cargar datos del dashboard:', error);
         }
     }
 
-    // ========== GRÁFICO DE DISTRIBUCIÓN ==========
-
-    function actualizarGrafico(rutas, lineas) {
+    // ========== GRÁFICO CON COLORES PROPIOS DE LAS RUTAS ==========
+    function actualizarGrafico(rutas) {
         const ctx = document.getElementById('distribucionChart');
         if (!ctx) return;
 
-        // Contar rutas por línea
-        const lineasMap = {};
-        lineas.forEach(l => {
-            lineasMap[l.id] = l.nombre;
-        });
+        if (rutas.length === 0) return;
 
-        const rutasPorLinea = {};
-        rutas.forEach(r => {
-            const nombreLinea = lineasMap[r.id_linea] || 'Sin línea';
-            if (!rutasPorLinea[nombreLinea]) {
-                rutasPorLinea[nombreLinea] = 0;
-            }
-            rutasPorLinea[nombreLinea]++;
-        });
-
-        const labels = Object.keys(rutasPorLinea);
-        const data = Object.values(rutasPorLinea);
-        const colores = ['#74A9D3', '#F3B001', '#95242A', '#10b981', '#8B5CF6', '#EC4899'];
+        // Extraer nombres y colores reales de las rutas
+        const labels = rutas.map(r => r.nombre || 'Ruta sin nombre');
+        // Usar el color definido en la ruta o un color por defecto de la paleta
+        const colors = rutas.map(r => r.color && r.color.trim() !== '' ? r.color : '#95242A');
+        
+        // Asignar valor unitario por ruta para mostrar la distribución de colores de las rutas registradas
+        const data = rutas.map(() => 1);
 
         if (chartDistribucion) {
             chartDistribucion.destroy();
@@ -122,9 +116,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 labels: labels,
                 datasets: [{
                     data: data,
-                    backgroundColor: colores.slice(0, data.length),
+                    backgroundColor: colors,
                     borderWidth: 2,
-                    borderColor: '#fff'
+                    borderColor: '#ffffff'
                 }]
             },
             options: {
@@ -134,33 +128,35 @@ document.addEventListener('DOMContentLoaded', function() {
                     legend: {
                         position: 'bottom',
                         labels: {
-                            font: { size: 11 },
-                            padding: 12,
-                            boxWidth: 14,
+                            font: { size: 11, weight: '600' },
+                            boxWidth: 10,
                             usePointStyle: true
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return ` Ruta: ${context.label}`;
+                            }
                         }
                     }
                 },
-                cutout: '60%'
+                cutout: '65%'
             }
         });
     }
 
     // ========== ÚLTIMAS RUTAS ==========
-
     function actualizarUltimasRutas(rutas) {
         const container = document.getElementById('ultimasRutas');
         if (!container) return;
 
-        // Ordenar por ID (asumiendo que IDs más altos = más recientes)
         const ultimas = [...rutas]
             .sort((a, b) => (b.id || 0) - (a.id || 0))
-            .slice(0, 5);
+            .slice(0, 4);
 
         if (ultimas.length === 0) {
-            container.innerHTML = `
-                <div class="loading-text">No hay rutas registradas</div>
-            `;
+            container.innerHTML = `<div class="loading-text">No hay rutas registradas</div>`;
             return;
         }
 
@@ -168,14 +164,14 @@ document.addEventListener('DOMContentLoaded', function() {
         ultimas.forEach(ruta => {
             const statusClass = ruta.status === 'activa' ? 'activa' : 'inactiva';
             const statusText = ruta.status === 'activa' ? 'Activa' : 'Inactiva';
-            const color = ruta.color || '#74A9D3';
+            const color = ruta.color || '#95242A';
 
             html += `
                 <div class="ultima-ruta-item">
                     <div class="ruta-info">
                         <span class="ruta-color" style="background: ${color};"></span>
                         <span class="ruta-nombre">${ruta.nombre}</span>
-                        <span class="ruta-linea">${ruta.linea_nombre || 'Sin línea'}</span>
+                        <span class="ruta-linea">• ${ruta.linea_nombre || 'Sin línea'}</span>
                     </div>
                     <span class="ruta-estado ${statusClass}">${statusText}</span>
                 </div>
@@ -185,35 +181,30 @@ document.addEventListener('DOMContentLoaded', function() {
         container.innerHTML = html;
     }
 
-    // ========== ANIMACIONES ==========
+    // ========== RESUMEN DE LÍNEAS ==========
+    function actualizarResumenLineas(rutas, lineas) {
+        const container = document.getElementById('lineasListSummary');
+        if (!container) return;
 
-    // Animar barras de progreso (si existen)
-    const barras = document.querySelectorAll('.bar-fill');
-    barras.forEach(barra => {
-        const anchoOriginal = barra.style.width;
-        barra.style.width = '0%';
-        setTimeout(() => {
-            barra.style.transition = 'width 0.8s ease-out';
-            barra.style.width = anchoOriginal;
-        }, 100);
-    });
+        if (lineas.length === 0) {
+            container.innerHTML = `<div class="loading-text">No hay líneas registradas</div>`;
+            return;
+        }
 
-    // Efectos hover
-    document.querySelectorAll('.incidencia-item').forEach(item => {
-        item.addEventListener('mouseenter', function() {
-            this.style.backgroundColor = 'var(--gris)';
-            this.style.transition = 'background-color 0.2s ease';
-            this.style.cursor = 'pointer';
+        let html = '';
+        lineas.forEach(linea => {
+            const cantidadRutas = rutas.filter(r => r.id_linea === linea.id).length;
+            html += `
+                <div class="linea-item-row">
+                    <span class="linea-item-name"><i class="fas fa-layer-group" style="color: var(--brand-red); margin-right: 6px;"></i>${linea.nombre}</span>
+                    <span class="linea-item-badge">${cantidadRutas} rutas</span>
+                </div>
+            `;
         });
-        item.addEventListener('mouseleave', function() {
-            this.style.backgroundColor = 'transparent';
-        });
-    });
 
-    // ========== INICIALIZAR ==========
+        container.innerHTML = html;
+    }
 
     cargarDatosDashboard();
-
-    // Recargar datos cada 5 minutos
     setInterval(cargarDatosDashboard, 300000);
 });

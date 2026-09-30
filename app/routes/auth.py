@@ -1,10 +1,9 @@
 # app/routes/auth.py
 from flask import Blueprint, request, url_for, redirect, render_template
 from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
-
-
 from ..controllers import userControllers
 from ..models.userModels import UserSession
+from app.controllers import configuracionControllers
 
 auth_scope = Blueprint("auth", __name__)
 
@@ -118,3 +117,13 @@ def update_perfil():
 @jwt_required()
 def cambiar_contrasena():
     return userControllers.cambiar_contrasenia()
+
+@auth_scope.route("/configuracion", methods=["PUT"])
+@jwt_required()
+def update_configuracion():
+    return configuracionControllers.update_configuracion()
+
+@auth_scope.route("/configuracion", methods=["GET"])
+@jwt_required()
+def get_configuracion():
+    return configuracionControllers.get_configuracion()
