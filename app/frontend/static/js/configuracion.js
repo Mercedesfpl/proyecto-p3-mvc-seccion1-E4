@@ -1,9 +1,17 @@
-// app/frontend/static/js/pages/configuracion.js
+// frontend/static/js/pages/configuracion.js
 
 document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById("configForm");
+  if (!form) return;
 
-  //  Función para aplicar el tema
+  // ========== HELPERS ==========
+  function getCookie(name) {
+    return document.cookie
+      .split("; ")
+      .find((r) => r.startsWith(name + "="))
+      ?.split("=")[1];
+  }
+
   function aplicarTema(tema) {
     if (tema === "oscuro") {
       document.body.classList.add("dark-mode");
@@ -13,40 +21,26 @@ document.addEventListener("DOMContentLoaded", function () {
     localStorage.setItem("theme", tema);
   }
 
-  // Función para mostrar mensaje (con eliminación de duplicados)
   function mostrarMensaje(mensaje, tipo = "success") {
-    // Eliminar mensajes anteriores
-    const mensajesAnteriores = form.querySelectorAll(".alert");
-    mensajesAnteriores.forEach((el) => el.remove());
-
-    const alertDiv = document.createElement("div");
-    alertDiv.className = `alert alert-${tipo} alert-dismissible fade show`;
-    alertDiv.role = "alert";
-    alertDiv.innerHTML = `
-            ${mensaje}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-    form.prepend(alertDiv);
-    setTimeout(() => alertDiv.remove(), 5000);
+    if (typeof showToast === "function") {
+      showToast(mensaje, tipo === "error" ? "error" : tipo);
+      return;
+    }
+    alert(mensaje);
   }
 
-  //  Cargar configuración desde el BACKEND
+  // ========== CARGAR ==========
   async function cargarConfiguracion() {
     try {
       const token = localStorage.getItem("access_token");
-      if (!token) {
-        aplicarTema("claro");
-        document.getElementById("tema").value = "claro";
-        document.getElementById("notificaciones").value = "activadas";
-        return;
-      }
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
       const response = await fetch("/api/configuracion", {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: headers,
+        credentials: "include",
       });
+
       const data = await response.json();
 
       if (response.ok && data.success) {
@@ -59,15 +53,10 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.setItem("notificaciones", notificaciones);
       } else {
         const temaCached = localStorage.getItem("theme") || "claro";
-        const notifCached =
-          localStorage.getItem("notificaciones") || "activadas";
+        const notifCached = localStorage.getItem("notificaciones") || "activadas";
         document.getElementById("tema").value = temaCached;
         document.getElementById("notificaciones").value = notifCached;
         aplicarTema(temaCached);
-        mostrarMensaje(
-          "No se pudo cargar la configuración del servidor, usando valores locales",
-          "warning",
-        );
       }
     } catch (error) {
       console.error("Error cargando configuración:", error);
@@ -76,14 +65,10 @@ document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("tema").value = temaCached;
       document.getElementById("notificaciones").value = notifCached;
       aplicarTema(temaCached);
-      mostrarMensaje(
-        "Error de conexión, usando configuración local",
-        "warning",
-      );
     }
   }
 
-  //  Guardar configuración en el BACKEND y en localStorage
+  // ========== GUARDAR ==========
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
 
@@ -97,17 +82,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     try {
       const token = localStorage.getItem("access_token");
-      if (!token) {
-        mostrarMensaje("No hay sesión activa, no se puede guardar", "error");
-        return;
-      }
+      const csrfToken = getCookie("csrf_access_token");
 
       const response = await fetch("/api/configuracion", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          "X-CSRF-TOKEN": csrfToken,                 
+          ...(token && { Authorization: `Bearer ${token}` }),
         },
+        credentials: "include",                      
         body: JSON.stringify(payload),
       });
 
@@ -119,13 +103,13 @@ document.addEventListener("DOMContentLoaded", function () {
         aplicarTema(data.data.tema);
         mostrarMensaje("Configuración guardada correctamente", "success");
       } else {
+        // Fallback local
         localStorage.setItem("theme", tema);
         localStorage.setItem("notificaciones", notificaciones);
         aplicarTema(tema);
         mostrarMensaje(
-          data.message ||
-            "Error al guardar en el servidor, se guardó localmente",
-          "warning",
+          data.message || "Error al guardar en el servidor, se guardó localmente",
+          "warning"
         );
       }
     } catch (error) {
@@ -133,11 +117,13 @@ document.addEventListener("DOMContentLoaded", function () {
       localStorage.setItem("theme", tema);
       localStorage.setItem("notificaciones", notificaciones);
       aplicarTema(tema);
-      mostrarMensaje(
-        "Error de conexión, configuración guardada localmente",
-        "warning",
-      );
+      mostrarMensaje("Error de conexión, configuración guardada localmente", "warning");
     }
+  });
+
+  // ========== PREVIEW DE TEMA EN VIVO ==========
+  document.getElementById("tema")?.addEventListener("change", function () {
+    aplicarTema(this.value);
   });
 
   cargarConfiguracion();
