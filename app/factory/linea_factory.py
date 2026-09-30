@@ -54,50 +54,16 @@ class LineaFactory:
             raise ResourceNotValid(nombre_campo, f"{nombre_campo} debe ser un número válido")
 
     @staticmethod
-    def crear_linea(data):
-        """
-        Valida y crea una instancia de Linea sin guardarla aún.
-        No consulta la base de datos.
-        
-        Args:
-            data (dict): Diccionario con los datos de la línea.
-                - nombre (str): Nombre de la línea.
-                - rif (str): RIF en formato J-12345678-9.
-                - presidente_id (int): ID del presidente.
-                - secretario_id (int, opcional): ID del secretario.
-                - otros campos...
-        
-        Returns:
-            Linea: Instancia de Linea no guardada.
-        
-        Raises:
-            ResourceNotValid: Si algún campo no cumple con las validaciones.
-        """
-        
-        # 1. Validar nombre
+    def crear_linea(data, color=None):
         nombre = LineaFactory._validar_nombre(data.get("nombre"))
-        
-        # 2. Validar RIF (sanitizar y validar formato)
-        rif_raw = data.get("rif")
-        if not rif_raw:
-            raise ResourceNotValid("RIF", "El RIF es requerido")
-        rif = LineaFactory._validar_rif(rif_raw)
-        
-        # 3. Validar presidente_id (obligatorio)
+        rif = LineaFactory._validar_rif(data.get("rif"))           
         presidente_id = LineaFactory._validar_id(data.get("presidente_id"), "presidente_id")
-        if presidente_id is None:
-            raise ResourceNotValid("presidente_id", "Debes seleccionar un presidente")
-        
-        # 4. Validar secretario_id (opcional)
         secretario_id = LineaFactory._validar_id(data.get("secretario_id"), "secretario_id")
-        
-        # 5. (Opcional) Otros campos como status, descripcion, etc.
-        # Si existen, agregar validaciones similares.
-        
-        # Crear instancia de Linea
+
         return Linea(
             nombre=nombre,
             rif=rif,
             presidente_id=presidente_id,
-            secretario_id=secretario_id
+            secretario_id=secretario_id,
+            color=color or data.get("color") or '#74A9D3'
         )

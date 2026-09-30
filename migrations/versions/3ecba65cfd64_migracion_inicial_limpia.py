@@ -1,8 +1,8 @@
-"""migracion inicial
+"""migracion inicial limpia
 
-Revision ID: f8cf8e5df95c
+Revision ID: 3ecba65cfd64
 Revises: 
-Create Date: 2026-09-16 16:30:06.606735
+Create Date: 2026-09-25 22:14:54.447515
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'f8cf8e5df95c'
+revision = '3ecba65cfd64'
 down_revision = None
 branch_labels = None
 depends_on = None

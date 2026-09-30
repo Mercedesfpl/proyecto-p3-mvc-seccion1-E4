@@ -1,5 +1,9 @@
+# app/repositories/rutaRepository.py
+
 from app.models.ruta import Ruta
-from ..extensions import db
+from app.models.ruta_parada import RutaParada
+from app.extensions import db
+
 
 class RutaRepository:
     

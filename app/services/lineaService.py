@@ -21,6 +21,10 @@ class LineaServices:
                     "presidente": l.presidente.nombre if l.presidente else None,
                     "secretario_nombre": l.secretario.nombre if l.secretario else None,
                     "rif": l.rif,
+                    "color": l.color or "#74A9D3",            
+                    "suspendido": l.suspendido,                
+                    "presidente_id": l.presidente_id,          
+                    "secretario_id": l.secretario_id,         
                 }
                 for l in lineas
             ]
@@ -66,11 +70,9 @@ class LineaServices:
             for s in secretarios
         ]
 
+
     @staticmethod
     def create_linea(data):
-        # Crea una nueva línea usando la fábrica
-
-        # Validaciones de negocio
         if not data.get("nombre"):
             raise ResourceNotValid("Línea", "El nombre es obligatorio")
         if not data.get("rif"):
@@ -78,48 +80,39 @@ class LineaServices:
         if not data.get("presidente_id"):
             raise ResourceNotValid("Línea", "Debes seleccionar un presidente")
 
-        # Verificar que no exista otra línea con el mismo nombre
         if LineaRepository.existentePorNombre(data["nombre"]):
             raise ResourceNotValid("Línea", "Ya existe una línea con ese nombre")
 
-        # Verificar que el presidente exista
-        presidente = UserRepository.get_by_id(data["presidente_id"])
+        # El presidente es una Persona, no un Usuario
+        presidente = PersonaRepository.get_by_id(data["presidente_id"])
         if not presidente:
             raise ResourceNotFound("Presidente no encontrado")
 
-        # Verificar que el secretario exista (si se selecciono)
         secretario_id = data.get("secretario_id")
         if secretario_id:
             secretario = UserRepository.get_by_id(secretario_id)
             if not secretario:
                 raise ResourceNotFound("Secretario no encontrado")
-        else:
-            secretario_id = None
 
-        # Usar la fábrica para crear un objeto
         nueva_linea = LineaFactory.crear_linea(data)
 
         if secretario_id:
             nueva_linea.secretario_id = secretario_id
 
-        # Guardar en la bd
         return LineaRepository.save(nueva_linea)
+
 
     @staticmethod
     def update_linea(id_linea, data):
-        # Actualiza una línea existente
-
         try:
             id_linea = int(id_linea)
         except (TypeError, ValueError):
             raise ResourceNotValid("Línea", "ID no válido")
 
-        # Validaciones de negocio
         linea = LineaRepository.get_by_id(id_linea)
         if not linea or linea.suspendido:
             raise ResourceNotFound("Línea")
 
-        # Actualizar campos con validaciones
         if "nombre" in data:
             nombre = data["nombre"].strip()
             if LineaRepository.existentePorNombre(nombre, exclude_id=id_linea):
@@ -130,7 +123,7 @@ class LineaServices:
             linea.rif = data["rif"].strip()
 
         if "presidente_id" in data:
-            presidente = UserRepository.get_by_id(data["presidente_id"])
+            presidente = PersonaRepository.get_by_id(data["presidente_id"]) 
             if not presidente:
                 raise ResourceNotFound("Presidente")
             linea.presidente_id = data["presidente_id"]
@@ -144,6 +137,9 @@ class LineaServices:
                 linea.secretario_id = secretario_id
             else:
                 linea.secretario_id = None
+
+        if "color" in data and data["color"]:
+            linea.color = data["color"]
 
         return LineaRepository.update(linea)
 
