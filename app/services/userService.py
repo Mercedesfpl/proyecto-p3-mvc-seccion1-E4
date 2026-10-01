@@ -38,7 +38,7 @@ class UserService:
             minutos = round(tiempo_restante.total_seconds() / 60)
             raise Unauthorized(
                 "Usuario",
-                reason=f"Usuario bloqueado temporalmente intenta nuevamente en {minutos} minutos",
+                rason=f"Usuario bloqueado temporalmente intenta nuevamenteeee en {minutos} minutos",
             )
 
         if user.verificar_password(user_data.password):
@@ -49,14 +49,19 @@ class UserService:
             login_user(user)
 
             # Generar token
-            from flask_jwt_extended import create_access_token
+            from flask_jwt_extended import create_access_token, create_refresh_token
 
             datos_adicionales = {"rol": user.rol}
             access_token = create_access_token(
                 identity=str(user.id), additional_claims=datos_adicionales
             )
+            refresh_token = create_refresh_token(identity=str(user.id))
 
-            return {"access_token": access_token}
+            return {
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+                "tema": user.tema or "claro",
+            }
         else:
             user.intentos_fallidos += 1
             UserRepository.update(user)
@@ -105,27 +110,17 @@ class UserService:
         )
         new_user.generateHass(user_data.password)
 
-        # UserRepository.save_usuario(new_user)
+        UserRepository.save_usuario(new_user)
 
         user_session = new_user.a_sesion()
         token = get_access_token(userData=user_session)
 
-        return success_response(
-            message="Registro exitoso",
-            cookies=token,
-            data={
-                "token": token,
-                "nombre": user_session.nombre,
-                "email": user_session.email,
-            },
-        )
+        return success_response(message="Registro exitoso", cookies=token)
 
     @staticmethod
     def request_password_reset(user_data):
-        print("Data---> user service >>>", user_data.email)
         # Genera y envía código de recuperación de contraseña
         user = UserRepository.get_by_email(user_data.email)
-        print("Usewr en service", user.email)
 
         if not user:
             raise UserNotValid(
@@ -133,7 +128,6 @@ class UserService:
             )
 
         code = user.generate_reset_code()
-        print("el codigo----->", code)
         UserRepository.update(user)
 
         if enviar_correo_recuperacion(userData=user_data, code=code):
@@ -237,21 +231,13 @@ class UserService:
         if enviar_correo_verificacion(userData=user_session, code=code):
             token = get_access_token(userData=user_session)
             return success_response(
-                message="El código se ha enviado correctamente",
-                cookies=token,
-                data={
-                    "token": token,
-                    "nombre": user_session.nombre,
-                    "email": user_session.email,
-                    "id": user_session.id,
-                },
+                message="El código se ha enviado correctamente", cookies=token
             )
         else:
             raise UserNotValid("No se ha logrado enviar el correo")
 
     @staticmethod
     def register2(user_data, code):
-        print("Dataaaa--->", user_data)
         # Completa el registro después de verificar el código
         pre_user = UserRepository.get_pre_register_by_id(user_data.id)
 
@@ -281,15 +267,7 @@ class UserService:
         user_session = new_user.a_sesion()
         token = get_access_token(userData=user_session)
 
-        return success_response(
-            message="Registro exitoso",
-            cookies=token,
-            data={
-                "nombre": user_session.nombre,
-                "token": token,
-                "rol": user_session.rol,
-            },
-        )
+        return success_response(message="Registro exitoso", cookies=token)
 
     @staticmethod
     def verify_email(user_data, code):
@@ -323,6 +301,7 @@ class UserService:
             "nombre": usuario.nombre,
             "email": usuario.email,
             "rol": usuario.rol,
+            "tema": usuario.tema or "claro",
         }
 
     @staticmethod

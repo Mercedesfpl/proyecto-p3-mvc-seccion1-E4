@@ -1,0 +1,16 @@
+{# Partial reutilizable para toolbar de tabla #}
+<div class="tabla-toolbar">
+    <div class="tabla-busqueda">
+        <i class="fas fa-search"></i>
+        <input
+            type="text"
+            id="{{ search_id|default('searchInput') }}"
+            placeholder="{{ search_placeholder|default('Buscar...') }}"
+            data-tabla-search
+        >
+    </div>
+
+    <div class="filter-group">
+        {% block filtros_extra %}{% endblock %}
+    </div>
+</div>

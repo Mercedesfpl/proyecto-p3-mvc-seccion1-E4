@@ -1,5 +1,3 @@
-<!-- app/frontend/views/pages/rutas.html -->
-
 {% extends 'layouts/base.html' %}
 
 {% block title %}Rutas{% endblock %}
@@ -39,7 +37,22 @@
                     </select>
                 </div>
             </div>
-            <div id="tablaRutas"></div>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Línea</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="rutasTableBody">
+                    <!-- Aquí se llenan las rutas -->
+                </tbody>
+            </table>
+
             <div class="tabla-paginacion" id="paginacionRutas">
                 <button id="btnAnterior" disabled>
                     <i class="fas fa-chevron-left"></i> Anterior
@@ -68,7 +81,7 @@
     </div>
 </div>
 
-<!-- MODAL NUEVA RUTA - Layout de 2 columnas -->
+<!-- MODAL NUEVA / EDITAR RUTA -->
 <div id="modalNuevaRuta" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -76,7 +89,6 @@
             <span class="modal-close" onclick="cerrarModalRuta()">&times;</span>
         </div>
 
-        <!-- Layout de 2 columnas -->
         <div class="modal-ruta-layout">
             <!-- Columna izquierda: Formulario -->
             <div class="form-columna">
@@ -148,6 +160,61 @@
                     <span id="contadorParadasSeleccionadas">0 paradas</span> seleccionadas
                 </small>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL VER RUTA -->
+<div id="modalVerRuta" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-info-circle"></i> Detalle de la Ruta</h2>
+            <span class="modal-close" onclick="cerrarModalVerRuta()">&times;</span>
+        </div>
+
+        <div class="detalle-ruta">
+            <div class="detalle-header">
+                <div class="detalle-icono">
+                    <i class="fas fa-route"></i>
+                </div>
+                <div class="detalle-titulo">
+                    <span class="detalle-id" id="verRutaId">RUTA-000</span>
+                    <span class="status-badge" id="verRutaEstadoBadge">
+                        <span id="verRutaEstado">-</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="detalle-grid">
+                <div class="detalle-item">
+                    <span class="detalle-label"><i class="fas fa-signature"></i> Nombre</span>
+                    <span class="detalle-value" id="verRutaNombre">-</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label"><i class="fas fa-sitemap"></i> Línea</span>
+                    <span class="detalle-value" id="verRutaLinea">-</span>
+                </div>
+                <div class="detalle-item">
+                    <span class="detalle-label"><i class="fas fa-map-marker-alt"></i> Total paradas</span>
+                    <span class="detalle-value" id="verRutaParadas">-</span>
+                </div>
+            </div>
+
+            <div class="detalle-paradas">
+                <span class="detalle-label"><i class="fas fa-list-ol"></i> Paradas de la ruta</span>
+                <ol id="verRutaListaParadas" class="lista-paradas-detalle">
+                    <li class="item-vacio">Sin paradas</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-editar-ver" onclick="editarDesdeVer()">
+                <i class="fas fa-edit"></i> Editar
+            </button>
+            <button class="btn-cerrar" onclick="cerrarModalVerRuta()">
+                <i class="fas fa-times"></i> Cerrar
+            </button>
         </div>
     </div>
 </div>

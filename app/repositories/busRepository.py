@@ -1,10 +1,9 @@
-# app/repositories/busRepository.py
-
-from ..models.bus import Bus
+from app.models.bus import Bus
 from ..extensions import db
 
 
 class BusRepository:
+    # Se debe hacer un join para traer {id_linea, id_ruta, id_secretario, id_vehiculo}
 
     @staticmethod
     def get_all():
@@ -19,28 +18,15 @@ class BusRepository:
         return Bus.query.filter_by(placa=placa).first()
 
     @staticmethod
-    def existePorPlaca(placa, exclude_id=None):
+    def existentePorPlaca(placa, exclude_id=None):
         query = Bus.query.filter_by(placa=placa)
         if exclude_id:
             query = query.filter(Bus.id_vehiculo != exclude_id)
         return query.first() is not None
 
     @staticmethod
-    def get_by_linea(id_linea):
-        return Bus.query.filter_by(id_linea=id_linea).all()
-
-    @staticmethod
-    def get_by_ruta(id_ruta):
-        return Bus.query.filter_by(id_ruta=id_ruta).all()
-
-    @staticmethod
     def save(bus):
         db.session.add(bus)
-        db.session.commit()
-        return bus
-
-    @staticmethod
-    def update(bus):
         db.session.commit()
         return bus
 

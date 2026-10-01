@@ -16,6 +16,7 @@ class Usuario(db.Model, UserMixin):
     password = db.Column(db.String(255), nullable=False)
     isAdmin = db.Column(db.Boolean, default=False)
     rol = db.Column(db.String(20), default="usuario")
+    tema = db.Column(db.String(20), default='claro')
     reset_code = db.Column(db.String(10), nullable=True)
     reset_code_expires = db.Column(db.DateTime, nullable=True)
     timestamp = db.Column(db.DateTime, default=datetime.now, index=True)

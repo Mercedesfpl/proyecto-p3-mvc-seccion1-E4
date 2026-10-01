@@ -172,16 +172,3 @@ if (sidebarUser && sidebarUserMenu) {
     }
 });
 
-function showToast(message, type) {
-    type = type || 'success';
-    var toast = document.getElementById('toastMessage');
-    if (!toast) return;
-
-    toast.textContent = message;
-    toast.className = 'toast-message ' + type + ' show';
-
-    clearTimeout(toast._timeout);
-    toast._timeout = setTimeout(function() {
-        toast.classList.remove('show');
-    }, 4000);
-}
