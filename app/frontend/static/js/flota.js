@@ -323,18 +323,11 @@ async function guardarNuevaUnidad(e) {
 
   loadingUnidad = true;
   document.getElementById("guardarUnidadBtn").disabled = true;
-
   try {
     const csrfToken = getCookie("csrf_access_token");
-    const esEdicion = editandoIdUnidad !== null;
-    const url = esEdicion
-      ? `/admin/buses/${editandoIdUnidad}`
-      : `/admin/save-bus`;
-    const method = esEdicion ? "PUT" : "POST";
-
     const url = editandoIdUnidad
       ? `/admin/buses/${editandoIdUnidad}`
-      : "/admin/buses";
+      : "/admin/save-bus";
     const method = editandoIdUnidad ? "PUT" : "POST";
 
     const response = await fetch(url, {
@@ -370,7 +363,6 @@ async function guardarNuevaUnidad(e) {
     document.getElementById("guardarUnidadBtn").disabled = false;
   }
 }
-
 // ============================================================
 // 6. EDITAR UNIDAD
 // ============================================================

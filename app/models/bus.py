@@ -13,9 +13,11 @@ class Bus(db.Model):
 
     id_ruta = db.Column(db.Integer, db.ForeignKey("rutas.id"), nullable=True)
     id_linea = db.Column(db.Integer, db.ForeignKey("lineas.id"), nullable=False)
+    id_secretario = db.Column(db.Integer, db.ForeignKey("usuarios.id"), nullable=True)
 
     ruta = db.relationship("Ruta", foreign_keys=[id_ruta])
     linea = db.relationship("Linea", foreign_keys=[id_linea])
+    secretario = db.relationship("Usuario", foreign_keys=[id_secretario])
 
     def to_dict(self):
         return {
