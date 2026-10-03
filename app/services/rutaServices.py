@@ -41,7 +41,8 @@ class RutaServices:
             'status': data.get('status', 'activa')
         }
         ruta = RutaFactory.crear_ruta(ruta_data)
-        ruta_guardada = RutaRepository.save(ruta)
+        db.session.add(ruta)
+        db.session.flush()
 
         paradas_ids = data.get('paradas_ids', [])
         if paradas_ids:
@@ -54,14 +55,14 @@ class RutaServices:
                     raise ResourceNotValid("Parada", f"La parada {id_parada} no existe")
 
                 ruta_parada = RutaParada(
-                    id_ruta=ruta_guardada.id,
+                    id_ruta=ruta.id,
                     id_parada=id_parada,
                     orden_parada=i
                 )
                 db.session.add(ruta_parada)
             db.session.commit()
 
-        return ruta_guardada.to_dict()
+        return ruta.to_dict()
 
     @staticmethod
     def update_ruta(id_ruta, data):

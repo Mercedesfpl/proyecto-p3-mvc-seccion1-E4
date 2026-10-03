@@ -74,14 +74,14 @@ def verify_email():
     if not request.method == "GET":
         data_cliente = request.get_json()
         id_token = get_jwt_identity()
-        usuario = UserSession(id=id_token)
+        #usuario = UserSession(id=id_token)
         code = data_cliente.get("code")
-        return userControllers.verificar_Email(usuario, code)
+        return userControllers.verificar_Email(id_token, code)
 
     if not request.method == "POST":
         id_token = get_jwt_identity()
-        usuario = UserSession(id=id_token)
-        return userControllers.enviar_codigo_de_verificacion(usuario)
+        #usuario = UserSession(id=id_token)
+        return userControllers.enviar_codigo_de_verificacion(id_token)
 
 
 @auth_scope.route("/pre-register", methods=["POST"])
@@ -111,12 +111,16 @@ def get_perfil():
 @auth_scope.route("/perfil", methods=["PUT"])
 @jwt_required()
 def update_perfil():
-    return userControllers.update_perfil()
+    user_id = int(get_jwt_identity())
+    data = request.get_json()
+    return userControllers.update_perfil(user_id, data)
 
 @auth_scope.route("/cambiar-contrasena", methods=["POST"])
 @jwt_required()
 def cambiar_contrasena():
-    return userControllers.cambiar_contrasenia()
+    user_id = int(get_jwt_identity())
+    data = request.get_json()
+    return userControllers.cambiar_contrasenia(user_id, data)
 
 @auth_scope.route("/configuracion", methods=["PUT"])
 @jwt_required()

@@ -2,6 +2,7 @@ from flask import request, jsonify
 from app.services.rutaServices import RutaServices
 from app.models.exceptions import ResourceNotFound, ResourceNotValid
 from app.helpers.makeResponse import success_response, error_response
+import traceback
 
 
 def get_all_rutas():
@@ -32,23 +33,23 @@ def create_ruta(data):
     try:
         print("datos de crear tuta>>>>>>>>>>>>>>", data)
         ruta = RutaServices.create_ruta(data)
-        return success_response(message="Ruta creada exitosamente", data=ruta.to_dict())
+        return success_response(message="Ruta creada exitosamente", data=data)
     except ResourceNotValid as e:
         return error_response(error=str(e), message=str(e), status_code=400)
     except ResourceNotFound as e:
         return error_response(error=str(e), message=str(e), status_code=404)
     except Exception as e:
+        #traceback.print_exc() 
         return error_response(
             error=str(e), message="Error al crear la ruta", status_code=500
         )
 
 
-def update_ruta(id_ruta):
+def update_ruta(id_ruta, data):
     try:
-        data = request.get_json()
         ruta = RutaServices.update_ruta(id_ruta, data)
         return success_response(
-            message="Ruta actualizada exitosamente", data=ruta.to_dict()
+            message="Ruta actualizada exitosamente", data=ruta
         )
     except ResourceNotValid as e:
         return error_response(error=str(e), message=str(e), status_code=400)

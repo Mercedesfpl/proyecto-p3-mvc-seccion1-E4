@@ -47,7 +47,7 @@ function inicializarMapaPrincipal(paradas = []) {
   container.innerHTML = "";
 
   let centroLat = 10.3447;
-  let centroLng = -67.0400;
+  let centroLng = -67.04;
 
   if (paradas.length > 0 && paradas[0].coordenadas) {
     const coords = paradas[0].coordenadas.split(",");
@@ -164,7 +164,7 @@ function destruirMapaModal() {
   if (container) container.innerHTML = "";
 }
 
-function inicializarMapaModal(lat = 10.3447, lng = -67.0400) {
+function inicializarMapaModal(lat = 10.3447, lng = -67.04) {
   if (mapa) destruirMapaModal();
 
   const container = document.getElementById("map-container");
@@ -261,7 +261,7 @@ function mostrarMapaModal(mostrar) {
 
     const coordsInput = document.getElementById("coordenadas");
     let lat = 10.3447;
-    let lng = -67.0400;
+    let lng = -67.04;
 
     if (coordsInput && coordsInput.value) {
       const partes = coordsInput.value.split(",");
@@ -417,7 +417,8 @@ function renderizarPagina() {
 
   tbody.innerHTML = "";
   pagina.forEach((p) => {
-    const statusClass = p.status === "activa" ? "status-active" : "status-inactive";
+    const statusClass =
+      p.status === "activa" ? "status-active" : "status-inactive";
     const statusText = p.status === "activa" ? "Activa" : "Inactiva";
 
     const tr = document.createElement("tr");
@@ -491,7 +492,9 @@ function asignarEventosTabla() {
 // ============================================================
 async function verParada(id) {
   try {
-    const response = await fetch(`/admin/paradas/${id}`, { credentials: "include" });
+    const response = await fetch(`/admin/paradas/${id}`, {
+      credentials: "include",
+    });
     const data = await response.json();
     if (!data.success || !data.data) {
       mostrarNotificacion(data.message || "Parada no encontrada", "danger");
@@ -505,13 +508,16 @@ async function verParada(id) {
     document.getElementById("verParadaId").textContent =
       `PARADA-${String(p.id).padStart(3, "0")}`;
     document.getElementById("verParadaNombre").textContent = p.nombre || "-";
-    document.getElementById("verParadaCoordenadas").textContent = p.coordenadas || "-";
+    document.getElementById("verParadaCoordenadas").textContent =
+      p.coordenadas || "-";
     document.getElementById("verParadaEstado").textContent = statusText;
 
     // Badge dinámico
     const badge = document.getElementById("verParadaEstadoBadge");
     badge.className = "status-badge";
-    badge.classList.add(p.status === "activa" ? "status-active" : "status-inactive");
+    badge.classList.add(
+      p.status === "activa" ? "status-active" : "status-inactive",
+    );
 
     // Fecha
     let fechaTexto = "No disponible";
@@ -554,7 +560,9 @@ function editarDesdeVer() {
 // ============================================================
 async function editarParada(id) {
   try {
-    const response = await fetch(`/admin/paradas/${id}`, { credentials: "include" });
+    const response = await fetch(`/admin/paradas/${id}`, {
+      credentials: "include",
+    });
     const data = await response.json();
     if (!data.success || !data.data) throw new Error("Datos inválidos");
 
@@ -588,7 +596,10 @@ async function eliminarParada(id) {
       mostrarNotificacion("Parada eliminada exitosamente", "success");
       cargarParadas();
     } else {
-      mostrarNotificacion(data.error || data.message || "Error al eliminar", "danger");
+      mostrarNotificacion(
+        data.error || data.message || "Error al eliminar",
+        "danger",
+      );
     }
   } catch (error) {
     console.error("Error:", error);
@@ -600,7 +611,8 @@ async function eliminarParada(id) {
 // 12. FILTROS
 // ============================================================
 function aplicarFiltros() {
-  const searchTerm = document.getElementById("searchParada")?.value?.toLowerCase() || "";
+  const searchTerm =
+    document.getElementById("searchParada")?.value?.toLowerCase() || "";
   const filterEstado = document.getElementById("filterEstado")?.value || "";
 
   paradasFiltradas = todasLasParadas.filter((p) => {
@@ -621,14 +633,18 @@ function aplicarFiltros() {
 // ============================================================
 document.addEventListener("DOMContentLoaded", function () {
   // Expandir mapa
-  document.getElementById("btnExpandirMapa")?.addEventListener("click", toggleExpandirMapa);
+  document
+    .getElementById("btnExpandirMapa")
+    ?.addEventListener("click", toggleExpandirMapa);
 
   // Toggle mapa en modal
-  document.getElementById("btnToggleMapa")?.addEventListener("click", function () {
-    const container = document.getElementById("mapaContainer");
-    const isVisible = container && container.style.display !== "none";
-    mostrarMapaModal(!isVisible);
-  });
+  document
+    .getElementById("btnToggleMapa")
+    ?.addEventListener("click", function () {
+      const container = document.getElementById("mapaContainer");
+      const isVisible = container && container.style.display !== "none";
+      mostrarMapaModal(!isVisible);
+    });
 
   // Formulario
   const form = document.getElementById("paradaForm");
@@ -658,7 +674,9 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
-      const url = editandoId ? `/admin/paradas/${editandoId}` : "/admin/paradas";
+      const url = editandoId
+        ? `/admin/paradas/${editandoId}`
+        : "/admin/paradas";
       const method = editandoId ? "PUT" : "POST";
       const csrfToken = getCookie("csrf_access_token");
 
@@ -678,12 +696,15 @@ document.addEventListener("DOMContentLoaded", function () {
         if (response.ok && data.success) {
           mostrarNotificacion(
             editandoId ? "Parada actualizada" : "Parada creada exitosamente",
-            "success"
+            "success",
           );
           cerrarModal();
           cargarParadas();
         } else {
-          mostrarNotificacion(data.error || data.message || "Error al guardar", "danger");
+          mostrarNotificacion(
+            data.error || data.message || "Error al guardar",
+            "danger",
+          );
         }
       } catch (error) {
         console.error("Error:", error);
@@ -728,8 +749,12 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Filtros
-  document.getElementById("searchParada")?.addEventListener("input", aplicarFiltros);
-  document.getElementById("filterEstado")?.addEventListener("change", aplicarFiltros);
+  document
+    .getElementById("searchParada")
+    ?.addEventListener("input", aplicarFiltros);
+  document
+    .getElementById("filterEstado")
+    ?.addEventListener("change", aplicarFiltros);
 
   // Paginación
   document.getElementById("btnAnterior")?.addEventListener("click", () => {
@@ -740,7 +765,10 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   document.getElementById("btnSiguiente")?.addEventListener("click", () => {
-    const totalPaginas = Math.max(1, Math.ceil(paradasFiltradas.length / itemsPorPagina));
+    const totalPaginas = Math.max(
+      1,
+      Math.ceil(paradasFiltradas.length / itemsPorPagina),
+    );
     if (paginaActual < totalPaginas) {
       paginaActual++;
       renderizarPagina();

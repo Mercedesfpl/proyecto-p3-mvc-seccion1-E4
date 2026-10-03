@@ -35,7 +35,9 @@ async function abrirModalRuta(titulo = "Nueva Ruta") {
   if (!modal) return;
 
   document.getElementById("formNuevaRuta").reset();
-  document.querySelectorAll(".is-invalid").forEach((el) => el.classList.remove("is-invalid"));
+  document
+    .querySelectorAll(".is-invalid")
+    .forEach((el) => el.classList.remove("is-invalid"));
 
   const titleEl = document.getElementById("modalRutaTitle");
   if (titleEl) titleEl.textContent = titulo;
@@ -129,15 +131,19 @@ function renderizarListasParadas() {
   if (!listaDisp || !listaSel) return;
 
   const idsSeleccionados = paradasSeleccionadas.map((p) => p.id);
-  const disponibles = paradasDisponibles.filter((p) => !idsSeleccionados.includes(p.id));
+  const disponibles = paradasDisponibles.filter(
+    (p) => !idsSeleccionados.includes(p.id),
+  );
 
   if (contDisp) contDisp.textContent = disponibles.length;
   if (contSel) contSel.textContent = paradasSeleccionadas.length;
-  if (contTotal) contTotal.textContent = `${paradasSeleccionadas.length} paradas`;
+  if (contTotal)
+    contTotal.textContent = `${paradasSeleccionadas.length} paradas`;
 
   listaDisp.innerHTML = "";
   if (disponibles.length === 0) {
-    listaDisp.innerHTML = '<div class="item-vacio">No hay paradas disponibles</div>';
+    listaDisp.innerHTML =
+      '<div class="item-vacio">No hay paradas disponibles</div>';
   } else {
     disponibles.forEach((parada) => {
       const div = document.createElement("div");
@@ -154,7 +160,8 @@ function renderizarListasParadas() {
 
   listaSel.innerHTML = "";
   if (paradasSeleccionadas.length === 0) {
-    listaSel.innerHTML = '<div class="item-vacio">No hay paradas seleccionadas</div>';
+    listaSel.innerHTML =
+      '<div class="item-vacio">No hay paradas seleccionadas</div>';
   } else {
     paradasSeleccionadas.forEach((parada, index) => {
       const div = document.createElement("div");
@@ -235,7 +242,9 @@ async function guardarRuta(e) {
   const data = Object.fromEntries(formData.entries());
 
   let valid = true;
-  document.querySelectorAll(".is-invalid").forEach((el) => el.classList.remove("is-invalid"));
+  document
+    .querySelectorAll(".is-invalid")
+    .forEach((el) => el.classList.remove("is-invalid"));
 
   if (!data.nombre || !data.nombre.trim()) {
     document.getElementById("nombre_ruta").classList.add("is-invalid");
@@ -275,13 +284,18 @@ async function guardarRuta(e) {
 
     if (response.ok && result.success) {
       mostrarNotificacion(
-        esEdicion ? "Ruta actualizada exitosamente" : "Ruta creada exitosamente",
-        "success"
+        esEdicion
+          ? "Ruta actualizada exitosamente"
+          : "Ruta creada exitosamente",
+        "success",
       );
       cerrarModalRuta();
       cargarDatos();
     } else {
-      mostrarNotificacion(result.message || "Error al guardar la ruta", "danger");
+      mostrarNotificacion(
+        result.message || "Error al guardar la ruta",
+        "danger",
+      );
     }
   } catch (error) {
     console.error("Error al guardar ruta:", error);
@@ -334,7 +348,9 @@ async function cargarDatos() {
   }
 
   try {
-    const response = await fetch("/admin/rutas/api", { credentials: "include" });
+    const response = await fetch("/admin/rutas/api", {
+      credentials: "include",
+    });
     const data = await response.json();
 
     if (data.success) {
@@ -392,9 +408,13 @@ function renderizarPagina() {
   tbody.innerHTML = "";
   pagina.forEach((ruta) => {
     const idRuta = ruta.id ?? ruta.id_ruta;
-    const statusClass = ruta.status === "activa" ? "status-active" : "status-inactive";
+    const statusClass =
+      ruta.status === "activa" ? "status-active" : "status-inactive";
     const statusText = ruta.status === "activa" ? "Activa" : "Inactiva";
-    const nombreLinea = ruta.linea_nombre || (ruta.linea ? ruta.linea.nombre : null) || "Sin linea";
+    const nombreLinea =
+      ruta.linea_nombre ||
+      (ruta.linea ? ruta.linea.nombre : null) ||
+      "Sin linea";
     const totalParadas = Array.isArray(ruta.paradas) ? ruta.paradas.length : 0;
 
     const tr = document.createElement("tr");
@@ -408,7 +428,6 @@ function renderizarPagina() {
           ${nombreLinea}
         </a>
       </td>
-      <td>${totalParadas}</td>
       <td>
         <span class="status-badge ${statusClass}">
           <i class="fas fa-circle"></i> ${statusText}
@@ -483,7 +502,9 @@ function actualizarMapaPrincipal(rutasData) {
 
   if (controlesRuta.length > 0) {
     controlesRuta.forEach((control) => {
-      try { mapaPrincipal.removeControl(control); } catch (e) {}
+      try {
+        mapaPrincipal.removeControl(control);
+      } catch (e) {}
     });
     controlesRuta = [];
   }
@@ -508,7 +529,9 @@ function actualizarMapaPrincipal(rutasData) {
     const color = ruta.color || "#74A9D3";
 
     if (ruta.paradas && ruta.paradas.length >= 2) {
-      const paradasOrdenadas = [...ruta.paradas].sort((a, b) => a.orden - b.orden);
+      const paradasOrdenadas = [...ruta.paradas].sort(
+        (a, b) => a.orden - b.orden,
+      );
 
       const waypoints = paradasOrdenadas
         .map((p) => {
@@ -560,7 +583,7 @@ function actualizarMapaPrincipal(rutasData) {
           }).addTo(mapaPrincipal);
 
           marker.bindPopup(
-            `<strong>${parada.nombre}</strong><br>Orden: ${i + 1}<br>Ruta: ${ruta.nombre}`
+            `<strong>${parada.nombre}</strong><br>Orden: ${i + 1}<br>Ruta: ${ruta.nombre}`,
           );
         });
       }
@@ -615,7 +638,9 @@ function actualizarMapaModal() {
   if (!mapaModal) return;
 
   marcadoresModal.forEach((m) => {
-    try { mapaModal.removeLayer(m); } catch (e) {}
+    try {
+      mapaModal.removeLayer(m);
+    } catch (e) {}
   });
   marcadoresModal = [];
 
@@ -733,23 +758,32 @@ async function verRuta(id) {
     idRutaViendo = id;
 
     const idRuta = ruta.id ?? ruta.id_ruta;
-    const nombreLinea = ruta.linea_nombre || (ruta.linea ? ruta.linea.nombre : null) || "Sin linea";
+    const nombreLinea =
+      ruta.linea_nombre ||
+      (ruta.linea ? ruta.linea.nombre : null) ||
+      "Sin linea";
     const statusText = ruta.status === "activa" ? "Activa" : "Inactiva";
 
-    document.getElementById("verRutaId").textContent = `RUTA-${String(idRuta).padStart(3, "0")}`;
+    document.getElementById("verRutaId").textContent =
+      `RUTA-${String(idRuta).padStart(3, "0")}`;
     document.getElementById("verRutaNombre").textContent = ruta.nombre || "-";
     document.getElementById("verRutaLinea").textContent = nombreLinea;
-    document.getElementById("verRutaParadas").textContent = `${(ruta.paradas || []).length} paradas`;
+    document.getElementById("verRutaParadas").textContent =
+      `${(ruta.paradas || []).length} paradas`;
     document.getElementById("verRutaEstado").textContent = statusText;
 
     const badge = document.getElementById("verRutaEstadoBadge");
     badge.className = "status-badge";
-    badge.classList.add(ruta.status === "activa" ? "status-active" : "status-inactive");
+    badge.classList.add(
+      ruta.status === "activa" ? "status-active" : "status-inactive",
+    );
 
     const lista = document.getElementById("verRutaListaParadas");
     lista.innerHTML = "";
     if (ruta.paradas && ruta.paradas.length > 0) {
-      const paradasOrdenadas = [...ruta.paradas].sort((a, b) => a.orden - b.orden);
+      const paradasOrdenadas = [...ruta.paradas].sort(
+        (a, b) => a.orden - b.orden,
+      );
       paradasOrdenadas.forEach((p) => {
         const li = document.createElement("li");
         li.textContent = p.nombre || `Parada #${p.id}`;
@@ -803,7 +837,9 @@ async function editarRuta(id) {
 
     if (ruta.paradas && ruta.paradas.length > 0) {
       const ids = ruta.paradas.map((p) => p.id);
-      paradasSeleccionadas = paradasDisponibles.filter((p) => ids.includes(p.id));
+      paradasSeleccionadas = paradasDisponibles.filter((p) =>
+        ids.includes(p.id),
+      );
     }
 
     modal.classList.add("show");
@@ -839,14 +875,17 @@ function llenarFiltroLineas(listaLineas) {
 }
 
 function aplicarFiltros() {
-  const searchTerm = document.getElementById("searchRuta")?.value?.toLowerCase() || "";
+  const searchTerm =
+    document.getElementById("searchRuta")?.value?.toLowerCase() || "";
   const filterLinea = document.getElementById("filterLinea")?.value || "";
   const filterEstado = document.getElementById("filterEstado")?.value || "";
 
   document.querySelectorAll("#rutasTableBody tr").forEach((tr) => {
-    if (tr.querySelector(".tabla-vacia") || tr.querySelector(".tabla-cargando")) return;
+    if (tr.querySelector(".tabla-vacia") || tr.querySelector(".tabla-cargando"))
+      return;
 
-    const nombre = tr.querySelector("td:nth-child(2)")?.textContent?.toLowerCase() || "";
+    const nombre =
+      tr.querySelector("td:nth-child(2)")?.textContent?.toLowerCase() || "";
     const lineaId = tr.getAttribute("data-linea-id");
     const estado = tr.getAttribute("data-status");
 
@@ -902,16 +941,28 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  document.getElementById("searchRuta")?.addEventListener("input", aplicarFiltros);
-  document.getElementById("filterLinea")?.addEventListener("change", aplicarFiltros);
-  document.getElementById("filterEstado")?.addEventListener("change", aplicarFiltros);
+  document
+    .getElementById("searchRuta")
+    ?.addEventListener("input", aplicarFiltros);
+  document
+    .getElementById("filterLinea")
+    ?.addEventListener("change", aplicarFiltros);
+  document
+    .getElementById("filterEstado")
+    ?.addEventListener("change", aplicarFiltros);
 
   document.getElementById("btnAnterior")?.addEventListener("click", () => {
-    if (paginaActual > 1) { paginaActual--; renderizarPagina(); }
+    if (paginaActual > 1) {
+      paginaActual--;
+      renderizarPagina();
+    }
   });
   document.getElementById("btnSiguiente")?.addEventListener("click", () => {
     const totalPaginas = Math.max(1, Math.ceil(rutas.length / itemsPorPagina));
-    if (paginaActual < totalPaginas) { paginaActual++; renderizarPagina(); }
+    if (paginaActual < totalPaginas) {
+      paginaActual++;
+      renderizarPagina();
+    }
   });
 
   cargarDatos();

@@ -55,3 +55,5 @@ de ahí en adelante podrás utilizar el mapa y los botones correspondientes
 ## Se debe creara la relacion de paradas y rutas
 
 ## Se debe de modificar el metodo para obtener la lista de buses ya que no existe ningun inner joy y las renderizacion de las tablas en el front no muetra los detalles. espesificamente esta app\repositories\paradaRepository.py
+
+## Problemas del back end solucionados
