@@ -1,0 +1,415 @@
+/* Paleta Institucional basada en la imagen (Gama de Azules Exacta) */
+:root {
+    --brand-blue: #3B82C4;            /* Azul medio de la franja / columna */
+    --brand-blue-light: #549AD6;      /* Azul claro brillante */
+    --brand-blue-dark: #2B6296;       /* Azul oscuro institucional */
+    --brand-blue-bg: #EBF3FA;         /* Azul suave para fondos de íconos/hover */
+    --brand-blue-soft: #B9D7F2;       /* Azul pastel claro para texto sobre oscuro */
+    
+    --bg-page: #f8fafc;
+    --bg-card: #ffffff;
+    --border-color: #e2e8f0;
+    --text-dark: #1e293b;
+    --text-muted: #64748b;
+    
+    --radius-lg: 14px;
+    --radius-md: 10px;
+    --radius-sm: 8px;
+    --shadow-soft: 0 4px 16px -2px rgba(43, 98, 150, 0.08);
+}
+
+.dashboard-page {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 10px 0 30px 0;
+    box-sizing: border-box;
+}
+
+/* Header */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.dash-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--brand-blue-dark);
+    margin: 0;
+}
+
+.dash-subtitle {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 2px;
+}
+
+.dash-fecha-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-card);
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.dash-fecha-pill i { color: var(--brand-blue); }
+
+/* KPI Banner Top (Uniforme en el Azul Exacto del Logo) */
+.kpi-banner-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.kpi-pill-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-soft);
+    border-left: 4px solid var(--brand-blue);
+}
+
+/* Todas las tarjetas superiores se unifican en el azul institucional */
+.kpi-pill-card.red,
+.kpi-pill-card.blue,
+.kpi-pill-card.yellow,
+.kpi-pill-card.green {
+    border-left-color: var(--brand-blue);
+}
+
+.kpi-pill-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    background: var(--brand-blue-bg);
+    color: var(--brand-blue);
+}
+
+.red .kpi-pill-icon,
+.blue .kpi-pill-icon,
+.yellow .kpi-pill-icon,
+.green .kpi-pill-icon {
+    background: var(--brand-blue-bg);
+    color: var(--brand-blue);
+}
+
+.kpi-pill-data {
+    display: flex;
+    flex-direction: column;
+}
+
+.kpi-pill-title {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.kpi-pill-data h3 {
+    margin: 3px 0;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--brand-blue-dark);
+    line-height: 1;
+}
+
+.kpi-pill-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Layout Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 22px;
+    align-items: start;
+}
+
+.dash-col-main, .dash-col-side {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+/* Cards Estándar */
+.card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-color);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.card-header h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--brand-blue-dark);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-header h3 i { color: var(--brand-blue); }
+
+.btn-link {
+    color: var(--brand-blue);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+}
+.btn-link:hover { text-decoration: underline; }
+
+/* Hero Summary Card Institucional (Degradado con los Azules del Logo) */
+.hero-summary-card {
+    background: linear-gradient(135deg, var(--brand-blue) 0%, var(--brand-blue-dark) 100%);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px;
+    color: #ffffff;
+    box-shadow: 0 8px 24px -4px rgba(43, 98, 150, 0.35);
+}
+
+.hero-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.18);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--brand-blue-soft);
+    margin-bottom: 6px;
+}
+
+.hero-text-side h2 {
+    margin: 0 0 4px 0;
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.hero-text-side p {
+    margin: 0;
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.hero-metrics {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.18);
+    border-radius: var(--radius-md);
+    padding: 12px 18px;
+    gap: 16px;
+}
+
+.hero-metric-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hm-val {
+    font-size: 20px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1;
+}
+
+.hm-lbl {
+    font-size: 11px;
+    opacity: 0.88;
+    margin-top: 4px;
+    white-space: nowrap;
+}
+
+.hero-divider {
+    width: 1px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.22);
+}
+
+/* Grid Doble Interno */
+.grid-card-twin {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.chart-wrapper {
+    height: 190px;
+    position: relative;
+}
+
+/* Cobertura de Operaciones (Barras Unificadas en Azul) */
+.progress-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.prog-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.prog-labels strong { color: var(--text-dark); }
+
+.prog-bar {
+    height: 8px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.prog-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.8s ease-out;
+}
+
+/* Todas las barras en el azul del logo */
+.bg-green, .bg-red, .bg-blue { background-color: var(--brand-blue); }
+
+/* Tabla de Últimas Rutas */
+.ultimas-rutas {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ultima-ruta-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+}
+
+.ruta-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Conserva el punto con el color específico asignado a cada línea */
+.ruta-color {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.ruta-nombre {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.ruta-linea {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.ruta-estado {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 700;
+}
+
+.ruta-estado.activa { background: var(--brand-blue-bg); color: var(--brand-blue); }
+.ruta-estado.inactiva { background: #f1f5f9; color: var(--text-muted); }
+
+/* Sidebar Estado de Líneas */
+.lineas-status-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.linea-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: #f8fafc;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    font-size: 12px;
+}
+
+.linea-item-name {
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.linea-item-badge {
+    background: var(--brand-blue-bg);
+    color: var(--brand-blue);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 11px;
+}
+
+.loading-text {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 10px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1100px) {
+    .kpi-banner-grid { grid-template-columns: repeat(2, 1fr); }
+    .dashboard-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 650px) {
+    .kpi-banner-grid { grid-template-columns: 1fr; }
+    .grid-card-twin { grid-template-columns: 1fr; }
+    .hero-body { flex-direction: column; align-items: flex-start; }
+    .hero-metrics { width: 100%; justify-content: space-around; box-sizing: border-box; }
+}

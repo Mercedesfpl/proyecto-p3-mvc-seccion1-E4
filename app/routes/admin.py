@@ -1,12 +1,21 @@
 # admin.py
 from flask import Blueprint, url_for, redirect, render_template, jsonify, request
 
-from flask_jwt_extended import jwt_required, get_jwt
-from ..controllers import userControllers, lineaControllers
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from ..controllers import (
+    userControllers,
+    lineaControllers,
+    busControllers,
+    rutaControllers,
+)
 from app.decorators.role_decorator import role_required
 
 admin_scope = Blueprint("admin", __name__)
 
+@admin_scope.route('/esp32', methods=['GET'])
+@jwt_required()
+def esp32_page():
+    return userControllers.show_esp32()
 
 # Solo admin puede ver el dashboard global
 @admin_scope.route("/dashboard", methods=["GET"])
@@ -32,6 +41,18 @@ def reportes_show():
 @jwt_required()
 def rutas_show():
     return userControllers.show_rutas()
+
+
+@admin_scope.route("/perfil", methods=["GET"])
+@jwt_required()
+def perfil_show():
+    return userControllers.show_miPerfil()
+
+
+@admin_scope.route("/configuración", methods=["GET"])
+@jwt_required()
+def configuracion_show():
+    return userControllers.show_configuracion()
 
 
 @admin_scope.route("/form-muestra", methods=["GET"])
@@ -81,7 +102,7 @@ def get_linea(id_linea):
 def create_linea():
 
     data = request.get_json()
-    return lineaControllers.create_linea(data=data)
+    return lineaControllers.create_linea(data)
 
 
 @admin_scope.route("/lineas/<int:id_linea>", methods=["PUT"])
@@ -208,6 +229,7 @@ def create_parada():
     from app.controllers.paradaControllers import create_parada
 
     data = request.get_json()
+    print("datos en el la ruta de parad", data)
     return create_parada(data)
 
 
@@ -236,3 +258,111 @@ def delete_parada(id_parada):
 @role_required("admin")
 def paradas_page():
     return render_template("pages/paradas.html")
+
+
+# ******************** CRUD DE BUSES (FLOTAS)*********************
+
+
+@admin_scope.route("/buses", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_buses():
+    from app.controllers.busControllers import get_all_buses
+
+    return get_all_buses()
+
+
+@admin_scope.route("/buses/<int:id_vehiculo>", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_bus(id_vehiculo):
+    from app.controllers.busControllers import get_bus_by_id
+
+    return get_bus_by_id(id_vehiculo)
+
+
+@admin_scope.route("/save-bus", methods=["POST"])
+@jwt_required()
+@role_required("admin")
+def create_bus():
+
+    from app.controllers.busControllers import create_bus
+
+    data = request.get_json()
+    user_id = get_jwt_identity()
+    print("Id-------en ruta------>", user_id)
+    return create_bus(data)
+
+
+@admin_scope.route("/buses/<int:id_vehiculo>", methods=["PUT"])
+@jwt_required()
+@role_required("admin")
+def update_bus(id_vehiculo):
+    from flask import request
+    from app.controllers.busControllers import update_bus
+
+    data = request.get_json()
+    return update_bus(id_vehiculo, data)
+
+
+@admin_scope.route("/buses/<int:id_vehiculo>", methods=["DELETE"])
+@jwt_required()
+@role_required("admin")
+def delete_bus(id_vehiculo):
+    from app.controllers.busControllers import delete_bus
+
+    return delete_bus(id_vehiculo)
+
+
+# *********************************** CRUD DE RUTAS**********************************
+
+
+@admin_scope.route(
+    "/rutas/api", methods=["GET"]
+)  # Usamos /rutas/api para no chocar con la vista
+@jwt_required()
+# @role_required("admin")
+def get_rutas_api():
+    from app.controllers.rutaControllers import get_all_rutas
+
+    return get_all_rutas()
+
+
+@admin_scope.route("/rutas/<int:id_ruta>", methods=["GET"])
+@jwt_required()
+# @role_required("admin")
+def get_ruta(id_ruta):
+    from app.controllers.rutaControllers import get_ruta_by_id
+
+    return get_ruta_by_id(id_ruta)
+
+
+@admin_scope.route("/rutas", methods=["POST"])
+@jwt_required()
+# @role_required("admin")
+def create_ruta():
+    from flask import request
+    from app.controllers.rutaControllers import create_ruta
+
+    data = request.get_json()
+    return create_ruta(data)
+
+
+@admin_scope.route("/rutas/<int:id_ruta>", methods=["PUT"])
+@jwt_required()
+# @role_required("admin")
+def update_ruta(id_ruta):
+    from flask import request
+    from app.controllers.rutaControllers import update_ruta
+
+    data = request.get_json()
+    return update_ruta(id_ruta, data)
+
+
+@admin_scope.route("/rutas/<int:id_ruta>", methods=["DELETE"])
+@jwt_required()
+# @role_required("admin")
+def delete_ruta(id_ruta):
+    from app.controllers.rutaControllers import delete_ruta
+
+    return delete_ruta(id_ruta)

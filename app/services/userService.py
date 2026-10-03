@@ -1,49 +1,67 @@
 # app/services/userService.py
 from app.repositories.userRepository import UserRepository
+from app.repositories.personaRepository import PersonaRepository
 from app.models.models import Usuario, PreRegistro
-from app.models.exceptions import UserNotValid, UserNotFound, UserAlreadyExists, ResourceNotValid, Unauthorized
+from app.models.exceptions import (
+    UserNotValid,
+    UserNotFound,
+    UserAlreadyExists,
+    ResourceNotValid,
+    Unauthorized,
+    ResourceNotFound,
+)
 from app.services.authServices import get_access_token, unset_cookiess, esta_bloqueado
-from app.services.emailServices import enviar_correo_recuperacion, enviar_correo_verificacion
+from app.services.emailServices import (
+    enviar_correo_recuperacion,
+    enviar_correo_verificacion,
+)
 from app.helpers.makeResponse import success_response
 from flask_login import login_user, logout_user
 from datetime import datetime, timedelta
 from flask import jsonify, request, render_template, make_response
 
+
 class UserService:
-    #Contiene la lógica de negocio para Usuarios
+    # Contiene la lógica de negocio para Usuarios
 
     @staticmethod
     def login(user_data):
-        
+
         user = UserRepository.get_by_email(user_data.email)
-        
+
         if not user:
             raise UserNotFound("Usuario no registrado")
 
         if user.esta_bloqueado():
-            
+
             tiempo_restante = user.bloqueado_hasta - datetime.now()
             minutos = round(tiempo_restante.total_seconds() / 60)
             raise Unauthorized(
                 "Usuario",
-                reason=f"Usuario bloqueado temporalmente intenta nuevamente en {minutos} minutos"
+                rason=f"Usuario bloqueado temporalmente intenta nuevamenteeee en {minutos} minutos",
             )
 
         if user.verificar_password(user_data.password):
-            # ✅ Credenciales correctas
+            # Credenciales correctas
             user.intentos_fallidos = 0
             user.bloqueado_hasta = None
             UserRepository.update(user)
             login_user(user)
-        
-            # ✅ Generar token
-            from flask_jwt_extended import create_access_token
+
+            # Generar token
+            from flask_jwt_extended import create_access_token, create_refresh_token
+
             datos_adicionales = {"rol": user.rol}
             access_token = create_access_token(
                 identity=str(user.id), additional_claims=datos_adicionales
             )
-        
-            return {"access_token": access_token}
+            refresh_token = create_refresh_token(identity=str(user.id))
+
+            return {
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+                "tema": user.tema or "claro",
+            }
         else:
             user.intentos_fallidos += 1
             UserRepository.update(user)
@@ -58,10 +76,10 @@ class UserService:
             raise UserNotValid(
                 f"Credenciales invalidas intentos restantes {3 - user.intentos_fallidos}"
             )
-        
+
     @staticmethod
     def logout():
-        #Cierra sesión de un usuario
+        # Cierra sesión de un usuario
         response = success_response(message="Sesión cerrada correctamente")
         unset_cookiess(response)
         logout_user()
@@ -69,7 +87,7 @@ class UserService:
 
     @staticmethod
     def register(user_data):
-        #Registra un nuevo usuario
+        # Registra un nuevo usuario
         # Validaciones
         if not user_data.email or not user_data.password:
             raise UserNotValid("Datos no validos, contraseña y usuario son requeridos")
@@ -78,7 +96,9 @@ class UserService:
             raise UserAlreadyExists("El correo electrónico ya está registrado")
 
         if not Usuario.formatPass(user_data.password):
-            raise ResourceNotValid("password", "No cumple con los parámetros necesarios")
+            raise ResourceNotValid(
+                "password", "No cumple con los parámetros necesarios"
+            )
 
         if not Usuario.formatEmail(user_data.email):
             raise UserNotValid("El email es inválido")
@@ -86,9 +106,7 @@ class UserService:
         # Crear usuario
         es_primer_usuario = UserRepository.is_first_user()
         new_user = Usuario(
-            nombre=user_data.nombre,
-            email=user_data.email,
-            isAdmin=es_primer_usuario
+            nombre=user_data.nombre, email=user_data.email, isAdmin=es_primer_usuario
         )
         new_user.generateHass(user_data.password)
 
@@ -101,11 +119,13 @@ class UserService:
 
     @staticmethod
     def request_password_reset(user_data):
-        #Genera y envía código de recuperación de contraseña
+        # Genera y envía código de recuperación de contraseña
         user = UserRepository.get_by_email(user_data.email)
 
         if not user:
-            raise UserNotValid("Si el correo existe, se le enviará un código de seguridad")
+            raise UserNotValid(
+                "Si el correo existe, se le enviará un código de seguridad"
+            )
 
         code = user.generate_reset_code()
         UserRepository.update(user)
@@ -114,15 +134,14 @@ class UserService:
             user_session = user.a_sesion()
             token = get_access_token(userData=user_session)
             return success_response(
-                message="El código se ha enviado correctamente",
-                cookies=token
+                message="El código se ha enviado correctamente", cookies=token
             )
         else:
             raise UserNotValid("No se ha logrado enviar el correo")
 
     @staticmethod
     def verify_reset_code(user_data, code):
-        #Verifica si el código de recuperación es válido
+        # Verifica si el código de recuperación es válido
         user = UserRepository.get_by_id(user_data.id)
 
         if not user:
@@ -133,7 +152,7 @@ class UserService:
             minutos_restantes = max(1, int(segundos_restantes // 60))
             raise Unauthorized(
                 "Usuario",
-                reason=f"Usuario Bloqueado temporalmente. Intenta nuevamente en {minutos_restantes} minutos"
+                reason=f"Usuario Bloqueado temporalmente. Intenta nuevamente en {minutos_restantes} minutos",
             )
 
         if not user.verify_reset_code(code):
@@ -160,7 +179,7 @@ class UserService:
 
     @staticmethod
     def reset_password(user_data, code):
-        #Restablece la contraseña del usuario
+        # Restablece la contraseña del usuario
         user = UserRepository.get_by_id(user_data.id)
 
         if not user:
@@ -170,7 +189,9 @@ class UserService:
             raise UserNotValid("El código ha expirado o es inválido")
 
         if not Usuario.formatPass(user_data.password):
-            raise ResourceNotValid("password", "No cumple con los parámetros necesarios")
+            raise ResourceNotValid(
+                "password", "No cumple con los parámetros necesarios"
+            )
 
         user.generateHass(user_data.password)
         user.clear_reset_code()
@@ -181,24 +202,25 @@ class UserService:
 
     @staticmethod
     def pre_register(user_data):
-        #Pre-registro de usuario (envío de código de verificación)
+        # Pre-registro de usuario (envío de código de verificación)
         if not user_data.email or not user_data.password:
-            raise ResourceNotValid("Datos no validos, contraseña y usuario son requeridos")
+            raise ResourceNotValid(
+                "Datos no validos, contraseña y usuario son requeridos"
+            )
 
         if UserRepository.exists_by_email(user_data.email):
             raise UserAlreadyExists("El correo electrónico ya está registrado")
 
         if not Usuario.formatPass(user_data.password):
-            raise ResourceNotValid("password", "No cumple con los parámetros necesarios")
+            raise ResourceNotValid(
+                "password", "No cumple con los parámetros necesarios"
+            )
 
         if not Usuario.formatEmail(user_data.email):
             raise UserNotValid("El email es inválido")
 
         # Crear pre-registro
-        pre = PreRegistro(
-            email=user_data.email,
-            nombre=user_data.nombre
-        )
+        pre = PreRegistro(email=user_data.email, nombre=user_data.nombre)
         code = pre.generate_reset_code()
         pre.generateHass(user_data.password)
 
@@ -209,29 +231,24 @@ class UserService:
         if enviar_correo_verificacion(userData=user_session, code=code):
             token = get_access_token(userData=user_session)
             return success_response(
-                message="El código se ha enviado correctamente",
-                cookies=token
+                message="El código se ha enviado correctamente", cookies=token
             )
         else:
             raise UserNotValid("No se ha logrado enviar el correo")
 
     @staticmethod
     def register2(user_data, code):
-        #Completa el registro después de verificar el código
+        # Completa el registro después de verificar el código
         pre_user = UserRepository.get_pre_register_by_id(user_data.id)
 
         if pre_user.is_expired():
             UserRepository.delete_pre_registro(pre_user)
             raise Unauthorized(
-                "Token",
-                reason="El código ha expirado, Inténtalo nuevamente"
+                "Token", reason="El código ha expirado, Inténtalo nuevamente"
             )
 
         if not pre_user.verify_reset_code(code):
-            raise Unauthorized(
-                "Código",
-                reason="Código incorrecto, Intente nuevamente"
-            )
+            raise Unauthorized("Código", reason="Código incorrecto, Intente nuevamente")
 
         # Crear usuario definitivo
         es_primer_usuario = UserRepository.is_first_user()
@@ -239,7 +256,7 @@ class UserService:
             nombre=pre_user.nombre,
             email=pre_user.email,
             isAdmin=es_primer_usuario,
-            password=pre_user.password
+            password=pre_user.password,
         )
 
         UserRepository.save_usuario(new_user)
@@ -254,7 +271,7 @@ class UserService:
 
     @staticmethod
     def verify_email(user_data, code):
-        #Verifica el correo electrónico del usuario
+        # Verifica el correo electrónico del usuario
         user = UserRepository.get_by_id(user_data.id)
 
         if not user:
@@ -269,3 +286,80 @@ class UserService:
         return success_response(
             message="Se ha verificado correctamente tu correo electrónico"
         )
+
+    @staticmethod
+    def get_perfil(user_id):
+        usuario = UserRepository.get_by_id(user_id)
+        if not usuario:
+            raise ResourceNotFound("Usuario no encontrado")
+
+        persona = None
+        if usuario.persona_id:
+            persona = PersonaRepository.get_by_id(usuario.persona.id)
+
+        return {
+            "nombre": usuario.nombre,
+            "email": usuario.email,
+            "rol": usuario.rol,
+            "tema": usuario.tema or "claro",
+        }
+
+    @staticmethod
+    def update_perfil(user_id, data):
+
+        usuario = UserRepository.get_by_id(user_id)
+
+        if not usuario:
+            raise ResourceNotFound("Usuario no encontrado")
+
+        # validar credenciales
+        if "nombre" in data:
+            nuevo_nombre = data["nombre"].strip()
+            if not nuevo_nombre:
+                raise ResourceNotFound("Nombre", "El nombre no puede estar vacio")
+            usuario.nombre = nuevo_nombre
+
+        if "email" in data:
+            nuevo_email = data["email"].strip()
+            if not nuevo_email:
+                raise ResourceNotFound("Email", "El email no puede estar vacio")
+            # verificar formato
+            import re
+
+            if not re.match(
+                r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", nuevo_email
+            ):
+                raise ResourceNotValid("Email", "Formato de email invalido")
+            # verificar si no está en uso con otro usuario
+            otro_usuario = UserRepository.get_by_email(nuevo_email)
+            if otro_usuario and otro_usuario.id != user_id:
+                raise ResourceNotValid(
+                    "Email", "El correo está registrado por otro usuario"
+                )
+            usuario.email = nuevo_email
+
+            UserRepository.update(usuario)
+
+            return UserService.get_perfil(user_id)
+
+    @staticmethod
+    def cambiar_contrasenia(user_id, contrasenia_actual, nueva_contrasenia):
+
+        usuario = UserRepository.get_by_id(user_id)
+        if not usuario:
+            raise ResourceNotFound("Usuario no encontrado")
+
+        if not usuario.verificar_password(contrasenia_actual):
+            raise ResourceNotValid(
+                "nueva_contrasenia", "La contraseña actual no coincide"
+            )
+
+        if not Usuario.formatPass(nueva_contrasenia):
+            raise ResourceNotValid(
+                "nueva_contrasenia",
+                "La nueva contraseña debe tener al menos 8 caracteres, incluir mayúscula, minúscula, número y carácter especial",
+            )
+
+        usuario.generateHass(nueva_contrasenia)
+        UserRepository.update(usuario)
+        return True
