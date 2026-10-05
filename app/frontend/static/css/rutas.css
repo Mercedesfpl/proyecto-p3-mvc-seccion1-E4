@@ -238,26 +238,68 @@
    MODO OSCURO
    ============================================ */
 body.dark-mode .mapa-container {
-    background: #1c1f24;
+    background: #131822;
+    border: 1px solid #1F293D;
 }
+
 body.dark-mode .mapa-header {
-    border-bottom-color: #2c3138;
+    border-bottom-color: #1F293D;
 }
+
 body.dark-mode .mapa-header h3 {
-    color: #e5eefc;
+    color: #F8FAFC;
 }
+
 body.dark-mode .mapa-contador,
 body.dark-mode .btn-expandir {
-    background: #2c3138;
-    color: #e5e7eb;
+    background: #1F293D;
+    color: #F8FAFC;
 }
+
+body.dark-mode .btn-expandir:hover {
+    background: #2c3a52;
+}
+
 body.dark-mode .paradas-disponibles,
 body.dark-mode .paradas-seleccionadas {
-    background: #1c1f24;
-    border-color: #2c3138;
+    background: #0A0D12;
+    border-color: #1F293D;
 }
+
+body.dark-mode .lista-titulo {
+    color: #F8FAFC;
+    border-bottom-color: #1F293D;
+}
+
+body.dark-mode .lista-titulo .contador {
+    background-color: #1F293D;
+    color: #64748B;
+}
+
 body.dark-mode .item-parada {
-    background: #252a31;
-    border-color: #2c3138;
-    color: #e5e7eb;
+    background: #131822;
+    border-color: #1F293D;
+    color: #F8FAFC;
+}
+
+body.dark-mode .numero-orden {
+    background-color: #00D2FF;
+    color: #0A0D12;
+}
+
+body.dark-mode .item-vacio {
+    color: #64748B;
+}
+
+body.dark-mode .btn-agregar-item { color: #00D2FF; }
+body.dark-mode .btn-quitar-item { color: #f87171; }
+
+body.dark-mode .btn-agregar-todas {
+    background-color: rgba(0, 210, 255, 0.15);
+    color: #00D2FF;
+}
+
+body.dark-mode .btn-quitar-todas {
+    background-color: rgba(149, 36, 42, 0.2);
+    color: #f87171;
 }

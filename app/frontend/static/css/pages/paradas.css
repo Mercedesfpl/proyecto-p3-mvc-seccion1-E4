@@ -272,32 +272,77 @@
    MODO OSCURO
    ============================================ */
 body.dark-mode .mapa-container {
-    background: #1c1f24;
+    background: #131822;
+    border: 1px solid #1F293D;
 }
+
 body.dark-mode .mapa-header {
-    border-bottom-color: #2c3138;
+    border-bottom-color: #1F293D;
 }
+
 body.dark-mode .mapa-header h3 {
-    color: #e5eefc;
+    color: #F8FAFC;
 }
+
 body.dark-mode .mapa-contador,
 body.dark-mode .btn-expandir {
-    background: #2c3138;
-    color: #e5e7eb;
+    background: #1F293D;
+    color: #F8FAFC;
 }
+
 body.dark-mode .detalle-parada .detalle-header {
-    background: #1e2a3a;
+    background: #1F293D;
 }
+
 body.dark-mode .detalle-parada .detalle-id {
-    color: #e5eefc;
+    color: #F8FAFC;
 }
+
 body.dark-mode .detalle-parada .detalle-item {
-    background: #1c1f24;
-    border-color: #2c3138;
+    background: #131822;
+    border-color: #1F293D;
 }
+
 body.dark-mode .detalle-parada .detalle-value {
-    color: #e5e7eb;
+    color: #F8FAFC;
 }
+
 body.dark-mode .detalle-parada .detalle-label {
-    color: #9ca3af;
+    color: #64748B;
+}
+
+body.dark-mode .detalle-parada .detalle-icono {
+    background: #00D2FF;
+    color: #0A0D12;
+}
+
+body.dark-mode #paradaModal .modal-content {
+    background: #131822;
+}
+
+body.dark-mode #paradaModal .form-group input {
+    background: #0A0D12;
+    border-color: #1F293D;
+    color: #F8FAFC;
+}
+
+body.dark-mode #paradaModal .form-group input::placeholder {
+    color: #64748B;
+}
+
+body.dark-mode #map-container {
+    border-color: #1F293D;
+}
+
+body.dark-mode .mapa-ayuda {
+    color: #64748B;
+}
+
+body.dark-mode .btn-mapa {
+    background: #00D2FF;
+    color: #0A0D12;
+}
+
+body.dark-mode .btn-mapa:hover {
+    background: #00b8e0;
 }

@@ -384,26 +384,26 @@
   color: white;
 }
 
-/* Modo oscuro - colores originales */
+/* Modo oscuro */
 body.dark-mode .toast-message {
-  background: #1a1a2e;
-  color: #e0e0e0;
-  border: 1px solid #2a2a4a;
+    background: #131822;
+    color: #F8FAFC;
+    border: 1px solid #1F293D;
 }
 
 body.dark-mode .toast-message.warning {
-  background: #7a5c00;
-  color: #ffffff;
+    background: #7a5c00;
+    color: #ffffff;
 }
 
 body.dark-mode .toast-message.success {
-  background: #0f6e3a;
-  color: #ffffff;
+    background: #0f6e3a;
+    color: #ffffff;
 }
 
 body.dark-mode .toast-message.error {
-  background: #7a1a1a;
-  color: #ffffff;
+    background: #7a1a1a;
+    color: #ffffff;
 }
 
 @keyframes slideInRight {
