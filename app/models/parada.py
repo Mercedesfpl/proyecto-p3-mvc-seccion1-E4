@@ -13,6 +13,8 @@ class Parada(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now)
     id_ruta = db.Column(db.Integer, db.ForeignKey('rutas.id'), nullable=True)
 
+    ruta = db.relationship('Ruta', backref='paradas') #relación con ruta
+
     def to_dict(self):
         return {
             "id": self.id,
@@ -20,5 +22,6 @@ class Parada(db.Model):
             "coordenadas": self.coordenadas,
             "status": self.status,
             "id_ruta": self.id_ruta,
+            "ruta_nombre": self.ruta.nombre if self.ruta else None, #util para el front
             "created_at": self.created_at.isoformat() if self.created_at else None
         }

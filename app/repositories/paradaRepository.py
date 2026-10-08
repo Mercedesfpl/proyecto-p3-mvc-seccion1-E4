@@ -25,6 +25,10 @@ class ParadaRepository:
         if exclude_id:
             query = query.filter(Parada.id != exclude_id)
         return query.first() is not None
+    @staticmethod
+    def get_by_ruta(id_ruta):
+        #devuelve todas las paradas asociadas a una ruta
+        return Parada.query.filter_by(id_ruta=id_ruta).all()
 
     # Se debe mejorar esto ya que no permite borra una linea y por que se debe de creara ese modelo Ruta parada se puede simplemneter llamar un query para ver si esa existe dentro de paradas
     # @staticmethod
@@ -35,7 +39,12 @@ class ParadaRepository:
     @staticmethod
     def esUsada(id_parada):
         # Verifica si está siendo usada por alguna ruta
-        return Ruta.query.filter_by(id_parada=id_parada).first() is not None
+        #return Ruta.query.filter_by(id_parada=id_parada).first() is not None
+        #código de prueba
+        parada = Parada.query.get(id_parada)
+        if not parada:
+            return False
+        return parada.id_ruta is not None
 
     @staticmethod
     def save(parada):

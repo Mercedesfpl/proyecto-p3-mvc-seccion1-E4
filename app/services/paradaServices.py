@@ -91,6 +91,9 @@ class ParadaServices:
         if "status" in data:
             parada.status = ParadaServices.validar_status(data["status"])
 
+        if "id_ruta" in data:
+            parada= ParadaFactory.actualizar_parada(parada, {"id_ruta": data["id_ruta"]})
+
         return ParadaRepository.save(parada)
 
     @staticmethod

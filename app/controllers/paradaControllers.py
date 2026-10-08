@@ -29,12 +29,13 @@ def get_parada_by_id(id_parada):
 
 
 def create_parada(data):
+    # Crear una parada
+    print("datos en el controller parad", data)
     try:
+        # validación básica de entrada
         if not data.get("nombre"):
             return error_response(
-                error="Nombre requerido",
-                message="El nombre es obligatorio",
-                status_code=400,
+                error="El nomnbre es obligatorio", message="El nombre es obligatorio", status_code=400
             )
         parada = ParadaServices.create_parada(data)
         return success_response(
