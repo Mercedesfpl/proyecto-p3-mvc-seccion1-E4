@@ -43,13 +43,10 @@ def create_ruta(data):
         )
 
 
-def update_ruta(id_ruta):
+def update_ruta(id_ruta, data):
     try:
-        data = request.get_json()
         ruta = RutaServices.update_ruta(id_ruta, data)
-        return success_response(
-            message="Ruta actualizada exitosamente", data=ruta.to_dict()
-        )
+        return success_response(message="Ruta actualizada exitosamente", data=ruta)
     except ResourceNotValid as e:
         return error_response(error=str(e), message=str(e), status_code=400)
     except ResourceNotFound as e:

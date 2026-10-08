@@ -19,7 +19,7 @@ def login():
 
 
 @auth_scope.route("/logout", methods=["POST"])
-@jwt_required()
+# @jwt_required()
 def logout():
     return userControllers.logout()
 
@@ -103,25 +103,30 @@ def verify_and_register():
     code = data_cliente.get("code")
     return userControllers.register2(usuario, code)
 
+
 @auth_scope.route("/perfil", methods=["GET"])
 @jwt_required()
 def get_perfil():
     return userControllers.get_perfil()
+
 
 @auth_scope.route("/perfil", methods=["PUT"])
 @jwt_required()
 def update_perfil():
     return userControllers.update_perfil()
 
+
 @auth_scope.route("/cambiar-contrasena", methods=["POST"])
 @jwt_required()
 def cambiar_contrasena():
     return userControllers.cambiar_contrasenia()
 
+
 @auth_scope.route("/configuracion", methods=["PUT"])
 @jwt_required()
 def update_configuracion():
     return configuracionControllers.update_configuracion()
+
 
 @auth_scope.route("/configuracion", methods=["GET"])
 @jwt_required()
