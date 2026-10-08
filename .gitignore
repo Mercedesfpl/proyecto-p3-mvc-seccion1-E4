@@ -1,13 +1,21 @@
-
+# === Python (Caché y Binarios) ===
 **/__pycache__/
 *.pyc
-
-
-
-# Entornos virtuales
+*.pyo
+*.pyd
+.Python
+env/
 venv/
 .venv/
-env/
+ENV/
 
-# Variables de entorno
+# === Flask / Variables de Entorno ===
 .env
+.flaskenv
+instance/
+
+# === Editores de Código y Sistema ===
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
