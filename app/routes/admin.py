@@ -379,6 +379,12 @@ def get_esp32_disponibles_para_bus():
     from app.controllers.esp32Controllers import get_disponibles_para_bus
     return get_disponibles_para_bus()
 
+@admin_scope.route("/esp32/disponibles-para-parada", methods=["GET"])
+@jwt_required()
+@role_required("admin")
+def get_esp32_disponibles_para_parada():
+    from app.controllers.esp32Controllers import get_disponibles_para_parada
+    return get_disponibles_para_parada()
 
 @admin_scope.route("/esp32-page", methods=["GET"])
 @jwt_required()

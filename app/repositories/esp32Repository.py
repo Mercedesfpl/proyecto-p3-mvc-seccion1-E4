@@ -34,22 +34,48 @@ class Esp32Repository:
     @staticmethod
     def get_disponibles_para_bus(id_bus_actual=None):
         """
-        ESP32 disponibles para asignar a un bus.
-        Incluye el ESP32 actual del bus (si tiene) para que aparezca en el select.
+        ESP32 disponibles para un bus.
+        Incluye el ESP32 actual del bus (si tiene).
         """
         from sqlalchemy import or_
 
-        query = Esp32.query.filter(
-            Esp32.status == "activo",
-            or_(
-                # ESP32 libres (sin vehiculo ni parada)
-                (Esp32.id_vehiculo.is_(None) & Esp32.id_parada.is_(None)),
-                # ESP32 actualmente asignado a este bus
-                (Esp32.id_vehiculo == id_bus_actual) if id_bus_actual else False,
-            ),
+        conditions = [
+            (Esp32.id_vehiculo.is_(None) & Esp32.id_parada.is_(None))
+        ]
+        if id_bus_actual:
+            conditions.append(Esp32.id_vehiculo == id_bus_actual)
+
+        return (
+            Esp32.query.filter(
+                Esp32.status == "activo",
+                or_(*conditions),
+            )
+            .order_by(Esp32.id_esp32)
+            .all()
         )
 
-        return query.order_by(Esp32.id_esp32).all()
+    @staticmethod
+    def get_disponibles_para_parada(id_parada_actual=None):
+        """
+        ESP32 disponibles para una parada.
+        Incluye el ESP32 actual de la parada (si tiene).
+        """
+        from sqlalchemy import or_
+
+        conditions = [
+            (Esp32.id_vehiculo.is_(None) & Esp32.id_parada.is_(None))
+        ]
+        if id_parada_actual:
+            conditions.append(Esp32.id_parada == id_parada_actual)
+
+        return (
+            Esp32.query.filter(
+                Esp32.status == "activo",
+                or_(*conditions),
+            )
+            .order_by(Esp32.id_esp32)
+            .all()
+        )
 
     @staticmethod
     def get_by_vehiculo(id_vehiculo):

@@ -13,7 +13,7 @@ const itemsPorPagina = 10;
 let idParadaViendo = null;
 
 // ============================================================
-// 1. HELPERS (usa los de base.js si existen)
+// 1. HELPERS
 // ============================================================
 
 function mostrarNotificacion(mensaje, tipo = "success") {
@@ -22,6 +22,13 @@ function mostrarNotificacion(mensaje, tipo = "success") {
     return;
   }
   alert(mensaje);
+}
+
+function getCookie(name) {
+  return document.cookie
+    .split("; ")
+    .find((r) => r.startsWith(name + "="))
+    ?.split("=")[1];
 }
 
 // ============================================================
@@ -151,7 +158,7 @@ function agregarMarcadorPrincipal(lat, lng, parada) {
 }
 
 // ============================================================
-// 3. MAPA EN MODAL (solo para nueva/editar)
+// 3. MAPA EN MODAL
 // ============================================================
 function destruirMapaModal() {
   if (mapa) {
@@ -309,7 +316,34 @@ function toggleExpandirMapa() {
 }
 
 // ============================================================
-// 5. MODAL NUEVA / EDITAR
+// 5. CARGAR SELECT DE ESP32
+// ============================================================
+async function cargarSelectEsp32(idParadaActual = null) {
+  try {
+    let url = "/admin/esp32/disponibles-para-parada";
+    if (idParadaActual) {
+      url += `?id_parada=${idParadaActual}`;
+    }
+    const resp = await fetch(url, { credentials: "include" });
+    const data = await resp.json();
+    const select = document.getElementById("id_esp32");
+    if (!select) return;
+
+    select.innerHTML = '<option value="">Sin ESP32 asignado</option>';
+    (data.data || []).forEach((esp32) => {
+      const opt = document.createElement("option");
+      opt.value = esp32.id_esp32;
+      const version = esp32.version_firmware || "sin version";
+      opt.textContent = `${esp32.mac} (${version})`;
+      select.appendChild(opt);
+    });
+  } catch (error) {
+    console.error("Error al cargar ESP32:", error);
+  }
+}
+
+// ============================================================
+// 6. MODAL NUEVA / EDITAR
 // ============================================================
 function abrirModal(titulo, data = null) {
   const modal = document.getElementById("paradaModal");
@@ -329,10 +363,22 @@ function abrirModal(titulo, data = null) {
   if (mapa) mostrarMapaModal(false);
 
   if (data) {
+    // MODO EDICION
     const nombreInput = document.getElementById("nombre");
     if (nombreInput) nombreInput.value = data.nombre || "";
     if (coordsInput && data.coordenadas) coordsInput.value = data.coordenadas;
     if (statusSelect) statusSelect.value = data.status || "activa";
+
+    // Cargar ESP32 disponibles para esta parada (incluye el actual)
+    cargarSelectEsp32(data.id).then(() => {
+      const selectEsp = document.getElementById("id_esp32");
+      if (selectEsp && data.id_esp32) {
+        selectEsp.value = data.id_esp32;
+      }
+    });
+  } else {
+    // MODO CREACION
+    cargarSelectEsp32(null);
   }
 
   modal.classList.add("show");
@@ -361,7 +407,7 @@ function cerrarModal() {
 }
 
 // ============================================================
-// 6. CARGAR PARADAS
+// 7. CARGAR PARADAS
 // ============================================================
 async function cargarParadas() {
   const tbody = document.getElementById("paradasTableBody");
@@ -396,7 +442,7 @@ async function cargarParadas() {
 }
 
 // ============================================================
-// 7. RENDERIZAR PÁGINA
+// 8. RENDERIZAR PAGINA
 // ============================================================
 function renderizarPagina() {
   const tbody = document.getElementById("paradasTableBody");
@@ -462,7 +508,7 @@ function actualizarControlesPaginacion(totalItems) {
 }
 
 // ============================================================
-// 8. EVENTOS DE LA TABLA
+// 9. EVENTOS DE LA TABLA
 // ============================================================
 function asignarEventosTabla() {
   document.querySelectorAll(".action-btn.view").forEach((btn) => {
@@ -488,7 +534,7 @@ function asignarEventosTabla() {
 }
 
 // ============================================================
-// 9. VER PARADA
+// 10. VER PARADA
 // ============================================================
 async function verParada(id) {
   try {
@@ -512,11 +558,21 @@ async function verParada(id) {
       p.coordenadas || "-";
     document.getElementById("verParadaEstado").textContent = statusText;
 
-    // Badge dinámico
+    // ESP32 (NUEVO)
+    const esp32El = document.getElementById("verParadaEsp32");
+    if (esp32El) {
+      if (p.esp32_mac) {
+        esp32El.innerHTML = `<span class="badge-esp32"><i class="fas fa-microchip"></i> ${p.esp32_mac}</span>`;
+      } else {
+        esp32El.innerHTML = '<span class="badge-sin-esp32">Sin ESP32</span>';
+      }
+    }
+
+    // Badge dinamico
     const badge = document.getElementById("verParadaEstadoBadge");
     badge.className = "status-badge";
     badge.classList.add(
-      p.status === "activa" ? "status-active" : "status-inactive",
+      p.status === "activa" ? "status-active" : "status-inactive"
     );
 
     // Fecha
@@ -556,7 +612,7 @@ function editarDesdeVer() {
 }
 
 // ============================================================
-// 10. EDITAR PARADA
+// 11. EDITAR PARADA
 // ============================================================
 async function editarParada(id) {
   try {
@@ -575,7 +631,7 @@ async function editarParada(id) {
 }
 
 // ============================================================
-// 11. ELIMINAR PARADA
+// 12. ELIMINAR PARADA
 // ============================================================
 async function eliminarParada(id) {
   if (!confirm("¿Estás seguro de eliminar esta parada?")) return;
@@ -598,7 +654,7 @@ async function eliminarParada(id) {
     } else {
       mostrarNotificacion(
         data.error || data.message || "Error al eliminar",
-        "danger",
+        "danger"
       );
     }
   } catch (error) {
@@ -608,7 +664,7 @@ async function eliminarParada(id) {
 }
 
 // ============================================================
-// 12. FILTROS
+// 13. FILTROS
 // ============================================================
 function aplicarFiltros() {
   const searchTerm =
@@ -629,7 +685,7 @@ function aplicarFiltros() {
 }
 
 // ============================================================
-// 13. INICIALIZACIÓN
+// 14. INICIALIZACION
 // ============================================================
 document.addEventListener("DOMContentLoaded", function () {
   // Expandir mapa
@@ -655,11 +711,20 @@ document.addEventListener("DOMContentLoaded", function () {
       loading = true;
       document.getElementById("btnGuardar").disabled = true;
 
+      const idEsp32Value = document.getElementById("id_esp32")?.value;
+
       const datos = {
         nombre: document.getElementById("nombre").value.trim(),
         coordenadas: document.getElementById("coordenadas").value.trim(),
         status: document.getElementById("status").value,
       };
+
+      // Agregar id_esp32 (NUEVO)
+      if (idEsp32Value) {
+        datos.id_esp32 = parseInt(idEsp32Value);
+      } else {
+        datos.id_esp32 = null;
+      }
 
       if (!datos.nombre) {
         mostrarNotificacion("El nombre es obligatorio", "warning");
@@ -696,14 +761,14 @@ document.addEventListener("DOMContentLoaded", function () {
         if (response.ok && data.success) {
           mostrarNotificacion(
             editandoId ? "Parada actualizada" : "Parada creada exitosamente",
-            "success",
+            "success"
           );
           cerrarModal();
           cargarParadas();
         } else {
           mostrarNotificacion(
             data.error || data.message || "Error al guardar",
-            "danger",
+            "danger"
           );
         }
       } catch (error) {
@@ -767,7 +832,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("btnSiguiente")?.addEventListener("click", () => {
     const totalPaginas = Math.max(
       1,
-      Math.ceil(paradasFiltradas.length / itemsPorPagina),
+      Math.ceil(paradasFiltradas.length / itemsPorPagina)
     );
     if (paginaActual < totalPaginas) {
       paginaActual++;
