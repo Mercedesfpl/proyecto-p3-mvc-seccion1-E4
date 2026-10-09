@@ -12,10 +12,12 @@ from app.decorators.role_decorator import role_required
 
 admin_scope = Blueprint("admin", __name__)
 
-@admin_scope.route('/esp32', methods=['GET'])
+
+@admin_scope.route("/esp32", methods=["GET"])
 @jwt_required()
 def esp32_page():
     return userControllers.show_esp32()
+
 
 # Solo admin puede ver el dashboard global
 @admin_scope.route("/dashboard", methods=["GET"])

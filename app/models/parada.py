@@ -11,7 +11,9 @@ class Parada(db.Model):
     coordenadas = db.Column(db.String(100), nullable=False)  # "latitud,longitud"
     status = db.Column(db.String(20), default="activa")  # 'activa', 'inactiva'
     created_at = db.Column(db.DateTime, default=datetime.now)
-    id_ruta = db.Column(db.Integer, db.ForeignKey('rutas.id'), nullable=True)
+    id_ruta = db.Column(db.Integer, db.ForeignKey("rutas.id"), nullable=True)
+
+    ruta = db.relationship("Ruta", backref="paradas")  # relación con ruta
 
     def to_dict(self):
         return {
@@ -20,5 +22,8 @@ class Parada(db.Model):
             "coordenadas": self.coordenadas,
             "status": self.status,
             "id_ruta": self.id_ruta,
-            "created_at": self.created_at.isoformat() if self.created_at else None
+            "ruta_nombre": (
+                self.ruta.nombre if self.ruta else None
+            ),  # util para el front
+            "created_at": self.created_at.isoformat() if self.created_at else None,
         }

@@ -1,5 +1,6 @@
 from app.models.bus import Bus
 from ..extensions import db
+from sqlalchemy.orm import joinedload
 
 
 class BusRepository:
@@ -7,11 +8,25 @@ class BusRepository:
 
     @staticmethod
     def get_all():
-        return Bus.query.all()
+        return (
+            Bus.query.options(
+                joinedload(Bus.linea),
+                joinedload(Bus.ruta),
+                joinedload(Bus.secretario),
+            )
+            .all()
+        )
 
     @staticmethod
     def get_by_id(id_vehiculo):
-        return Bus.query.get(id_vehiculo)
+        return (
+            Bus.query.options(
+                joinedload(Bus.linea),
+                joinedload(Bus.ruta),
+                joinedload(Bus.secretario),
+            )
+            .get(id_vehiculo)
+        )
 
     @staticmethod
     def get_by_placa(placa):

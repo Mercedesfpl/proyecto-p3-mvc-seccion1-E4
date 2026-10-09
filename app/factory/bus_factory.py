@@ -40,6 +40,7 @@ class BusFactory:
             raise ResourceNotValid("id_linea", "La linea es obligatoria")
 
         id_ruta = BusFactory._validar_id(data.get("id_ruta"), "id_ruta")
+        id_secretario = BusFactory._validar_id(data.get("id_secretario"), "id_secretario")
 
         status = data.get("status", "activa")
         if status not in ["activa", "inactiva"]:
@@ -49,5 +50,6 @@ class BusFactory:
             placa=placa,
             id_linea=id_linea,
             id_ruta=id_ruta,
+            id_secretario=id_secretario,
             status=status
         )

@@ -158,12 +158,10 @@ def reset_password(usuario, code):
 # ========== VERIFICACIÓN DE CORREO ==========
 
 
-def verify_email():
+def verify_email(user_id, code):
     # Verifica el correo electrónico del usuario
     try:
-        data = request.get_json()
-        user_data = UserSession(id=data.get("user_id"))
-        code = data.get("code")
+        user_data = UserSession(id=user_id)
         result = UserService.verify_email(user_data, code)
         return result
     except ResourceNotValid as e:
@@ -278,11 +276,9 @@ def get_perfil():
         )
 
 
-def update_perfil():
+def update_perfil(user_id, data):
     # actualizar perfil auntenticado
     try:
-        user_id = int(get_jwt_identity())
-        data = request.get_json()
         perfil = UserService.update_perfil(user_id, data)
         return success_response(message="Perfil actualizado exitosamente", data=perfil)
     except ResourceNotFound as e:
@@ -295,10 +291,8 @@ def update_perfil():
         )
 
 
-def cambiar_contrasenia():
+def cambiar_contrasenia(user_id, data):
     try:
-        user_id = int(get_jwt_identity())
-        data = request.get_json()
         contasenia_actual = data.get("contrasenia_actual")
         nueva_contrasenia = data.get("nueva_contrasenia")
 

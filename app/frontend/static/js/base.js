@@ -1,10 +1,10 @@
 // frontend/static/js/base.js
-function getCookie(name) {
+window.getCookie = function (name) {
   return document.cookie
     .split("; ")
     .find((r) => r.startsWith(name + "="))
     ?.split("=")[1];
-}
+};
 
 // ========== TOAST GLOBAL ==========
 // Delega a showToast() que viene de notificaciones.js

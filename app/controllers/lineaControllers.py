@@ -9,7 +9,9 @@ def get_lineas():
         data = LineaServices.get_all_lineas()
         return success_response(data=data)
     except Exception as e:
-        return error_response(error=str(e), message="Error al obtener las líneas", status_code=500)
+        return error_response(
+            error=str(e), message="Error al obtener las líneas", status_code=500
+        )
 
 
 def get_linea_by_id(id_linea):
@@ -17,9 +19,13 @@ def get_linea_by_id(id_linea):
         data = LineaServices.get_linea_by_id(id_linea)
         return success_response(data=data)
     except ResourceNotFound as e:
-        return error_response(error=str(e), message="Línea no encontrada", status_code=404)
+        return error_response(
+            error=str(e), message="Línea no encontrada", status_code=404
+        )
     except Exception as e:
-        return error_response(error=str(e), message="Error al obtener la línea", status_code=500)
+        return error_response(
+            error=str(e), message="Error al obtener la línea", status_code=500
+        )
 
 
 def get_personas_disponibles():
@@ -29,7 +35,9 @@ def get_personas_disponibles():
     except ResourceNotFound:
         return success_response(data=[])
     except Exception as e:
-        return error_response(error=str(e), message="Error al obtener las personas", status_code=500)
+        return error_response(
+            error=str(e), message="Error al obtener las personas", status_code=500
+        )
 
 
 def get_secretarios_disponibles():
@@ -39,31 +47,63 @@ def get_secretarios_disponibles():
     except ResourceNotFound:
         return success_response(data=[])
     except Exception as e:
-        return error_response(error=str(e), message="Error al obtener los secretarios", status_code=500)
+        return error_response(
+            error=str(e), message="Error al obtener los secretarios", status_code=500
+        )
 
 
-def create_linea(data):                  
+def create_linea(data):
     try:
         linea = LineaServices.create_linea(data)
-        return success_response(message="Línea creada exitosamente", data=linea.to_dict())
+        return success_response(
+            message="Línea creada exitosamente", data=linea.to_dict()
+        )
     except ResourceNotValid as e:
         return error_response(error=str(e), message=str(e), status_code=400)
     except ResourceNotFound as e:
         return error_response(error=str(e), message=str(e), status_code=404)
     except Exception as e:
-        return error_response(error=str(e), message="Error al crear la línea", status_code=500)
+        return error_response(
+            error=str(e), message="Error en crear una línea", status_code=500
+        )
 
 
-def update_linea(id_linea, data):         
+def update_linea(id_linea, data):
+    # Actualizar linea
     try:
-        linea = LineaServices.update_linea(id_linea, data)
-        return success_response(message="Línea actualizada exitosamente", data=linea.to_dict())
+        id_linea_int = int(id_linea)
+        linea = LineaServices.update_linea(id_linea_int, data)
+        return success_response(
+            message="Línea actualizada exitosamente", data=linea.to_dict()
+        )
     except ResourceNotValid as e:
         return error_response(error=str(e), message=str(e), status_code=400)
     except ResourceNotFound as e:
-        return error_response(error=str(e), message="Línea no encontrada", status_code=404)
+        return error_response(
+            error=str(e), message="Línea no encontrada", status_code=404
+        )
     except Exception as e:
-        return error_response(error=str(e), message="Error al actualizar la línea", status_code=500)
+        return error_response(
+            error=str(e), message="Error en actualizar una línea", status_code=500
+        )
+
+
+def update_linea(id_linea, data):
+    try:
+        linea = LineaServices.update_linea(id_linea, data)
+        return success_response(
+            message="Línea actualizada exitosamente", data=linea.to_dict()
+        )
+    except ResourceNotValid as e:
+        return error_response(error=str(e), message=str(e), status_code=400)
+    except ResourceNotFound as e:
+        return error_response(
+            error=str(e), message="Línea no encontrada", status_code=404
+        )
+    except Exception as e:
+        return error_response(
+            error=str(e), message="Error al actualizar la línea", status_code=500
+        )
 
 
 def delete_linea(id_linea):
@@ -71,6 +111,10 @@ def delete_linea(id_linea):
         LineaServices.delete_linea(id_linea)
         return success_response(message="Línea eliminada exitosamente")
     except ResourceNotFound as e:
-        return error_response(error=str(e), message="Línea no encontrada", status_code=404)
+        return error_response(
+            error=str(e), message="Línea no encontrada", status_code=404
+        )
     except Exception as e:
-        return error_response(error=str(e), message="Error al eliminar la línea", status_code=500)
+        return error_response(
+            error=str(e), message="Error al eliminar la línea", status_code=500
+        )

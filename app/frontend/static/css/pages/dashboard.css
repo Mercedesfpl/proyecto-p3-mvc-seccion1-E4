@@ -413,3 +413,163 @@
     .hero-body { flex-direction: column; align-items: flex-start; }
     .hero-metrics { width: 100%; justify-content: space-around; box-sizing: border-box; }
 }
+
+/* ============================================
+   MODO OSCURO DASHBOARD
+   ============================================ */
+body.dark-mode .dashboard-page {
+    color: #F8FAFC;
+}
+
+body.dark-mode .dash-title {
+    color: #F8FAFC;
+}
+
+body.dark-mode .dash-subtitle {
+    color: #64748B;
+}
+
+body.dark-mode .dash-fecha-pill {
+    background: #131822;
+    border-color: #1F293D;
+    color: #64748B;
+}
+
+body.dark-mode .dash-fecha-pill i {
+    color: #00D2FF;
+}
+
+body.dark-mode .kpi-pill-card {
+    background: #131822;
+    border-color: #1F293D;
+    border-left-color: #00D2FF;
+}
+
+body.dark-mode .kpi-pill-icon {
+    background: rgba(0, 210, 255, 0.1);
+    color: #00D2FF;
+}
+
+body.dark-mode .kpi-pill-title {
+    color: #64748B;
+}
+
+body.dark-mode .kpi-pill-data h3 {
+    color: #F8FAFC;
+}
+
+body.dark-mode .kpi-pill-sub {
+    color: #64748B;
+}
+
+body.dark-mode .card {
+    background: #131822;
+    border-color: #1F293D;
+}
+
+body.dark-mode .card-header h3 {
+    color: #F8FAFC;
+}
+
+body.dark-mode .card-header h3 i {
+    color: #00D2FF;
+}
+
+body.dark-mode .btn-link {
+    color: #00D2FF;
+}
+
+body.dark-mode .hero-summary-card {
+    background: linear-gradient(135deg, #00D2FF 0%, #0099cc 100%);
+    color: #0A0D12;
+}
+
+body.dark-mode .hero-text-side h2 {
+    color: #0A0D12;
+}
+
+body.dark-mode .hero-text-side p {
+    color: #0A0D12;
+    opacity: 0.8;
+}
+
+body.dark-mode .hero-badge {
+    background: rgba(10, 13, 18, 0.2);
+    color: #0A0D12;
+}
+
+body.dark-mode .hero-metrics {
+    background: rgba(10, 13, 18, 0.25);
+}
+
+body.dark-mode .hm-val {
+    color: #0A0D12;
+}
+
+body.dark-mode .hm-lbl {
+    color: #0A0D12;
+    opacity: 0.8;
+}
+
+body.dark-mode .hero-divider {
+    background: rgba(10, 13, 18, 0.2);
+}
+
+body.dark-mode .prog-labels {
+    color: #64748B;
+}
+
+body.dark-mode .prog-labels strong {
+    color: #F8FAFC;
+}
+
+body.dark-mode .prog-bar {
+    background: #1F293D;
+}
+
+body.dark-mode .bg-green,
+body.dark-mode .bg-red,
+body.dark-mode .bg-blue {
+    background-color: #00D2FF;
+}
+
+body.dark-mode .ultima-ruta-item {
+    background: #0A0D12;
+    border-color: #1F293D;
+}
+
+body.dark-mode .ruta-nombre {
+    color: #F8FAFC;
+}
+
+body.dark-mode .ruta-linea {
+    color: #64748B;
+}
+
+body.dark-mode .ruta-estado.activa {
+    background: rgba(0, 210, 255, 0.15);
+    color: #00D2FF;
+}
+
+body.dark-mode .ruta-estado.inactiva {
+    background: #1F293D;
+    color: #64748B;
+}
+
+body.dark-mode .linea-item-row {
+    background: #0A0D12;
+    border-color: #1F293D;
+}
+
+body.dark-mode .linea-item-name {
+    color: #F8FAFC;
+}
+
+body.dark-mode .linea-item-badge {
+    background: rgba(0, 210, 255, 0.15);
+    color: #00D2FF;
+}
+
+body.dark-mode .loading-text {
+    color: #64748B;
+}

@@ -32,12 +32,13 @@ def create_ruta(data):
     try:
         print("datos de crear tuta>>>>>>>>>>>>>>", data)
         ruta = RutaServices.create_ruta(data)
-        return success_response(message="Ruta creada exitosamente", data=ruta.to_dict())
+        return success_response(message="Ruta creada exitosamente", data=data)
     except ResourceNotValid as e:
         return error_response(error=str(e), message=str(e), status_code=400)
     except ResourceNotFound as e:
         return error_response(error=str(e), message=str(e), status_code=404)
     except Exception as e:
+        # traceback.print_exc()
         return error_response(
             error=str(e), message="Error al crear la ruta", status_code=500
         )
@@ -46,6 +47,7 @@ def create_ruta(data):
 def update_ruta(id_ruta, data):
     try:
         ruta = RutaServices.update_ruta(id_ruta, data)
+        return success_response(message="Ruta actualizada exitosamente", data=ruta)
         return success_response(message="Ruta actualizada exitosamente", data=ruta)
     except ResourceNotValid as e:
         return error_response(error=str(e), message=str(e), status_code=400)

@@ -34,32 +34,51 @@ function getCookie(name) {
 }
 
 // ============================================================
-// 3. MODAL
+// 2. ABRIR / CERRAR MODAL (igual que en personas)
 // ============================================================
-async function abrirModalUnidad(titulo = "Nueva Unidad") {
+function abrirModalUnidad(data = null) {
   const modal = document.getElementById("modalNuevaUnidad");
-  document.getElementById("formNuevaUnidad").reset();
-  document.querySelectorAll(".is-invalid").forEach((el) => el.classList.remove("is-invalid"));
+  const form = document.getElementById("formNuevaUnidad");
+  form.reset();
+  document
+    .querySelectorAll(".is-invalid")
+    .forEach((el) => el.classList.remove("is-invalid"));
 
-  const titleEl = document.getElementById("modalUnidadTitle");
-  if (titleEl) titleEl.textContent = titulo;
+  if (data) {
+    //modo edición
+    editandoIdUnidad = data.id_vehiculo;
+    document.getElementById("placa").value = data.placa || "";
+    document.getElementById("id_linea").value = data.id_linea || "";
+    document.getElementById("id_ruta").value = data.id_ruta || "";
+    document.getElementById("id_secretario").value = data.id_secretario || "";
+    document.getElementById("status").value = data.status || "";
+    document.querySelector("#modalNuevaUnidad h2").innerHTML =
+      '<i class="fas fa-bus"></i> Editar unidad';
+  } else {
+    //modo creación
+    editandoIdUnidad = null;
+    document.querySelector("#modalNuevaUnidad h2").innerHTML =
+      '<i class="fas fa-bus"></i> Nueva unidad';
+  }
 
-  await cargarSelectsModal();
   modal.classList.add("show");
+  document.body.style.overflow = "hidden";
   document.getElementById("guardarUnidadBtn").disabled = false;
 }
 
 function cerrarModalUnidad() {
   const modal = document.getElementById("modalNuevaUnidad");
   modal.classList.remove("show");
+  document.body.style.overflow = "";
   editandoIdUnidad = null;
-  document.getElementById("guardarUnidadBtn").disabled = false;
   document.getElementById("formNuevaUnidad").reset();
-  document.querySelectorAll(".is-invalid").forEach((el) => el.classList.remove("is-invalid"));
+  document
+    .querySelectorAll(".is-invalid")
+    .forEach((el) => el.classList.remove("is-invalid"));
 }
 
 // ============================================================
-// 4. CARGAR DATOS DESDE EL BACKEND
+// 3. CARGAR TABLA DE BUSES
 // ============================================================
 async function cargarBuses() {
   const tbody = document.getElementById("unidadesTableBody");
@@ -73,21 +92,61 @@ async function cargarBuses() {
   }
 
   try {
-    const response = await fetch("/admin/buses");
+    const response = await fetch("/admin/buses", { credentials: "include" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
-    todosLosBuses = data.success && Array.isArray(data.data) ? data.data : [];
-    busesFiltrados = [...todosLosBuses]; 
-    paginaActual = 1;
-    renderizarPagina();   
+    const buses = data.data || [];
+    const tbody = document.getElementById("unidadesTableBody");
+    if (!tbody) return;
+
+    if (buses.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;">No hay unidades registradas</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = buses
+      .map((bus) => {
+        //Usamos los campos planos que devuelve el backend
+        const nombreLinea = bus.linea_nombre || "Sin Línea";
+        const nombreRuta = bus.ruta_nombre || "Sin ruta";
+        const nombreSecretario = bus.secretario_nombre || "Sin secretario";
+
+        let statusClass = "status-active";
+        let statusText = "Activo";
+        if (bus.status === "inactiva") {
+          statusClass = "status-inactive";
+          statusText = "Inactivo";
+        }
+
+        return `
+          <tr>
+            <td><strong>BUS-${String(bus.id_vehiculo).padStart(3, "0")}</strong></td>
+            <td>${bus.placa}</td>
+            <td>${nombreLinea}</td>
+            <td>${nombreRuta}</td>
+            <td>${nombreSecretario}</td>
+            <td>
+              <span class="status-badge ${statusClass}">
+                <i class="fas fa-circle"></i> ${statusText}
+              </span>
+            </td>
+            <td class="action-buttons">
+              <button class="action-btn edit" data-id="${bus.id_vehiculo}" title="Editar">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="action-btn delete" data-id="${bus.id_vehiculo}" title="Eliminar">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      })
+      .join("");
+
+    asignarEventosTabla();
   } catch (error) {
     console.error("Error al cargar buses:", error);
-    mostrarNotificacion("No se pudieron cargar los datos del servidor.", "warning");
-    if (tbody) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="5" class="tabla-vacia">Error al cargar datos</td>
-        </tr>`;
-    }
+    mostrarNotificacion("Error al cargar las unidades", "danger");
   }
 }
 
@@ -100,9 +159,10 @@ function renderizarPagina() {
 
   // Si no hay buses (ni filtrados ni totales)
   if (busesFiltrados.length === 0) {
-    const mensaje = todosLosBuses.length === 0
-      ? "No hay buses registrados"
-      : "No hay buses que coincidan con el filtro";
+    const mensaje =
+      todosLosBuses.length === 0
+        ? "No hay buses registrados"
+        : "No hay buses que coincidan con el filtro";
     tbody.innerHTML = `
       <tr>
         <td colspan="5" class="tabla-vacia">${mensaje}</td>
@@ -113,23 +173,23 @@ function renderizarPagina() {
 
   // Calcular rango SOBRE busesFiltrados
   const inicio = (paginaActual - 1) * itemsPorPagina;
-  const fin    = inicio + itemsPorPagina;
-  const pagina = busesFiltrados.slice(inicio, fin);   
+  const fin = inicio + itemsPorPagina;
+  const pagina = busesFiltrados.slice(inicio, fin);
 
   // Pintar filas
   tbody.innerHTML = "";
   pagina.forEach((bus) => {
     const nombreLinea = bus.linea ? bus.linea.nombre : "Sin línea";
-    const nombreRuta  = bus.ruta  ? bus.ruta.nombre  : "Sin ruta";
+    const nombreRuta = bus.ruta ? bus.ruta.nombre : "Sin ruta";
 
     let statusClass = "status-active";
-    let statusText  = "Activo";
+    let statusText = "Activo";
     if (bus.status === "inactiva") {
       statusClass = "status-inactive";
-      statusText  = "Inactivo";
+      statusText = "Inactivo";
     } else if (bus.status === "en_servicio") {
       statusClass = "status-warning";
-      statusText  = "En servicio";
+      statusText = "En servicio";
     }
 
     const tr = document.createElement("tr");
@@ -169,11 +229,11 @@ function renderizarPagina() {
 function actualizarControlesPaginacion(totalItems) {
   const totalPaginas = Math.max(1, Math.ceil(totalItems / itemsPorPagina));
 
-  const info     = document.getElementById("infoPagina");
-  const btnPrev  = document.getElementById("btnAnterior");
-  const btnNext  = document.getElementById("btnSiguiente");
+  const info = document.getElementById("infoPagina");
+  const btnPrev = document.getElementById("btnAnterior");
+  const btnNext = document.getElementById("btnSiguiente");
 
-  if (info)    info.textContent = `Página ${paginaActual} de ${totalPaginas}`;
+  if (info) info.textContent = `Página ${paginaActual} de ${totalPaginas}`;
   if (btnPrev) btnPrev.disabled = paginaActual === 1;
   if (btnNext) btnNext.disabled = paginaActual >= totalPaginas;
 }
@@ -184,35 +244,45 @@ function actualizarControlesPaginacion(totalItems) {
 async function cargarSelectsModal() {
   try {
     // Líneas
-    const respLineas = await fetch("/admin/lineas");
+    const respLineas = await fetch("/admin/lineas", { credentials: "include" });
     const dataLineas = await respLineas.json();
-    if (dataLineas.success) {
-      const select = document.getElementById("id_linea");
-      if (select) {
-        select.innerHTML = '<option value="">Seleccione una línea...</option>';
-        dataLineas.data.forEach((linea) => {
-          const opt = document.createElement("option");
-          opt.value = linea.id;
-          opt.textContent = linea.nombre;
-          select.appendChild(opt);
-        });
-      }
-    }
+    const selectLinea = document.getElementById("id_linea");
+    selectLinea.innerHTML = '<option value="">Seleccione una línea...</option>';
+    (dataLineas.data || []).forEach((linea) => {
+      const opt = document.createElement("option");
+      opt.value = linea.id;
+      opt.textContent = linea.nombre;
+      selectLinea.appendChild(opt);
+    });
+
     // Rutas
-    const respRutas = await fetch("/admin/rutas/api");
+    const respRutas = await fetch("/admin/rutas/api", {
+      credentials: "include",
+    });
     const dataRutas = await respRutas.json();
-    if (dataRutas.success) {
-      const select = document.getElementById("id_ruta");
-      if (select) {
-        select.innerHTML = '<option value="">Sin ruta asignada</option>';
-        dataRutas.data.forEach((ruta) => {
-          const opt = document.createElement("option");
-          opt.value = ruta.id ?? ruta.id_ruta;
-          opt.textContent = ruta.nombre;
-          select.appendChild(opt);
-        });
-      }
-    }
+    const selectRuta = document.getElementById("id_ruta");
+    selectRuta.innerHTML = '<option value="">Sin ruta asignada...</option>';
+    (dataRutas.data || []).forEach((ruta) => {
+      const opt = document.createElement("option");
+      opt.value = ruta.id_ruta;
+      opt.textContent = ruta.nombre;
+      selectRuta.appendChild(opt);
+    });
+
+    // Secretarios
+    const respSecretarios = await fetch("/admin/secretarios/select", {
+      credentials: "include",
+    });
+    const dataSecretarios = await respSecretarios.json();
+    const selectSecretario = document.getElementById("id_secretario");
+    selectSecretario.innerHTML =
+      '<option value="">Seleccione un secretario...</option>';
+    (dataSecretarios.data || []).forEach((sec) => {
+      const opt = document.createElement("option");
+      opt.value = sec.id;
+      opt.textContent = sec.nombre;
+      selectSecretario.appendChild(opt);
+    });
   } catch (error) {
     console.error("Error al cargar selects:", error);
   }
@@ -229,11 +299,13 @@ async function guardarNuevaUnidad(e) {
   const formData = new FormData(form);
   const data = Object.fromEntries(formData.entries());
 
-  if (!data.id_ruta)   delete data.id_ruta;
+  if (!data.id_ruta) delete data.id_ruta;
   if (!data.ubicacion) delete data.ubicacion;
 
   let valid = true;
-  document.querySelectorAll(".is-invalid").forEach((el) => el.classList.remove("is-invalid"));
+  document
+    .querySelectorAll(".is-invalid")
+    .forEach((el) => el.classList.remove("is-invalid"));
 
   if (data.placa) data.placa = data.placa.trim().toUpperCase();
   if (!data.placa) {
@@ -251,18 +323,16 @@ async function guardarNuevaUnidad(e) {
 
   loadingUnidad = true;
   document.getElementById("guardarUnidadBtn").disabled = true;
-
   try {
     const csrfToken = getCookie("csrf_access_token");
-    const esEdicion = editandoIdUnidad !== null;
-    const url = esEdicion
+    const url = editandoIdUnidad
       ? `/admin/buses/${editandoIdUnidad}`
-      : `/admin/save-bus`;
-    const method = esEdicion ? "PUT" : "POST";
+      : "/admin/save-bus";
+    const method = editandoIdUnidad ? "PUT" : "POST";
 
     const response = await fetch(url, {
-      method,
-      credentials: "include",
+      method: method,
+      credentials: "include", // 🔑 envía cookies
       headers: {
         "Content-Type": "application/json",
         "X-CSRF-TOKEN": csrfToken,
@@ -274,13 +344,16 @@ async function guardarNuevaUnidad(e) {
 
     if (response.ok && result.success) {
       mostrarNotificacion(
-        esEdicion ? "Unidad actualizada exitosamente" : "Unidad creada exitosamente",
-        "success"
+        editandoIdUnidad ? "Unidad actualizada" : "Unidad creada exitosamente",
+        "success",
       );
       cerrarModalUnidad();
       cargarBuses();
     } else {
-      mostrarNotificacion(result.message || "Error al guardar la unidad", "danger");
+      mostrarNotificacion(
+        result.message || "Error al guardar la unidad",
+        "danger",
+      );
     }
   } catch (error) {
     console.error("Error al guardar unidad:", error);
@@ -290,9 +363,29 @@ async function guardarNuevaUnidad(e) {
     document.getElementById("guardarUnidadBtn").disabled = false;
   }
 }
+// ============================================================
+// 6. EDITAR UNIDAD
+// ============================================================
+async function editarUnidad(id) {
+  try {
+    const response = await fetch(`/admin/buses/${id}`, {
+      credentials: "include",
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    if (!data.data) throw new Error("Datos inválidos");
+
+    //Aseguramos que los selects estén cargados antes de abrir el modal
+    await cargarSelectsModal();
+    abrirModalUnidad(data.data);
+  } catch (error) {
+    console.error("Error al cargar la unidad:", error);
+    mostrarNotificacion("Error al cargar la unidad", "danger");
+  }
+}
 
 // ============================================================
-// 7. ELIMINAR
+// 7. ELIMINAR UNIDAD (DELETE)
 // ============================================================
 async function eliminarUnidad(id) {
   if (!confirm(`¿Está seguro de eliminar la unidad ID: ${id}?`)) return;
@@ -302,7 +395,10 @@ async function eliminarUnidad(id) {
     const response = await fetch(`/admin/buses/${id}`, {
       method: "DELETE",
       credentials: "include",
-      headers: { "X-CSRF-TOKEN": csrfToken },
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-TOKEN": csrfToken,
+      },
     });
     const result = await response.json();
 
@@ -319,126 +415,14 @@ async function eliminarUnidad(id) {
 }
 
 // ============================================================
-// 8. VER
-// ============================================================
-async function verUnidad(id) {
-  try {
-    const resp = await fetch(`/admin/buses/${id}`);
-    const result = await resp.json();
-    if (!result.success) {
-      mostrarNotificacion(result.message || "Bus no encontrado", "danger");
-      return;
-    }
-    const bus = result.data;
-
-    const nombreLinea      = bus.linea ? bus.linea.nombre : "Sin línea";
-    const colorLinea       = bus.linea?.color || "#74A9D3";
-    const nombreSecretario = bus.linea?.secretario_nombre || "Sin secretario";
-    const nombreRuta       = bus.ruta ? bus.ruta.nombre : "Sin ruta";
-
-  // Formatear fecha
-  let fechaCreacion = "No disponible";
-  if (bus.created_at) {
-    const d = new Date(bus.created_at);
-    if (!isNaN(d.getTime())) {
-      fechaCreacion = new Intl.DateTimeFormat("es-VE", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-      }).format(d);
-    }
-  }
-
-    const statusText = bus.status === "activa"
-      ? "Activa"
-      : bus.status === "inactiva"
-        ? "Inactiva"
-        : "En servicio";
-
-    // Rellenar modal
-    document.getElementById("verBusId").textContent         = `BUS-${String(bus.id_vehiculo).padStart(3, "0")}`;
-    document.getElementById("verBusPlaca").textContent      = bus.placa || "-";
-    document.getElementById("verBusLinea").textContent      = nombreLinea;
-    document.getElementById("verBusLinea").style.color      = colorLinea;
-    document.getElementById("verBusRuta").textContent       = nombreRuta;
-    document.getElementById("verBusSecretario").textContent = nombreSecretario;
-    document.getElementById("verBusEstado").textContent     = statusText;
-    document.getElementById("verBusUbicacion").textContent  = bus.ubicacion || "No asignada";
-    document.getElementById("verBusFecha").textContent      = fechaCreacion;
-
-        const estadoBadge = document.getElementById("verBusEstadoBadge");
-        if (estadoBadge) {
-          estadoBadge.className = "status-badge";
-          if (bus.status === "activa")         estadoBadge.classList.add("status-active");
-          else if (bus.status === "inactiva")  estadoBadge.classList.add("status-inactive");
-          else                                  estadoBadge.classList.add("status-warning");
-        }
-    // Mostrar modal
-    document.getElementById("modalVerUnidad").classList.add("show");
-  } catch (error) {
-    console.error("Error al ver unidad:", error);
-    mostrarNotificacion("Error de conexión al servidor", "danger");
-  }
-}
-
-function cerrarModalVerUnidad() {
-  document.getElementById("modalVerUnidad").classList.remove("show");
-}
-
-// ============================================================
-// 9. EDITAR
-// ============================================================
-async function editarUnidad(id) {
-  try {
-    const resp = await fetch(`/admin/buses/${id}`);
-    const result = await resp.json();
-    if (!result.success) {
-      mostrarNotificacion(result.message || "Bus no encontrado", "danger");
-      return;
-    }
-    const bus = result.data;
-
-    editandoIdUnidad = id;
-
-    // Abrir modal y ESPERAR a que los selects se carguen
-    const modal = document.getElementById("modalNuevaUnidad");
-    document.getElementById("formNuevaUnidad").reset();
-    document.getElementById("modalUnidadTitle").textContent = "Editar Unidad";
-    await cargarSelectsModal();    
-    modal.classList.add("show");
-
-    // Ahora sí, rellenar sin setTimeout
-    document.getElementById("placa").value      = bus.placa || "";
-    document.getElementById("id_linea").value   = bus.id_linea || "";
-    document.getElementById("id_ruta").value    = bus.id_ruta || "";
-    document.getElementById("status").value     = bus.status || "activa";
-    if (document.getElementById("ubicacion")) {
-      document.getElementById("ubicacion").value = bus.ubicacion || "";
-    }
-  } catch (error) {
-    console.error("Error al editar unidad:", error);
-    mostrarNotificacion("Error de conexión al servidor", "danger");
-  }
-}
-
-// ============================================================
-// 10. EVENTOS DE LA TABLA
+// 8. ASIGNAR EVENTOS A BOTONES DE LA TABLA
 // ============================================================
 function asignarEventosTabla() {
-  document.querySelectorAll(".action-btn.view").forEach((btn) => {
-    btn.onclick = function (e) {
-      e.stopPropagation();
-      verUnidad(this.getAttribute("data-id"));
-    };
-  });
-
   document.querySelectorAll(".action-btn.edit").forEach((btn) => {
     btn.onclick = function (e) {
       e.stopPropagation();
-      editarUnidad(this.getAttribute("data-id"));
+      const id = this.getAttribute("data-id");
+      editarUnidad(id);
     };
   });
 
@@ -474,17 +458,23 @@ async function llenarFiltroLineasFlota() {
 }
 
 function aplicarFiltros() {
-  const searchTerm   = document.getElementById("searchUnidad")?.value?.toLowerCase() || "";
-  const filterLinea  = document.getElementById("filterLinea")?.value || "";
+  const searchTerm =
+    document.getElementById("searchUnidad")?.value?.toLowerCase() || "";
+  const filterLinea = document.getElementById("filterLinea")?.value || "";
   const filterEstado = document.getElementById("filterEstado")?.value || "";
 
   busesFiltrados = todosLosBuses.filter((bus) => {
-    const placa    = (bus.placa || "").toLowerCase();
+    const placa = (bus.placa || "").toLowerCase();
     const lineaTxt = (bus.linea?.nombre || "").toLowerCase();
-    const lineaId  = String(bus.id_linea || "");
-    const estado   = bus.status || "";
+    const lineaId = String(bus.id_linea || "");
+    const estado = bus.status || "";
 
-    if (searchTerm && !placa.includes(searchTerm) && !lineaTxt.includes(searchTerm)) return false;
+    if (
+      searchTerm &&
+      !placa.includes(searchTerm) &&
+      !lineaTxt.includes(searchTerm)
+    )
+      return false;
     if (filterLinea && lineaId !== filterLinea) return false;
     if (filterEstado && estado !== filterEstado) return false;
     return true;
@@ -498,6 +488,13 @@ function aplicarFiltros() {
 // 12. INICIALIZAR
 // ============================================================
 document.addEventListener("DOMContentLoaded", function () {
+  //Cargar los selects al inicio (para que estén listos al abrir el modal)
+  cargarSelectsModal();
+
+  //cargar tabla
+  cargarBuses();
+
+  // Botón "Nueva Unidad"
   const nuevaUnidadBtn = document.getElementById("nuevaUnidadBtn");
   if (nuevaUnidadBtn) {
     nuevaUnidadBtn.onclick = async function () {
@@ -538,25 +535,34 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Paginación
-document.getElementById("btnAnterior")?.addEventListener("click", () => {
-  if (paginaActual > 1) {
-    paginaActual--;
-    renderizarPagina();
-  }
-});
+  document.getElementById("btnAnterior")?.addEventListener("click", () => {
+    if (paginaActual > 1) {
+      paginaActual--;
+      renderizarPagina();
+    }
+  });
 
-document.getElementById("btnSiguiente")?.addEventListener("click", () => {
-  const totalPaginas = Math.max(1, Math.ceil(busesFiltrados.length / itemsPorPagina));
-  if (paginaActual < totalPaginas) {
-    paginaActual++;
-    renderizarPagina();
-  }
-});
+  document.getElementById("btnSiguiente")?.addEventListener("click", () => {
+    const totalPaginas = Math.max(
+      1,
+      Math.ceil(busesFiltrados.length / itemsPorPagina),
+    );
+    if (paginaActual < totalPaginas) {
+      paginaActual++;
+      renderizarPagina();
+    }
+  });
 
   // Filtros
-  document.getElementById("searchUnidad")?.addEventListener("input", aplicarFiltros);
-  document.getElementById("filterLinea")?.addEventListener("change", aplicarFiltros);
-  document.getElementById("filterEstado")?.addEventListener("change", aplicarFiltros);
+  document
+    .getElementById("searchUnidad")
+    ?.addEventListener("input", aplicarFiltros);
+  document
+    .getElementById("filterLinea")
+    ?.addEventListener("change", aplicarFiltros);
+  document
+    .getElementById("filterEstado")
+    ?.addEventListener("change", aplicarFiltros);
 
   // Cargar datos
   llenarFiltroLineasFlota();

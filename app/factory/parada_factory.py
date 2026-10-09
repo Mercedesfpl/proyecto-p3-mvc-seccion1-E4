@@ -2,7 +2,7 @@
 from ..models.parada import Parada
 from ..models.exceptions import ResourceNotValid
 from ..helpers.coordenadas_helper import limpiar_coordenadas, validar_coordenadas
-from ..repositories import lineaRepository
+from ..repositories import lineaRepository, rutaRepository
 
 
 class ParadaFactory:
@@ -64,11 +64,25 @@ class ParadaFactory:
         return orden
 
     @staticmethod
+    def _validar_ruta_id(ruta_id):
+        if ruta_id is not None and ruta_id != "":
+            ruta = rutaRepository.RutaRepository.get_by_id(int(ruta_id))
+            if not ruta:
+                raise ResourceNotValid("Parada", "La ruta asociada no existe")
+            return int(ruta_id)
+
+    @staticmethod
     def crear_parada(data):
         """Valida y crea una instancia de Parada sin guardarla aún."""
         print("datos en el factory", data)
 
+        """Valida y crea una instancia de Parada sin guardarla aún."""
+        print("datos en el factory", data)
+
         nombre = ParadaFactory._validar_nombre(data.get("nombre"))
+        coordenadas_limpias = ParadaFactory._validar_coordenadas(
+            data.get("coordenadas", "")
+        )
         coordenadas_limpias = ParadaFactory._validar_coordenadas(
             data.get("coordenadas", "")
         )
@@ -80,6 +94,7 @@ class ParadaFactory:
             nombre=nombre,
             coordenadas=coordenadas_limpias,
             status=status,
+            id_ruta=id_ruta,
             # linea_id=linea_id,
             # orden=orden
         )
