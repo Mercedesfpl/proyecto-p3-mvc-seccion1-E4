@@ -6,7 +6,7 @@ styles %}
 />
 {% endblock %} {% block content %}
 <div class="page-header">
-  <h1>Gestión de Flota</h1>
+  <h1>Gestion de Flota</h1>
   <button class="btn-add" id="nuevaUnidadBtn">
     <i class="fas fa-plus"></i> Nueva Unidad
   </button>
@@ -19,12 +19,12 @@ styles %}
       <input
         type="text"
         id="searchUnidad"
-        placeholder="Buscar por placa o línea..."
+        placeholder="Buscar por placa o linea..."
       />
     </div>
     <div class="filter-group">
       <select class="filter-select" id="filterLinea">
-        <option value="">Todas las líneas</option>
+        <option value="">Todas las lineas</option>
       </select>
       <select class="filter-select" id="filterEstado">
         <option value="">Todos los estados</option>
@@ -37,17 +37,14 @@ styles %}
   <table class="data-table">
     <thead>
       <tr>
-        <th>Código</th>
+        <th>Codigo</th>
         <th>Placa</th>
-        <th>Línea</th>
-        <th>Ruta</th>
-        <th>Secretario</th>
         <th>Estado</th>
         <th>Acciones</th>
       </tr>
     </thead>
     <tbody id="unidadesTableBody">
-      <!-- Aquí se llenan los buses con flota.js -->
+      <!-- Aqui se llenan los buses con flota.js -->
     </tbody>
   </table>
 
@@ -55,7 +52,7 @@ styles %}
     <button id="btnAnterior" disabled>
       <i class="fas fa-chevron-left"></i> Anterior
     </button>
-    <span class="info-pagina" id="infoPagina">Página 1 de 1</span>
+    <span class="info-pagina" id="infoPagina">Pagina 1 de 1</span>
     <button id="btnSiguiente" disabled>
       Siguiente <i class="fas fa-chevron-right"></i>
     </button>
@@ -85,30 +82,31 @@ styles %}
           />
         </div>
         <div class="form-group">
-          <label>Línea <span class="required">*</span></label>
+          <label>Linea <span class="required">*</span></label>
           <select id="id_linea" name="id_linea" required>
-            <option value="">Seleccione una línea...</option>
+            <option value="">Seleccione una linea...</option>
           </select>
+          <small style="font-size: 11px; color: #666;">
+            El secretario se asigna automaticamente de la linea
+          </small>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label
-            >Ruta
-            <span style="color: var(--texto-claro); font-weight: 400"
-              >(opcional)</span
-            ></label
-          >
+          <label>Ruta <span style="color: var(--texto-claro); font-weight: 400">(opcional)</span></label>
           <select id="id_ruta" name="id_ruta">
             <option value="">Sin ruta asignada</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Secretario <span class="required">*</span></label>
-          <select id="id_secretario" name="id_secretario" required>
-            <option value="">Seleccione un secretario...</option>
+          <label>ESP32 Asignado</label>
+          <select id="id_esp32" name="id_esp32">
+            <option value="">Sin ESP32 asignado</option>
           </select>
+          <small style="font-size: 11px; color: #666;">
+            Solo se muestran ESP32 activos y disponibles
+          </small>
         </div>
       </div>
 
@@ -133,13 +131,83 @@ styles %}
         "
       >
         <i class="fas fa-info-circle" style="color: #1a73e8"></i>
-        La placa debe ser única.
+        La placa debe ser unica. El secretario se hereda de la linea.
       </div>
 
       <button type="submit" class="btn-guardar" id="guardarUnidadBtn">
         <i class="fas fa-save"></i> Guardar Unidad
       </button>
     </form>
+  </div>
+</div>
+
+<!-- MODAL VER UNIDAD (mas info) -->
+<div id="modalVerUnidad" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2><i class="fas fa-info-circle"></i> Detalle de la Unidad</h2>
+      <span class="modal-close" onclick="cerrarModalVerUnidad()">&times;</span>
+    </div>
+
+    <div class="detalle-unidad">
+      <div class="detalle-header">
+        <div class="detalle-icono" id="verUnidadIcono" style="background: #74A9D3;">
+          <i class="fas fa-bus"></i>
+        </div>
+        <div class="detalle-titulo">
+          <span class="detalle-id" id="verUnidadId">BUS-000</span>
+          <span class="status-badge" id="verUnidadEstadoBadge">
+            <span id="verUnidadEstado">-</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="detalle-grid">
+        <div class="detalle-item">
+          <span class="detalle-label"><i class="fas fa-id-card"></i> Placa</span>
+          <span class="detalle-value" id="verUnidadPlaca">-</span>
+        </div>
+
+        <div class="detalle-item">
+          <span class="detalle-label"><i class="fas fa-route"></i> Linea</span>
+          <span class="detalle-value" id="verUnidadLinea">-</span>
+        </div>
+
+        <div class="detalle-item">
+          <span class="detalle-label"><i class="fas fa-map-signs"></i> Ruta</span>
+          <span class="detalle-value" id="verUnidadRuta">-</span>
+        </div>
+
+        <div class="detalle-item">
+          <span class="detalle-label"><i class="fas fa-user-cog"></i> Secretario</span>
+          <span class="detalle-value" id="verUnidadSecretario">-</span>
+        </div>
+
+        <div class="detalle-item">
+          <span class="detalle-label"><i class="fas fa-microchip"></i> ESP32</span>
+          <span class="detalle-value" id="verUnidadEsp32">-</span>
+        </div>
+
+        <div class="detalle-item">
+          <span class="detalle-label"><i class="fas fa-code-branch"></i> Version Firmware</span>
+          <span class="detalle-value" id="verUnidadFirmware">-</span>
+        </div>
+
+        <div class="detalle-item">
+          <span class="detalle-label"><i class="fas fa-calendar-plus"></i> Fecha de registro</span>
+          <span class="detalle-value" id="verUnidadFecha">-</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-editar-ver" onclick="editarDesdeVerUnidad()">
+        <i class="fas fa-edit"></i> Editar
+      </button>
+      <button class="btn-cerrar" onclick="cerrarModalVerUnidad()">
+        <i class="fas fa-times"></i> Cerrar
+      </button>
+    </div>
   </div>
 </div>
 {% endblock %} {% block scripts %}

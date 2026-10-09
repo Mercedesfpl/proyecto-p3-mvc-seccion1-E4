@@ -1,5 +1,5 @@
 // ============================================================
-// FLOTA (Buses) - Lógica completa
+// FLOTA (Buses) - Logica completa
 // ============================================================
 
 let editandoIdUnidad = null;
@@ -8,6 +8,7 @@ let paginaActual = 1;
 const itemsPorPagina = 10;
 let todosLosBuses = [];
 let busesFiltrados = [];
+let idUnidadViendo = null;
 
 // ============================================================
 // 1. NOTIFICACIONES
@@ -17,10 +18,10 @@ function mostrarNotificacion(mensaje, tipo = "success") {
     showToast(mensaje, tipo);
     return;
   }
-  if (tipo === "success") alert("" + mensaje);
-  else if (tipo === "warning") alert(" " + mensaje);
-  else if (tipo === "danger") alert("" + mensaje);
-  else alert("" + mensaje);
+  if (tipo === "success") alert("OK: " + mensaje);
+  else if (tipo === "warning") alert("AVISO: " + mensaje);
+  else if (tipo === "danger") alert("ERROR: " + mensaje);
+  else alert(mensaje);
 }
 
 // ============================================================
@@ -34,7 +35,7 @@ function getCookie(name) {
 }
 
 // ============================================================
-// 2. ABRIR / CERRAR MODAL (igual que en personas)
+// 3. ABRIR / CERRAR MODAL CREAR-EDITAR
 // ============================================================
 function abrirModalUnidad(data = null) {
   const modal = document.getElementById("modalNuevaUnidad");
@@ -45,18 +46,24 @@ function abrirModalUnidad(data = null) {
     .forEach((el) => el.classList.remove("is-invalid"));
 
   if (data) {
-    //modo edición
     editandoIdUnidad = data.id_vehiculo;
     document.getElementById("placa").value = data.placa || "";
     document.getElementById("id_linea").value = data.id_linea || "";
     document.getElementById("id_ruta").value = data.id_ruta || "";
-    document.getElementById("id_secretario").value = data.id_secretario || "";
     document.getElementById("status").value = data.status || "";
+
+    cargarSelectEsp32(data.id_vehiculo).then(() => {
+      const selectEsp = document.getElementById("id_esp32");
+      if (selectEsp && data.id_esp32) {
+        selectEsp.value = data.id_esp32;
+      }
+    });
+
     document.querySelector("#modalNuevaUnidad h2").innerHTML =
       '<i class="fas fa-bus"></i> Editar unidad';
   } else {
-    //modo creación
     editandoIdUnidad = null;
+    cargarSelectEsp32(null);
     document.querySelector("#modalNuevaUnidad h2").innerHTML =
       '<i class="fas fa-bus"></i> Nueva unidad';
   }
@@ -78,14 +85,14 @@ function cerrarModalUnidad() {
 }
 
 // ============================================================
-// 3. CARGAR TABLA DE BUSES
+// 4. CARGAR TABLA DE BUSES
 // ============================================================
 async function cargarBuses() {
   const tbody = document.getElementById("unidadesTableBody");
   if (tbody) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="5" class="tabla-cargando">
+        <td colspan="4" class="tabla-cargando">
           <i class="fas fa-spinner fa-spin"></i> Cargando...
         </td>
       </tr>`;
@@ -96,54 +103,11 @@ async function cargarBuses() {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
     const buses = data.data || [];
-    const tbody = document.getElementById("unidadesTableBody");
-    if (!tbody) return;
 
-    if (buses.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;">No hay unidades registradas</td></tr>`;
-      return;
-    }
+    todosLosBuses = buses;
+    busesFiltrados = [...todosLosBuses];
 
-    tbody.innerHTML = buses
-      .map((bus) => {
-        //Usamos los campos planos que devuelve el backend
-        const nombreLinea = bus.linea_nombre || "Sin Línea";
-        const nombreRuta = bus.ruta_nombre || "Sin ruta";
-        const nombreSecretario = bus.secretario_nombre || "Sin secretario";
-
-        let statusClass = "status-active";
-        let statusText = "Activo";
-        if (bus.status === "inactiva") {
-          statusClass = "status-inactive";
-          statusText = "Inactivo";
-        }
-
-        return `
-          <tr>
-            <td><strong>BUS-${String(bus.id_vehiculo).padStart(3, "0")}</strong></td>
-            <td>${bus.placa}</td>
-            <td>${nombreLinea}</td>
-            <td>${nombreRuta}</td>
-            <td>${nombreSecretario}</td>
-            <td>
-              <span class="status-badge ${statusClass}">
-                <i class="fas fa-circle"></i> ${statusText}
-              </span>
-            </td>
-            <td class="action-buttons">
-              <button class="action-btn edit" data-id="${bus.id_vehiculo}" title="Editar">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="action-btn delete" data-id="${bus.id_vehiculo}" title="Eliminar">
-                <i class="fas fa-trash"></i>
-              </button>
-            </td>
-          </tr>
-        `;
-      })
-      .join("");
-
-    asignarEventosTabla();
+    renderizarPagina();
   } catch (error) {
     console.error("Error al cargar buses:", error);
     mostrarNotificacion("Error al cargar las unidades", "danger");
@@ -151,13 +115,12 @@ async function cargarBuses() {
 }
 
 // ============================================================
-// 4.1 RENDERIZAR PÁGINA ACTUAL
+// 5. RENDERIZAR PAGINA ACTUAL (solo codigo, placa, estado)
 // ============================================================
 function renderizarPagina() {
   const tbody = document.getElementById("unidadesTableBody");
   if (!tbody) return;
 
-  // Si no hay buses (ni filtrados ni totales)
   if (busesFiltrados.length === 0) {
     const mensaje =
       todosLosBuses.length === 0
@@ -165,31 +128,24 @@ function renderizarPagina() {
         : "No hay buses que coincidan con el filtro";
     tbody.innerHTML = `
       <tr>
-        <td colspan="5" class="tabla-vacia">${mensaje}</td>
+        <td colspan="4" class="tabla-vacia">${mensaje}</td>
       </tr>`;
     actualizarControlesPaginacion(0);
     return;
   }
 
-  // Calcular rango SOBRE busesFiltrados
   const inicio = (paginaActual - 1) * itemsPorPagina;
   const fin = inicio + itemsPorPagina;
   const pagina = busesFiltrados.slice(inicio, fin);
 
-  // Pintar filas
   tbody.innerHTML = "";
-  pagina.forEach((bus) => {
-    const nombreLinea = bus.linea ? bus.linea.nombre : "Sin línea";
-    const nombreRuta = bus.ruta ? bus.ruta.nombre : "Sin ruta";
 
+  pagina.forEach((bus) => {
     let statusClass = "status-active";
     let statusText = "Activo";
     if (bus.status === "inactiva") {
       statusClass = "status-inactive";
       statusText = "Inactivo";
-    } else if (bus.status === "en_servicio") {
-      statusClass = "status-warning";
-      statusText = "En servicio";
     }
 
     const tr = document.createElement("tr");
@@ -198,20 +154,19 @@ function renderizarPagina() {
     tr.innerHTML = `
       <td><strong>BUS-${String(bus.id_vehiculo).padStart(3, "0")}</strong></td>
       <td>${bus.placa}</td>
-      <td>${nombreLinea} / ${nombreRuta}</td>
       <td>
         <span class="status-badge ${statusClass}">
           <i class="fas fa-circle"></i> ${statusText}
         </span>
       </td>
       <td class="action-buttons">
-        <button class="action-btn view" data-id="${bus.id_vehiculo}">
+        <button class="action-btn view" data-id="${bus.id_vehiculo}" title="Ver">
           <i class="fas fa-eye"></i>
         </button>
-        <button class="action-btn edit" data-id="${bus.id_vehiculo}">
+        <button class="action-btn edit" data-id="${bus.id_vehiculo}" title="Editar">
           <i class="fas fa-edit"></i>
         </button>
-        <button class="action-btn delete" data-id="${bus.id_vehiculo}">
+        <button class="action-btn delete" data-id="${bus.id_vehiculo}" title="Eliminar">
           <i class="fas fa-trash"></i>
         </button>
       </td>
@@ -224,7 +179,7 @@ function renderizarPagina() {
 }
 
 // ============================================================
-// 4.2 CONTROLES DE PAGINACIÓN
+// 6. CONTROLES DE PAGINACION
 // ============================================================
 function actualizarControlesPaginacion(totalItems) {
   const totalPaginas = Math.max(1, Math.ceil(totalItems / itemsPorPagina));
@@ -233,27 +188,29 @@ function actualizarControlesPaginacion(totalItems) {
   const btnPrev = document.getElementById("btnAnterior");
   const btnNext = document.getElementById("btnSiguiente");
 
-  if (info) info.textContent = `Página ${paginaActual} de ${totalPaginas}`;
+  if (info) info.textContent = `Pagina ${paginaActual} de ${totalPaginas}`;
   if (btnPrev) btnPrev.disabled = paginaActual === 1;
   if (btnNext) btnNext.disabled = paginaActual >= totalPaginas;
 }
 
 // ============================================================
-// 5. CARGAR SELECTS DEL MODAL
+// 7. CARGAR SELECTS DEL MODAL
 // ============================================================
 async function cargarSelectsModal() {
   try {
-    // Líneas
+    // Lineas
     const respLineas = await fetch("/admin/lineas", { credentials: "include" });
     const dataLineas = await respLineas.json();
     const selectLinea = document.getElementById("id_linea");
-    selectLinea.innerHTML = '<option value="">Seleccione una línea...</option>';
-    (dataLineas.data || []).forEach((linea) => {
-      const opt = document.createElement("option");
-      opt.value = linea.id;
-      opt.textContent = linea.nombre;
-      selectLinea.appendChild(opt);
-    });
+    if (selectLinea) {
+      selectLinea.innerHTML = '<option value="">Seleccione una linea...</option>';
+      (dataLineas.data || []).forEach((linea) => {
+        const opt = document.createElement("option");
+        opt.value = linea.id;
+        opt.textContent = linea.nombre;
+        selectLinea.appendChild(opt);
+      });
+    }
 
     // Rutas
     const respRutas = await fetch("/admin/rutas/api", {
@@ -261,35 +218,49 @@ async function cargarSelectsModal() {
     });
     const dataRutas = await respRutas.json();
     const selectRuta = document.getElementById("id_ruta");
-    selectRuta.innerHTML = '<option value="">Sin ruta asignada...</option>';
-    (dataRutas.data || []).forEach((ruta) => {
-      const opt = document.createElement("option");
-      opt.value = ruta.id_ruta;
-      opt.textContent = ruta.nombre;
-      selectRuta.appendChild(opt);
-    });
-
-    // Secretarios
-    const respSecretarios = await fetch("/admin/secretarios/select", {
-      credentials: "include",
-    });
-    const dataSecretarios = await respSecretarios.json();
-    const selectSecretario = document.getElementById("id_secretario");
-    selectSecretario.innerHTML =
-      '<option value="">Seleccione un secretario...</option>';
-    (dataSecretarios.data || []).forEach((sec) => {
-      const opt = document.createElement("option");
-      opt.value = sec.id;
-      opt.textContent = sec.nombre;
-      selectSecretario.appendChild(opt);
-    });
+    if (selectRuta) {
+      selectRuta.innerHTML = '<option value="">Sin ruta asignada...</option>';
+      (dataRutas.data || []).forEach((ruta) => {
+        const opt = document.createElement("option");
+        opt.value = ruta.id_ruta || ruta.id;
+        opt.textContent = ruta.nombre;
+        selectRuta.appendChild(opt);
+      });
+    }
   } catch (error) {
     console.error("Error al cargar selects:", error);
   }
 }
 
 // ============================================================
-// 6. GUARDAR (POST o PUT)
+// 8. CARGAR SELECT DE ESP32
+// ============================================================
+async function cargarSelectEsp32(idBusActual = null) {
+  try {
+    let url = "/admin/esp32/disponibles-para-bus";
+    if (idBusActual) {
+      url += `?id_bus=${idBusActual}`;
+    }
+    const resp = await fetch(url, { credentials: "include" });
+    const data = await resp.json();
+    const select = document.getElementById("id_esp32");
+    if (!select) return;
+
+    select.innerHTML = '<option value="">Sin ESP32 asignado</option>';
+    (data.data || []).forEach((esp32) => {
+      const opt = document.createElement("option");
+      opt.value = esp32.id_esp32;
+      const version = esp32.version_firmware || "sin version";
+      opt.textContent = `${esp32.mac} (${version})`;
+      select.appendChild(opt);
+    });
+  } catch (error) {
+    console.error("Error al cargar ESP32:", error);
+  }
+}
+
+// ============================================================
+// 9. GUARDAR (POST o PUT)
 // ============================================================
 async function guardarNuevaUnidad(e) {
   if (e) e.preventDefault();
@@ -300,7 +271,13 @@ async function guardarNuevaUnidad(e) {
   const data = Object.fromEntries(formData.entries());
 
   if (!data.id_ruta) delete data.id_ruta;
-  if (!data.ubicacion) delete data.ubicacion;
+
+  const idEsp32Value = document.getElementById("id_esp32")?.value;
+  if (idEsp32Value) {
+    data.id_esp32 = parseInt(idEsp32Value);
+  } else {
+    data.id_esp32 = null;
+  }
 
   let valid = true;
   document
@@ -323,6 +300,7 @@ async function guardarNuevaUnidad(e) {
 
   loadingUnidad = true;
   document.getElementById("guardarUnidadBtn").disabled = true;
+
   try {
     const csrfToken = getCookie("csrf_access_token");
     const url = editandoIdUnidad
@@ -332,7 +310,7 @@ async function guardarNuevaUnidad(e) {
 
     const response = await fetch(url, {
       method: method,
-      credentials: "include", // 🔑 envía cookies
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
         "X-CSRF-TOKEN": csrfToken,
@@ -345,26 +323,27 @@ async function guardarNuevaUnidad(e) {
     if (response.ok && result.success) {
       mostrarNotificacion(
         editandoIdUnidad ? "Unidad actualizada" : "Unidad creada exitosamente",
-        "success",
+        "success"
       );
       cerrarModalUnidad();
       cargarBuses();
     } else {
       mostrarNotificacion(
-        result.message || "Error al guardar la unidad",
-        "danger",
+        result.message || result.error || "Error al guardar la unidad",
+        "danger"
       );
     }
   } catch (error) {
     console.error("Error al guardar unidad:", error);
-    mostrarNotificacion("Error de conexión al servidor", "danger");
+    mostrarNotificacion("Error de conexion al servidor", "danger");
   } finally {
     loadingUnidad = false;
     document.getElementById("guardarUnidadBtn").disabled = false;
   }
 }
+
 // ============================================================
-// 6. EDITAR UNIDAD
+// 10. EDITAR UNIDAD
 // ============================================================
 async function editarUnidad(id) {
   try {
@@ -373,9 +352,8 @@ async function editarUnidad(id) {
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
-    if (!data.data) throw new Error("Datos inválidos");
+    if (!data.data) throw new Error("Datos invalidos");
 
-    //Aseguramos que los selects estén cargados antes de abrir el modal
     await cargarSelectsModal();
     abrirModalUnidad(data.data);
   } catch (error) {
@@ -385,10 +363,10 @@ async function editarUnidad(id) {
 }
 
 // ============================================================
-// 7. ELIMINAR UNIDAD (DELETE)
+// 11. ELIMINAR UNIDAD (DELETE)
 // ============================================================
 async function eliminarUnidad(id) {
-  if (!confirm(`¿Está seguro de eliminar la unidad ID: ${id}?`)) return;
+  if (!confirm(`Esta seguro de eliminar la unidad ID: ${id}?`)) return;
 
   try {
     const csrfToken = getCookie("csrf_access_token");
@@ -410,19 +388,107 @@ async function eliminarUnidad(id) {
     }
   } catch (error) {
     console.error("Error al eliminar:", error);
-    mostrarNotificacion("Error de conexión al servidor", "danger");
+    mostrarNotificacion("Error de conexion al servidor", "danger");
   }
 }
 
 // ============================================================
-// 8. ASIGNAR EVENTOS A BOTONES DE LA TABLA
+// 12. VER UNIDAD (modal con toda la info)
+// ============================================================
+async function verUnidad(id) {
+  try {
+    const resp = await fetch(`/admin/buses/${id}`, { credentials: "include" });
+    const result = await resp.json();
+    if (!result.success && !result.data) {
+      mostrarNotificacion(result.error || "Unidad no encontrada", "danger");
+      return;
+    }
+    const bus = result.data;
+    idUnidadViendo = id;
+
+    // Codigo
+    document.getElementById("verUnidadId").textContent =
+      `BUS-${String(bus.id_vehiculo).padStart(3, "0")}`;
+
+    // Estado
+    const inactiva = bus.status === "inactiva";
+    const statusText = inactiva ? "Inactivo" : "Activo";
+    const badge = document.getElementById("verUnidadEstadoBadge");
+    document.getElementById("verUnidadEstado").textContent = statusText;
+    badge.className = "status-badge";
+    badge.classList.add(inactiva ? "status-inactive" : "status-active");
+
+    // Icono
+    const icono = document.getElementById("verUnidadIcono");
+    if (icono) icono.style.background = "#74A9D3";
+
+    // Info
+    document.getElementById("verUnidadPlaca").textContent = bus.placa || "-";
+    document.getElementById("verUnidadLinea").textContent = bus.linea_nombre || "Sin linea";
+    document.getElementById("verUnidadRuta").textContent = bus.ruta_nombre || "Sin ruta";
+    document.getElementById("verUnidadSecretario").textContent = bus.secretario_nombre || "Sin secretario";
+
+    // ESP32
+    if (bus.esp32_mac) {
+      document.getElementById("verUnidadEsp32").innerHTML =
+        `<span class="badge-esp32"><i class="fas fa-microchip"></i> ${bus.esp32_mac}</span>`;
+    } else {
+      document.getElementById("verUnidadEsp32").innerHTML =
+        '<span class="badge-sin-esp32">Sin ESP32</span>';
+    }
+
+    document.getElementById("verUnidadFirmware").textContent = bus.esp32_version || "-";
+
+    // Fecha
+    let fecha = "No disponible";
+    if (bus.created_at) {
+      const d = new Date(bus.created_at);
+      if (!isNaN(d.getTime())) {
+        fecha = new Intl.DateTimeFormat("es-VE", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        }).format(d);
+      }
+    }
+    document.getElementById("verUnidadFecha").textContent = fecha;
+
+    document.getElementById("modalVerUnidad").classList.add("show");
+  } catch (error) {
+    console.error("Error al ver unidad:", error);
+    mostrarNotificacion("Error de conexion al servidor", "danger");
+  }
+}
+
+function cerrarModalVerUnidad() {
+  document.getElementById("modalVerUnidad").classList.remove("show");
+  idUnidadViendo = null;
+}
+
+function editarDesdeVerUnidad() {
+  const id = idUnidadViendo;
+  cerrarModalVerUnidad();
+  if (id) editarUnidad(id);
+}
+
+// ============================================================
+// 13. ASIGNAR EVENTOS A BOTONES DE LA TABLA
 // ============================================================
 function asignarEventosTabla() {
+  document.querySelectorAll(".action-btn.view").forEach((btn) => {
+    btn.onclick = function (e) {
+      e.stopPropagation();
+      verUnidad(this.getAttribute("data-id"));
+    };
+  });
+
   document.querySelectorAll(".action-btn.edit").forEach((btn) => {
     btn.onclick = function (e) {
       e.stopPropagation();
-      const id = this.getAttribute("data-id");
-      editarUnidad(id);
+      editarUnidad(this.getAttribute("data-id"));
     };
   });
 
@@ -435,7 +501,7 @@ function asignarEventosTabla() {
 }
 
 // ============================================================
-// 11. FILTROS
+// 14. FILTROS
 // ============================================================
 async function llenarFiltroLineasFlota() {
   try {
@@ -444,7 +510,7 @@ async function llenarFiltroLineasFlota() {
     if (data.success) {
       const select = document.getElementById("filterLinea");
       if (!select) return;
-      select.innerHTML = '<option value="">Todas las líneas</option>';
+      select.innerHTML = '<option value="">Todas las lineas</option>';
       data.data.forEach((linea) => {
         const opt = document.createElement("option");
         opt.value = linea.id;
@@ -453,7 +519,7 @@ async function llenarFiltroLineasFlota() {
       });
     }
   } catch (error) {
-    console.error("Error al cargar filtro de líneas:", error);
+    console.error("Error al cargar filtro de lineas:", error);
   }
 }
 
@@ -465,7 +531,7 @@ function aplicarFiltros() {
 
   busesFiltrados = todosLosBuses.filter((bus) => {
     const placa = (bus.placa || "").toLowerCase();
-    const lineaTxt = (bus.linea?.nombre || "").toLowerCase();
+    const lineaTxt = (bus.linea_nombre || "").toLowerCase();
     const lineaId = String(bus.id_linea || "");
     const estado = bus.status || "";
 
@@ -485,56 +551,45 @@ function aplicarFiltros() {
 }
 
 // ============================================================
-// 12. INICIALIZAR
+// 15. INICIALIZAR
 // ============================================================
 document.addEventListener("DOMContentLoaded", function () {
-  //Cargar los selects al inicio (para que estén listos al abrir el modal)
   cargarSelectsModal();
-
-  //cargar tabla
   cargarBuses();
 
-  // Botón "Nueva Unidad"
   const nuevaUnidadBtn = document.getElementById("nuevaUnidadBtn");
   if (nuevaUnidadBtn) {
     nuevaUnidadBtn.onclick = async function () {
       editandoIdUnidad = null;
-      await abrirModalUnidad("Nueva Unidad");
+      await cargarSelectsModal();
+      abrirModalUnidad(null);
     };
   }
 
   const form = document.getElementById("formNuevaUnidad");
   if (form) form.onsubmit = guardarNuevaUnidad;
 
-  window.onclick = function (event) {
+  // Cerrar modales con click fuera
+  window.addEventListener("click", function (event) {
     const modal = document.getElementById("modalNuevaUnidad");
     if (event.target === modal) cerrarModalUnidad();
-  };
 
-  // Cerrar modal de Ver con click fuera
-  window.addEventListener("click", function (event) {
     const modalVer = document.getElementById("modalVerUnidad");
     if (event.target === modalVer) cerrarModalVerUnidad();
   });
 
-  // Cerrar modal de Ver con Escape
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") {
-      const modalVer = document.getElementById("modalVerUnidad");
-      if (modalVer && modalVer.classList.contains("show")) {
-        cerrarModalVerUnidad();
-      }
-    }
-  });
-
+  // Cerrar con Escape
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") {
       const modal = document.getElementById("modalNuevaUnidad");
-      if (modal.classList.contains("show")) cerrarModalUnidad();
+      if (modal && modal.classList.contains("show")) cerrarModalUnidad();
+
+      const modalVer = document.getElementById("modalVerUnidad");
+      if (modalVer && modalVer.classList.contains("show")) cerrarModalVerUnidad();
     }
   });
 
-  // Paginación
+  // Paginacion
   document.getElementById("btnAnterior")?.addEventListener("click", () => {
     if (paginaActual > 1) {
       paginaActual--;
@@ -545,7 +600,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("btnSiguiente")?.addEventListener("click", () => {
     const totalPaginas = Math.max(
       1,
-      Math.ceil(busesFiltrados.length / itemsPorPagina),
+      Math.ceil(busesFiltrados.length / itemsPorPagina)
     );
     if (paginaActual < totalPaginas) {
       paginaActual++;
@@ -564,7 +619,5 @@ document.addEventListener("DOMContentLoaded", function () {
     .getElementById("filterEstado")
     ?.addEventListener("change", aplicarFiltros);
 
-  // Cargar datos
   llenarFiltroLineasFlota();
-  cargarBuses();
 });
