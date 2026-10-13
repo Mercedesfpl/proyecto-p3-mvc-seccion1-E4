@@ -142,6 +142,16 @@
         </select>
       </div>
 
+      <div class="form-group">
+        <label>ESP32 Asignado</label>
+        <select id="id_esp32" name="id_esp32">
+          <option value="">Sin ESP32 asignado</option>
+        </select>
+        <small style="font-size: 11px; color: #666;">
+          Solo se muestran ESP32 activos y disponibles
+        </small>
+      </div>
+
       <button type="submit" class="btn-guardar" id="btnGuardar">
         <i class="fas fa-save"></i> Guardar Parada
       </button>
@@ -189,6 +199,12 @@
           >
           <span class="detalle-value" id="verParadaFecha">-</span>
         </div>
+
+        <div class="detalle-item">
+          <span class="detalle-label"><i class="fas fa-microchip"></i> ESP32</span>
+          <span class="detalle-value" id="verParadaEsp32">-</span>
+        </div>
+        
       </div>
     </div>
 
