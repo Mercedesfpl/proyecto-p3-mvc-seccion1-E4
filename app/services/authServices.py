@@ -24,8 +24,8 @@ def get_refresh_token(id_user):
 
 
 def unset_cookiess(response):
-    unset_jwt_cookies(response)
-    response.delete_cookie("session")
+    response.delete_cookie("access_token", path="/")
+    response.delete_cookie("refresh_token", path="/")
     return response
 
 

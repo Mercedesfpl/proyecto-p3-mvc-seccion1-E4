@@ -119,6 +119,10 @@ class RutaServices:
         if not ruta:
             raise ResourceNotFound("Ruta")
 
+        from app.models.bus import Bus
+        Bus.query.filter_by(id_ruta=id_ruta).update({"id_ruta": None})
+        db.session.commit()
+
         from app.models.ruta_parada import RutaParada
         RutaParada.query.filter_by(id_ruta=id_ruta).delete()
         db.session.commit()

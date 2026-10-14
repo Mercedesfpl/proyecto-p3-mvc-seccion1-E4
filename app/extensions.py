@@ -31,7 +31,7 @@ def custom_unauthorized_callback(reason):
     print(">>> request.is_json:", request.is_json)
     print(">>> request.path:", request.path)
     print(">>> request.headers.get('Accept'):", request.headers.get("Accept"))
-    if request.is_json or request.path.startswith("/api/"):
+    if request.is_json or request.path.startswith("/api/") or request.path.startswith("/admin/"):
         return (
             jsonify(
                 {
@@ -54,7 +54,7 @@ def custom_expired_token_callback(jwt_header, jwt_payload):
     print(">>> request.path:", request.path)
     print(">>> request.headers.get('Accept'):", request.headers.get("Accept"))
 
-    if request.is_json or request.path.startswith("/api/"):
+    if request.is_json or request.path.startswith("/api/") or request.path.startswith("/admin/"):
         return (
             jsonify(
                 {

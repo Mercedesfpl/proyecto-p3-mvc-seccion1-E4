@@ -19,7 +19,6 @@ def login():
 
 
 @auth_scope.route("/logout", methods=["POST"])
-@jwt_required()
 def logout():
     return userControllers.logout()
 
