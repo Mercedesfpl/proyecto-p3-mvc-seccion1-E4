@@ -2,13 +2,16 @@ from app import create_app
 from flask_socketio import SocketIO
 
 app = create_app()
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
+# version ificial
+# socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
 
 
 @socketio.on("connect")
 def handle_connect():
     print("Cliente conectado (Socket.IO)")
     from flask_socketio import emit
+
     emit("connected", {"data": "Conectado al servidor"})
 
 
@@ -22,8 +25,10 @@ def handle_bus_passed(data):
     """Cuando un bus pasa por una parada, avisa a todos"""
     print("Bus paso por control:", data)
     from flask_socketio import emit
+
     emit("bus_passed_control", data, broadcast=True)
 
 
 if __name__ == "__main__":
-    socketio.run(app, host="0.0.0.0", port=5000, debug=True)
+    # Puerto modificado antes era el 5000
+    socketio.run(app, host="0.0.0.0", port=5001, debug=True)

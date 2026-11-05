@@ -8,7 +8,8 @@ class RutaParada(db.Model):
     id_ruta = db.Column(db.Integer, db.ForeignKey("rutas.id"), primary_key=True)
     id_parada = db.Column(db.Integer, db.ForeignKey("paradas.id"), primary_key=True)
     orden_parada = db.Column(db.Integer, nullable=False)
-
+    ####Se agrego este campo########
+    tiempo_estimado_min = db.Column(db.Integer, nullable=False, default=0)
     ruta = db.relationship("Ruta", backref="ruta_paradas")
     parada = db.relationship("Parada")
 

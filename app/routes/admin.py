@@ -1,6 +1,9 @@
 # admin.py
 from flask import Blueprint, url_for, redirect, render_template, jsonify, request
 
+# Esto es para consumir el osrm
+import requests as http_requests
+
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from ..controllers import (
     userControllers,
@@ -8,6 +11,9 @@ from ..controllers import (
     busControllers,
     rutaControllers,
 )
+
+# Esto es para el calculo de los tiempos
+from ..services.etaService import calcular_etas
 from app.decorators.role_decorator import role_required
 
 admin_scope = Blueprint("admin", __name__)
@@ -205,8 +211,9 @@ def delete_persona(id):
 
 
 @admin_scope.route("/paradas", methods=["GET"])
-@jwt_required()
-@role_required("admin")
+# Se eleimino por estan deben de ser publicas se debe de crear public.py y colocar rutas publicas
+# @jwt_required()
+# @role_required("admin")
 def get_paradas():
     from app.controllers.paradaControllers import get_all_paradas
 
@@ -319,9 +326,9 @@ def delete_bus(id_vehiculo):
 
 
 @admin_scope.route(
-    "/rutas/api", methods=["GET"]
-)  # Usamos /rutas/api para no chocar con la vista
-@jwt_required()
+    "/rutas/get", methods=["GET"]
+)  # Usamos /rutas/api para no chocar con la vista <--- esto ya no se usa, si un get lo usa un usurio normal se le debe de quitar el role decorador tambien se deben de crear la rutas publicas donde seobtengan las paradas y las rutas
+# @jwt_required()
 # @role_required("admin")
 def get_rutas_api():
     from app.controllers.rutaControllers import get_all_rutas
@@ -340,7 +347,7 @@ def get_ruta(id_ruta):
 
 @admin_scope.route("/rutas", methods=["POST"])
 @jwt_required()
-# @role_required("admin")
+@role_required("admin")
 def create_ruta():
     from flask import request
     from app.controllers.rutaControllers import create_ruta
@@ -351,7 +358,7 @@ def create_ruta():
 
 @admin_scope.route("/rutas/<int:id_ruta>", methods=["PUT"])
 @jwt_required()
-# @role_required("admin")
+@role_required("admin")
 def update_ruta(id_ruta):
     from flask import request
     from app.controllers.rutaControllers import update_ruta
@@ -362,7 +369,7 @@ def update_ruta(id_ruta):
 
 @admin_scope.route("/rutas/<int:id_ruta>", methods=["DELETE"])
 @jwt_required()
-# @role_required("admin")
+@role_required("admin")
 def delete_ruta(id_ruta):
     from app.controllers.rutaControllers import delete_ruta
 
@@ -452,57 +459,56 @@ def delete_esp32(id_esp32):
 # ENDPOINTS PARA LA APP MOVIL
 # ============================================================
 
+###Esta se debe eliminar ya que no la usamos
+# @admin_scope.route("/routesssssssssss", methods=["GET"])
+# def mobile_get_routes():
+#     """Endpoint para la app movil - lista de rutas"""
+#     from app.services.rutaServices import RutaServices
 
-@admin_scope.route("/api/routes", methods=["GET"])
-def mobile_get_routes():
-    """Endpoint para la app movil - lista de rutas"""
-    from app.services.rutaServices import RutaServices
+#     try:
+#         rutas = RutaServices.get_all_rutas()
+#         # Adaptar al formato que espera la app
+#         resultado = [{"id": str(r["id"]), "name": r["nombre"]} for r in rutas]
+#         return jsonify(resultado)
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
-    try:
-        rutas = RutaServices.get_all_rutas()
-        # Adaptar al formato que espera la app
-        resultado = [{"id": str(r["id"]), "name": r["nombre"]} for r in rutas]
-        return jsonify(resultado)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+# Esta igual la coloco aSI PARA QUE SEA MAS FACIL AL MOMENTO DE MERGEAR
+# @admin_scope.route("/stops", methods=["GET"])
+# def mobile_get_stops():
+#     """Endpoint para la app movil - paradas de una ruta"""
+#     from app.services.rutaServices import RutaServices
 
+#     route_id = request.args.get("route_id")
+#     if not route_id:
+#         return jsonify({"error": "Falta route_id"}), 400
 
-@admin_scope.route("/api/stops", methods=["GET"])
-def mobile_get_stops():
-    """Endpoint para la app movil - paradas de una ruta"""
-    from app.services.rutaServices import RutaServices
-
-    route_id = request.args.get("route_id")
-    if not route_id:
-        return jsonify({"error": "Falta route_id"}), 400
-
-    try:
-        ruta = RutaServices.get_ruta_by_id(int(route_id))
-        paradas = []
-        for p in ruta.get("paradas", []):
-            coords = p.get("coordenadas", "").split(",")
-            if len(coords) == 2:
-                paradas.append(
-                    {
-                        "id": p["id"],
-                        "name": p["nombre"],
-                        "lat": float(coords[0].strip()),
-                        "lng": float(coords[1].strip()),
-                    }
-                )
-        return jsonify(paradas)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+#     try:
+#         ruta = RutaServices.get_ruta_by_id(int(route_id))
+#         paradas = []
+#         for p in ruta.get("paradas", []):
+#             coords = p.get("coordenadas", "").split(",")
+#             if len(coords) == 2:
+#                 paradas.append(
+#                     {
+#                         "id": p["id"],
+#                         "name": p["nombre"],
+#                         "lat": float(coords[0].strip()),
+#                         "lng": float(coords[1].strip()),
+#                     }
+#                 )
+#         return jsonify(paradas)
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
 
 # ============================================================
 # ENDPOINT OSRM PARA LA APP MOVIL
 # ============================================================
 
-import requests as http_requests
 
-
-@admin_scope.route("/api/route", methods=["GET"])
+##eSTE SE DEBE DE ACOMODAR SEGUN LA ESTRUCTURA HACER UN SERVICIO PARA ESTO Y QUE ESTE SOLO DEVUELVA LA RESPUESTA
+@admin_scope.route("/routes", methods=["GET"])
 def mobile_get_route():
     """Endpoint para la app movil - calcula ruta con OSRM"""
     coords = request.args.get("coordinates")
@@ -526,18 +532,34 @@ def mobile_get_route():
         return jsonify({"error": str(e)}), 500
 
 
-PARADAS_VISITADAS = {
-    "7": [],
-    "11": [],
-}
+# No se para que se hizo esto expliquen en un comentario
+# PARADAS_VISITADAS = {
+#     "7": [],
+#     "11": [],
+# }
 
 
-@admin_scope.route("/api/paradas-visitadas", methods=["GET"])
-def mobile_get_paradas_visitadas():
-    """Devuelve las paradas visitadas por un bus en una ruta"""
-    route_id = request.args.get("route_id")
-    if not route_id:
-        return jsonify({"error": "Falta route_id"}), 400
+# # @admin_scope.route("/paradas-visitadas", methods=["GET"])
+# # def mobile_get_paradas_visitadas():
+# #     """Devuelve las paradas visitadas por un bus en una ruta"""
+# #     route_id = request.args.get("route_id")
+# #     if not route_id:
+# #         return jsonify({"error": "Falta route_id"}), 400
 
-    paradas = PARADAS_VISITADAS.get(str(route_id), [])
-    return jsonify({"paradas_visitadas": paradas})
+# #     paradas = PARADAS_VISITADAS.get(str(route_id), [])
+# #     return jsonify({"paradas_visitadas": paradas})
+
+
+#######Rutas de fechas de llegada. gregado
+@admin_scope.route("/eta", methods=["GET"])
+def get_eta():
+    id_ruta = request.args.get("id_ruta", type=int)
+    id_parada = request.args.get("id_parada", type=int)
+
+    if not id_ruta or not id_parada:
+        return jsonify({"error": "id_ruta e id_parada son obligatorios"}), 400
+
+    data = calcular_etas(id_ruta, id_parada)
+    if "error" in data:
+        return jsonify(data), 404
+    return jsonify(data), 200
