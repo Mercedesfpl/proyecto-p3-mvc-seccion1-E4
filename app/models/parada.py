@@ -11,13 +11,14 @@ class Parada(db.Model):
     coordenadas = db.Column(db.String(100), nullable=False)  # "latitud,longitud"
     status = db.Column(db.String(20), default="activa")  # 'activa', 'inactiva'
     created_at = db.Column(db.DateTime, default=datetime.now)
-    id_ruta = db.Column(db.Integer, db.ForeignKey('rutas.id'), nullable=True)
+    id_ruta = db.Column(db.Integer, db.ForeignKey("rutas.id"), nullable=True)
 
-    ruta = db.relationship('Ruta', backref='paradas')  # relacion con ruta
+    ruta = db.relationship("Ruta", backref="paradas")  # relación con ruta
 
     def to_dict(self):
         # Buscar el ESP32 asignado a esta parada
         from ..models.esp32 import Esp32
+
         esp32 = Esp32.query.filter_by(id_parada=self.id).first()
 
         return {

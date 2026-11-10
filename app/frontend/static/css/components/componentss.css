@@ -386,24 +386,24 @@
 
 /* Modo oscuro */
 body.dark-mode .toast-message {
-    background: #131822;
-    color: #F8FAFC;
-    border: 1px solid #1F293D;
+  background: #131822;
+  color: #f8fafc;
+  border: 1px solid #1f293d;
 }
 
 body.dark-mode .toast-message.warning {
-    background: #7a5c00;
-    color: #ffffff;
+  background: #7a5c00;
+  color: #ffffff;
 }
 
 body.dark-mode .toast-message.success {
-    background: #0f6e3a;
-    color: #ffffff;
+  background: #0f6e3a;
+  color: #ffffff;
 }
 
 body.dark-mode .toast-message.error {
-    background: #7a1a1a;
-    color: #ffffff;
+  background: #7a1a1a;
+  color: #ffffff;
 }
 
 @keyframes slideInRight {

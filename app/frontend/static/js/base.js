@@ -158,7 +158,7 @@ window.fetch = async function (...args) {
     }
 
     const mensaje =
-      errorData.Message || "Tu sesión ha expirado. Inicia sesión nuevamente.";
+      errorData.message || "Tu sesión ha expirado. Inicia sesión nuevamente.";
     if (typeof window.mostrarToast === "function") {
       window.mostrarToast(mensaje, "warning");
     } else {
@@ -177,6 +177,7 @@ if (logoutBtn) {
     e.preventDefault();
     try {
       const csrfToken = getCookie("csrf_access_token");
+      console.log("token---->", csrfToken);
       const response = await fetch("/api/logout", {
         method: "POST",
         credentials: "include",

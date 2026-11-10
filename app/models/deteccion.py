@@ -3,22 +3,21 @@
 from ..extensions import db
 from datetime import datetime
 
+
 class Deteccion(db.Model):
     __tablename__ = "detecciones"
     id_deteccion = db.Column(db.Integer, primary_key=True)
     fecha_hora = db.Column(db.DateTime, default=datetime.now)
-    id_vehiculo = db.Column(db.Integer, db.ForeignKey("buses.id_vehiculo"), nullable=False)
+    id_vehiculo = db.Column(
+        db.Integer, db.ForeignKey("buses.id_vehiculo"), nullable=False
+    )
     id_parada = db.Column(db.Integer, db.ForeignKey("paradas.id"), nullable=False)
-    
+
     # Nuevos campos para tiempos
-    tiempo_real = db.Column(db.Float, nullable=True)
-    tiempo_estimado = db.Column(db.Float, nullable=True)
-    retraso = db.Column(db.Float, nullable=True)
-    estado = db.Column(db.String(20), default='normal')
-    
+
     vehiculo = db.relationship("Bus", foreign_keys=[id_vehiculo])
     parada = db.relationship("Parada", foreign_keys=[id_parada])
-    
+
     def to_dict(self):
         return {
             "id_deteccion": self.id_deteccion,
@@ -30,5 +29,5 @@ class Deteccion(db.Model):
             "tiempo_real": self.tiempo_real,
             "tiempo_estimado": self.tiempo_estimado,
             "retraso": self.retraso,
-            "estado": self.estado
+            "estado": self.estado,
         }

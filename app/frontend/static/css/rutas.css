@@ -238,6 +238,30 @@
    MODO OSCURO
    ============================================ */
 body.dark-mode .mapa-container {
+<<<<<<< HEAD
+    background: #1c1f24;
+}
+body.dark-mode .mapa-header {
+    border-bottom-color: #2c3138;
+}
+body.dark-mode .mapa-header h3 {
+    color: #e5eefc;
+}
+body.dark-mode .mapa-contador,
+body.dark-mode .btn-expandir {
+    background: #2c3138;
+    color: #e5e7eb;
+}
+body.dark-mode .paradas-disponibles,
+body.dark-mode .paradas-seleccionadas {
+    background: #1c1f24;
+    border-color: #2c3138;
+}
+body.dark-mode .item-parada {
+    background: #252a31;
+    border-color: #2c3138;
+    color: #e5e7eb;
+=======
     background: #131822;
     border: 1px solid #1F293D;
 }
@@ -302,4 +326,5 @@ body.dark-mode .btn-agregar-todas {
 body.dark-mode .btn-quitar-todas {
     background-color: rgba(149, 36, 42, 0.2);
     color: #f87171;
+>>>>>>> eaaf80c5463b4d5650e922e6bce80d57e533903d
 }

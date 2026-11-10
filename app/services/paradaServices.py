@@ -27,7 +27,10 @@ class ParadaServices:
 
     @staticmethod
     def validar_coordenadas(coordenadas):
-        print("corrdennadas llegando al metodo validar coordenadas en eñl servicio ", coordenadas)
+        print(
+            "corrdennadas llegando al metodo validar coordenadas en eñl servicio ",
+            coordenadas,
+        )
 
         # Validad y limpia las coordenadas utilizando helper
         coordenadas_limpias = limpiar_coordenadas(coordenadas)
@@ -98,14 +101,18 @@ class ParadaServices:
             parada.nombre = nombre
 
         if "coordenadas" in data:
-            coordenadas_limpias = ParadaServices.validar_coordenadas(data["coordenadas"])
+            coordenadas_limpias = ParadaServices.validar_coordenadas(
+                data["coordenadas"]
+            )
             parada.coordenadas = coordenadas_limpias
 
         if "status" in data:
             parada.status = ParadaServices.validar_status(data["status"])
 
         if "id_ruta" in data:
-            parada = ParadaFactory.actualizar_parada(parada, {"id_ruta": data["id_ruta"]})
+            parada = ParadaFactory.actualizar_parada(
+                parada, {"id_ruta": data["id_ruta"]}
+            )
 
         # ACTUALIZAR ESP32 (NUEVO)
         if "id_esp32" in data:

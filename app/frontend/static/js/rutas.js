@@ -27,6 +27,13 @@ function mostrarNotificacion(mensaje, tipo = "success") {
   alert(mensaje);
 }
 
+function getCookie(name) {
+  return document.cookie
+    .split("; ")
+    .find((r) => r.startsWith(name + "="))
+    ?.split("=")[1];
+}
+
 // ============================================================
 // 2. MODAL NUEVA / EDITAR
 // ============================================================
@@ -428,6 +435,7 @@ function renderizarPagina() {
           ${nombreLinea}
         </a>
       </td>
+      <td>${totalParadas}</td>
       <td>
         <span class="status-badge ${statusClass}">
           <i class="fas fa-circle"></i> ${statusText}

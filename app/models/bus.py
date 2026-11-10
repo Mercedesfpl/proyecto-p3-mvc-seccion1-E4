@@ -22,16 +22,29 @@ class Bus(db.Model):
     def to_dict(self):
         # Buscar el ESP32 asignado a este bus
         from ..models.esp32 import Esp32
+
         esp32 = Esp32.query.filter_by(id_vehiculo=self.id_vehiculo).first()
 
         return {
             "id_vehiculo": self.id_vehiculo,
             "placa": self.placa,
-            "status": self.status,
+            "id_linea": self.id_linea,
+            "linea": (
+                {
+                    "id": self.linea.id,
+                    "nombre": self.linea.nombre,
+                    "color": self.linea.color,
+                    "secretario_id": self.linea.secretario_id,
+                    "secretario_nombre": (
+                        self.linea.secretario.nombre if self.linea.secretario else None
+                    ),
+                }
+                if self.linea
+                else None
+            ),
+            "linea_nombre": self.linea.nombre if self.linea else None,
             "id_ruta": self.id_ruta,
             "ruta_nombre": self.ruta.nombre if self.ruta else None,
-            "id_linea": self.id_linea,
-            "linea_nombre": self.linea.nombre if self.linea else None,
             "id_secretario": self.id_secretario,
             "secretario_nombre": self.secretario.nombre if self.secretario else None,
             "created_at": self.created_at.isoformat() if self.created_at else None,
