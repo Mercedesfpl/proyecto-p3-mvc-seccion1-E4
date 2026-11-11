@@ -355,7 +355,7 @@ async function cargarDatos() {
   }
 
   try {
-    const response = await fetch("/admin/rutas/api", {
+    const response = await fetch("/admin/rutas/get", {
       credentials: "include",
     });
     const data = await response.json();
