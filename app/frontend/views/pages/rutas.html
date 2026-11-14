@@ -81,41 +81,67 @@
     </div>
 </div>
 
-<!-- MODAL NUEVA / EDITAR RUTA -->
+<!-- MODAL NUEVA / EDITAR RUTA - WIZARD 3 PASOS -->
 <div id="modalNuevaRuta" class="modal">
-    <div class="modal-content">
+    <div class="modal-content wizard-modal">
         <div class="modal-header">
             <h2><i class="fas fa-route"></i> <span id="modalRutaTitle">Nueva Ruta</span></h2>
             <span class="modal-close" onclick="cerrarModalRuta()">&times;</span>
         </div>
 
-        <div class="modal-ruta-layout">
-            <!-- Columna izquierda: Formulario -->
-            <div class="form-columna">
-                <form id="formNuevaRuta">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Nombre <span class="required">*</span></label>
-                            <input type="text" id="nombre_ruta" name="nombre" placeholder="Ej: Ruta Los Teques" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Línea <span class="required">*</span></label>
-                            <select id="id_linea_ruta" name="id_linea" required>
-                                <option value="">Seleccione...</option>
-                            </select>
-                        </div>
-                    </div>
+        <!-- Indicador de pasos -->
+        <div class="wizard-steps">
+            <div class="wizard-step active" data-step="1">
+                <span class="step-number">1</span>
+                <span class="step-label">Datos de la ruta</span>
+            </div>
+            <div class="wizard-step" data-step="2">
+                <span class="step-number">2</span>
+                <span class="step-label">Paradas y tiempos</span>
+            </div>
+            <div class="wizard-step" data-step="3">
+                <span class="step-number">3</span>
+                <span class="step-label">Confirmación</span>
+            </div>
+        </div>
 
+        <form id="formNuevaRuta">
+            <!-- PASO 1: Datos de la ruta -->
+            <div class="wizard-panel active" data-panel="1">
+                <div class="form-row">
                     <div class="form-group">
-                        <label>Estado</label>
-                        <select id="status_ruta" name="status">
-                            <option value="activa">Activa</option>
-                            <option value="inactiva">Inactiva</option>
+                        <label>Nombre <span class="required">*</span></label>
+                        <input type="text" id="nombre_ruta" name="nombre" placeholder="Ej: Ruta Los Teques" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Línea <span class="required">*</span></label>
+                        <select id="id_linea_ruta" name="id_linea" required>
+                            <option value="">Seleccione...</option>
                         </select>
                     </div>
+                </div>
 
-                    <div class="form-group">
-                        <label>Paradas que conforman la ruta</label>
+                <div class="form-group">
+                    <label>Estado</label>
+                    <select id="status_ruta" name="status">
+                        <option value="activa">Activa</option>
+                        <option value="inactiva">Inactiva</option>
+                    </select>
+                </div>
+
+                <div class="wizard-footer">
+                    <button type="button" class="btn-wizard-next" onclick="irPaso(2)">
+                        Siguiente <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- PASO 2: Selección de paradas y tiempos -->
+            <div class="wizard-panel" data-panel="2">
+                <div class="paso2-layout">
+                    <!-- Columna izquierda: selección de paradas -->
+                    <div class="paso2-paradas">
+                        <h4><i class="fas fa-map-marker-alt"></i> Paradas de la ruta</h4>
                         <div class="paradas-lista-container">
                             <div class="paradas-disponibles">
                                 <div class="lista-titulo">
@@ -125,42 +151,74 @@
                                 <div class="lista-items" id="listaDisponibles">
                                     <div class="item-vacio">Cargando...</div>
                                 </div>
-                                <button type="button" class="btn-agregar-todas" id="btnAgregarTodasParadas">
-                                    <i class="fas fa-plus-circle"></i> Agregar todas
-                                </button>
-                            </div>
-
-                            <div class="paradas-seleccionadas">
-                                <div class="lista-titulo">
-                                    <span>Seleccionadas</span>
-                                    <span class="contador" id="contadorSeleccionadas">0</span>
-                                </div>
-                                <div class="lista-items" id="listaSeleccionadas">
-                                    <div class="item-vacio">No hay paradas</div>
-                                </div>
-                                <button type="button" class="btn-quitar-todas" id="btnQuitarTodasParadas">
-                                    <i class="fas fa-trash-alt"></i> Quitar todas
-                                </button>
                             </div>
                         </div>
-                        <small style="font-size: 10px;">Presiona "Agregar" para añadir al final de la lista</small>
+                        <small>Selecciona una parada para agregarla al final de la ruta</small>
                     </div>
 
-                    <button type="submit" class="btn-guardar" id="guardarRutaBtn" style="margin-top: 8px;">
-                        <i class="fas fa-save"></i> Guardar Ruta
+                    <!-- Columna derecha: ruta construida con tiempos -->
+                    <div class="paso2-ruta">
+                        <h4><i class="fas fa-route"></i> Ruta construida</h4>
+                        <div class="ruta-construida" id="rutaConstruida">
+                            <div class="item-vacio">Selecciona paradas para construir la ruta</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wizard-footer">
+                    <button type="button" class="btn-wizard-prev" onclick="irPaso(1)">
+                        <i class="fas fa-arrow-left"></i> Atrás
                     </button>
-                </form>
+                    <button type="button" class="btn-wizard-next" onclick="irPaso(3)">
+                        Siguiente <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
             </div>
 
-            <!-- Columna derecha: Mapa -->
-            <div class="mapa-columna">
-                <span class="mapa-label">Visualización en el mapa</span>
-                <div id="mapa-rutas-modal"></div>
-                <small>
-                    <span id="contadorParadasSeleccionadas">0 paradas</span> seleccionadas
-                </small>
+            <!-- PASO 3: Confirmación con mapa -->
+            <div class="wizard-panel" data-panel="3">
+                <div class="paso3-layout">
+                    <div class="paso3-datos">
+                        <h4><i class="fas fa-info-circle"></i> Resumen de la ruta</h4>
+                        <div class="resumen-item">
+                            <span class="resumen-label">Nombre:</span>
+                            <span class="resumen-value" id="resumenNombre">-</span>
+                        </div>
+                        <div class="resumen-item">
+                            <span class="resumen-label">Línea:</span>
+                            <span class="resumen-value" id="resumenLinea">-</span>
+                        </div>
+                        <div class="resumen-item">
+                            <span class="resumen-label">Estado:</span>
+                            <span class="resumen-value" id="resumenEstado">-</span>
+                        </div>
+                        <div class="resumen-item">
+                            <span class="resumen-label">Paradas:</span>
+                            <span class="resumen-value" id="resumenParadas">0</span>
+                        </div>
+                        <div class="resumen-item">
+                            <span class="resumen-label">Tiempo total estimado:</span>
+                            <span class="resumen-value" id="resumenTiempo">0 min</span>
+                        </div>
+
+                        <h4 style="margin-top:16px;"><i class="fas fa-list-ol"></i> Detalle</h4>
+                        <ol id="resumenListaParadas" class="lista-paradas-detalle"></ol>
+                    </div>
+                    <div class="paso3-mapa">
+                        <div id="mapa-rutas-preview"></div>
+                    </div>
+                </div>
+
+                <div class="wizard-footer">
+                    <button type="button" class="btn-wizard-prev" onclick="irPaso(2)">
+                        <i class="fas fa-arrow-left"></i> Atrás
+                    </button>
+                    <button type="submit" class="btn-guardar" id="guardarRutaBtn">
+                        <i class="fas fa-check"></i> Confirmar y Guardar
+                    </button>
+                </div>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 

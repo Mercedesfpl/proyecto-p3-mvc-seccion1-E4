@@ -235,33 +235,213 @@
 .btn-quitar-todas { background-color: #fee2e2; color: #991b1b; }
 
 /* ============================================
+   WIZARD DE RUTAS
+   ============================================ */
+.wizard-modal {
+    max-width: 1000px;
+    width: 95%;
+}
+
+.wizard-steps {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #eaecef;
+    gap: 8px;
+}
+
+.wizard-step {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #f0f2f5;
+    color: #6b7280;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+
+.wizard-step.active {
+    background: #dbeafe;
+    color: #1e40af;
+    font-weight: 600;
+}
+
+.wizard-step.completed {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.step-number {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.wizard-step.active .step-number { background: #2563eb; color: #fff; }
+.wizard-step.completed .step-number { background: #10b981; color: #fff; }
+
+.wizard-panel { display: none; padding: 20px; }
+.wizard-panel.active { display: block; }
+
+.wizard-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 16px;
+    margin-top: 16px;
+    border-top: 1px solid #eaecef;
+}
+
+.btn-wizard-next,
+.btn-wizard-prev {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-wizard-next { background: #2563eb; color: #fff; margin-left: auto; }
+.btn-wizard-next:hover { background: #1d4ed8; }
+.btn-wizard-prev { background: #e5e7eb; color: #374151; }
+.btn-wizard-prev:hover { background: #d1d5db; }
+
+/* Paso 2 layout */
+.paso2-layout {
+    display: flex;
+    gap: 16px;
+    min-height: 380px;
+}
+
+.paso2-paradas { flex: 1; }
+.paso2-ruta { flex: 1.2; }
+
+.ruta-construida {
+    max-height: 380px;
+    overflow-y: auto;
+    padding: 8px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.ruta-parada-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-size: 12px;
+}
+
+.ruta-parada-item .orden {
+    background: #2563eb;
+    color: #fff;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 11px;
+    flex-shrink: 0;
+}
+
+.ruta-parada-item .nombre { flex: 1; font-weight: 600; }
+
+.ruta-parada-item .btn-remove {
+    border: none;
+    background: transparent;
+    color: #dc2626;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+/* Caja de tiempo entre paradas */
+.tiempo-conexion {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    background: #fffbeb;
+    border: 1px dashed #f59e0b;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+.tiempo-conexion label { font-weight: 600; color: #92400e; }
+.tiempo-conexion input {
+    width: 70px;
+    padding: 4px 6px;
+    border: 1px solid #f59e0b;
+    border-radius: 4px;
+    font-size: 12px;
+    text-align: center;
+}
+.tiempo-conexion span { color: #92400e; }
+
+/* Paso 3 layout */
+.paso3-layout { display: flex; gap: 16px; }
+.paso3-datos { flex: 1; }
+.paso3-mapa { flex: 1.2; }
+
+#mapa-rutas-preview {
+    width: 100%;
+    height: 380px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+}
+
+.resumen-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid #f0f2f5;
+    font-size: 13px;
+}
+.resumen-label { color: #6b7280; }
+.resumen-value { font-weight: 600; color: #1a3a5c; }
+
+/* Modo oscuro */
+body.dark-mode .wizard-steps { border-bottom-color: #1F293D; }
+body.dark-mode .wizard-step { background: #1F293D; color: #64748B; }
+body.dark-mode .wizard-step.active { background: rgba(0,210,255,0.15); color: #00D2FF; }
+body.dark-mode .wizard-step.completed { background: rgba(16,185,129,0.15); color: #34d399; }
+body.dark-mode .wizard-footer { border-top-color: #1F293D; }
+body.dark-mode .ruta-construida { background: #0A0D12; border-color: #1F293D; }
+body.dark-mode .ruta-parada-item { background: #131822; border-color: #1F293D; color: #F8FAFC; }
+body.dark-mode .ruta-parada-item .orden { background: #00D2FF; color: #0A0D12; }
+body.dark-mode .tiempo-conexion { background: rgba(245,158,11,0.1); border-color: #f59e0b; color: #fbbf24; }
+body.dark-mode .tiempo-conexion label,
+body.dark-mode .tiempo-conexion span { color: #fbbf24; }
+body.dark-mode .tiempo-conexion input { background: #0A0D12; border-color: #f59e0b; color: #F8FAFC; }
+body.dark-mode .resumen-item { border-bottom-color: #1F293D; }
+body.dark-mode .resumen-label { color: #64748B; }
+body.dark-mode .resumen-value { color: #F8FAFC; }
+
+/* ============================================
    MODO OSCURO
    ============================================ */
 body.dark-mode .mapa-container {
-<<<<<<< HEAD
-    background: #1c1f24;
-}
-body.dark-mode .mapa-header {
-    border-bottom-color: #2c3138;
-}
-body.dark-mode .mapa-header h3 {
-    color: #e5eefc;
-}
-body.dark-mode .mapa-contador,
-body.dark-mode .btn-expandir {
-    background: #2c3138;
-    color: #e5e7eb;
-}
-body.dark-mode .paradas-disponibles,
-body.dark-mode .paradas-seleccionadas {
-    background: #1c1f24;
-    border-color: #2c3138;
-}
-body.dark-mode .item-parada {
-    background: #252a31;
-    border-color: #2c3138;
-    color: #e5e7eb;
-=======
     background: #131822;
     border: 1px solid #1F293D;
 }
@@ -326,5 +506,4 @@ body.dark-mode .btn-agregar-todas {
 body.dark-mode .btn-quitar-todas {
     background-color: rgba(149, 36, 42, 0.2);
     color: #f87171;
->>>>>>> eaaf80c5463b4d5650e922e6bce80d57e533903d
 }
