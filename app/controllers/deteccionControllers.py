@@ -70,3 +70,25 @@ def delete_deteccion(id_deteccion):
         return error_response(error=str(e), message="Deteccion no encontrada", status_code=404)
     except Exception as e:
         return error_response(error=str(e), message="Error al eliminar la deteccion", status_code=500)
+
+def registrar_paso(data):
+    try:
+        deteccion = DeteccionServices.registrar_paso(data)
+        return success_response(
+            message="Paso registrado exitosamente", 
+            data=deteccion.to_dict())
+    except ResourceNotFound as e:
+        return error_response(error=str(e), message=str(e), status_code=404)
+    except ResourceNotValid as e:
+        return error_response(error=str(e), message=str(e), status_code=400)
+    except Exception as e:
+        return error_response(error=str(e), message="Error al registrar paso", status_code=500)
+
+def verificar_retraso(data):
+    try:
+        resultado = DeteccionServices.verificar_retraso(data)
+        return success_response(message="Verificación de retraso completado", data=resultado)
+    except ResourceNotValid as e:
+        return error_response(error=str(e), message=str(e), status_code=400)
+    except Exception as e:
+        return error_response(error=str(e), message="Error al verificar retraso", status_code=500)

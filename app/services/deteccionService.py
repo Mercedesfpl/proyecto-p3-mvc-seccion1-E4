@@ -1,13 +1,12 @@
 # app/services/deteccionServices.py
-
-from ..models.deteccion import Deteccion
-from ..models.exceptions import ResourceNotFound
+from app.factory.deteccion_factory import DeteccionFactory
+from ..models.exceptions import ResourceNotFound, ResourceNotValid
 from ..repositories.deteccionRepository import DeteccionRepository
 from ..repositories.paradaRepository import ParadaRepository
 from ..repositories.busRepository import BusRepository
-from ..extensions import db
-from datetime import datetime, timedelta
-
+from app.models.exceptions import ResourceNotFound
+from datetime import datetime, timezone
+from ..models.ruta_parada import RutaParada
 
 class DeteccionServices:
 
@@ -38,53 +37,6 @@ class DeteccionServices:
         detecciones = DeteccionRepository.get_alertas(tolerancia)
         return [d.to_dict() for d in detecciones]
 
-    @staticmethod
-    def create_deteccion(data):
-        id_vehiculo = data.get('id_vehiculo')
-        id_parada = data.get('id_parada')
-        fecha_hora = data.get('fecha_hora', datetime.now())
-
-        vehiculo = BusRepository.get_by_id(id_vehiculo)
-        if not vehiculo:
-            raise ResourceNotFound("Vehiculo")
-
-        parada = ParadaRepository.get_by_id(id_parada)
-        if not parada:
-            raise ResourceNotFound("Parada")
-
-        deteccion = Deteccion(
-            id_vehiculo=id_vehiculo,
-            id_parada=id_parada,
-            fecha_hora=fecha_hora
-        )
-
-        # Calcular tiempo de viaje si existe deteccion anterior
-        deteccion_anterior = DeteccionRepository.get_last_by_vehiculo(id_vehiculo)
-        if deteccion_anterior and deteccion_anterior.id_parada != id_parada:
-            tiempo_real = (fecha_hora - deteccion_anterior.fecha_hora).total_seconds() / 60
-            deteccion.tiempo_real = round(tiempo_real, 2)
-
-            # Obtener tiempo estimado desde la ruta
-            tiempo_estimado = DeteccionServices._get_tiempo_estimado(
-                id_vehiculo, 
-                deteccion_anterior.id_parada, 
-                id_parada
-            )
-            deteccion.tiempo_estimado = tiempo_estimado
-
-            if tiempo_estimado:
-                retraso = tiempo_real - tiempo_estimado
-                deteccion.retraso = round(retraso, 2)
-
-                tolerancia = data.get('tolerancia', 5)
-                if retraso > tolerancia:
-                    deteccion.estado = 'retraso'
-                elif retraso < 0:
-                    deteccion.estado = 'adelantado'
-                else:
-                    deteccion.estado = 'normal'
-
-        return DeteccionRepository.save(deteccion)
 
     @staticmethod
     def _get_tiempo_estimado(id_vehiculo, id_parada_origen, id_parada_destino):
@@ -124,3 +76,62 @@ class DeteccionServices:
         if not deteccion:
             raise ResourceNotFound("Deteccion")
         return DeteccionRepository.delete(deteccion)
+
+    @staticmethod
+    def registrar_paso(data):
+        #validar que el bus y la parada existan
+        bus = BusRepository.get_by_id(data.get("id_vehiculo"))
+        if not bus:
+            raise ResourceNotFound("Bus no encontrado")
+        
+        parada = ParadaRepository.get_by_id(data.get("id_parada"))
+        if not parada:
+            raise ResourceNotFound("Parada no encontrado")
+
+        deteccion = DeteccionFactory.crear_deteccion(data)
+        return DeteccionRepository.save(deteccion)
+
+    @staticmethod
+    def verificar_retraso(data):
+        id_ruta = data.get("id_ruta")
+        secuencia_actual = data.get("secuencia_actual")
+        hora_inicio_str = data.get("hora_inicio")
+
+        if not id_ruta or secuencia_actual is None or not hora_inicio_str:
+            raise ResourceNotValid("Retraso", "Faltan datos: id_ruta, secuencia_actual y hora_inicio son obligatorios")
+
+        try:
+            secuencia_actual = int(secuencia_actual)
+            hora_inicio = datetime.fromisoformat(hora_inicio_str.replace("Z", "+00:00"))
+            if hora_inicio.tzinfo is None:
+                hora_inicio = hora_inicio.replace(tzinfo=timezone.utc)
+        except ValueError:
+            raise ResourceNotValid("Retraso", "Formato de hora_inicio inválido. Usa ISO 8601.")
+
+        # 1. Buscar los tiempos estimados
+        tramos = RutaParada.query.filter_by(id_ruta=id_ruta).filter(RutaParada.orden_parada < secuencia_actual).all()
+        
+        if not tramos:
+            raise ResourceNotValid("Retraso", f"No hay paradas configuradas para la ruta {id_ruta} hasta la secuencia {secuencia_actual}")
+
+        # 👇 FORZAMOS a float() por si en la BD está guardado como texto
+        tiempo_estimado_total = sum(float(tramo.tiempo_estimado_min or 0) for tramo in tramos)
+
+        # 2. Calcular el tiempo real
+        hora_actual = datetime.now(timezone.utc)
+        tiempo_transcurrido_real = float((hora_actual - hora_inicio).total_seconds() / 60)
+
+        # 3. Calcular la diferencia
+        umbral = 5.0 # 5 minutos
+        diferencia = tiempo_transcurrido_real - tiempo_estimado_total
+        retrasado = diferencia > umbral
+        minutos_retraso = max(0.0, round(diferencia, 1))
+
+        return {
+            "id_ruta": id_ruta,
+            "secuencia_actual": secuencia_actual,
+            "retrasado": retrasado,
+            "minutos_retraso": minutos_retraso,
+            "tiempo_estimado_total": tiempo_estimado_total,
+            "tiempo_transcurrido_real": round(tiempo_transcurrido_real, 1)
+        }

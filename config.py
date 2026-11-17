@@ -55,6 +55,9 @@ class Config:
     SQLALCHEMY_DATABASE_URI = _sanitize_database_url(_raw_db_url) or _default_uri
     print("DEBUG SQLALCHEMY_DATABASE_URI repr:", repr(SQLALCHEMY_DATABASE_URI))
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "connect_args": {"options": "-c client_encoding=utf8"}
+    }
     SECRET_KEY = os.environ.get("DB_TOKEN", "")
 
     DEBUG = True  # activa el modo depuración de FLask

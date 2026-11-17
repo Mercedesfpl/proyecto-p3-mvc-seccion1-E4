@@ -563,3 +563,14 @@ def get_eta():
     if "error" in data:
         return jsonify(data), 404
     return jsonify(data), 200
+
+# ============================================================
+# ENDPOINT de pasos de autobuses
+# ============================================================
+
+@admin_scope.route("/verificar-retraso", methods=["POST"])
+@jwt_required()
+def verificar_retraso_route():
+    from app.controllers.deteccionControllers import verificar_retraso
+    data = request.get_json()
+    return verificar_retraso(data)

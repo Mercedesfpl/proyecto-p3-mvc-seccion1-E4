@@ -43,24 +43,32 @@ class RutaServices:
             "status": data.get("status", "activa"),
         }
         ruta = RutaFactory.crear_ruta(ruta_data)
-        ruta_guardada = RutaRepository.save(ruta)
+        db.session.add(ruta)
+        db.session.flush()
 
-        paradas_ids = data.get("paradas_ids", [])
+        paradas_ids = data.get("paradas", [])
         if paradas_ids:
             from app.models.ruta_parada import RutaParada
             from app.repositories.paradaRepository import ParadaRepository
 
-            for i, id_parada in enumerate(paradas_ids, start=1):
+            for p_data in paradas_ids:
+                id_parada = p_data.get("id")
+                orden = p_data.get("orden")
+                tiempo = p_data.get("tiempo_siguiente") or 0
+
                 parada = ParadaRepository.get_by_id(id_parada)
                 if not parada:
                     raise ResourceNotValid("Parada", f"La parada {id_parada} no existe")
 
                 ruta_parada = RutaParada(
-                    id_ruta=ruta.id, id_parada=id_parada, orden_parada=i
+                    id_ruta = ruta.id,
+                    id_parada = id_parada,
+                    orden_parada = orden,
+                    tiempo_estimado = tiempo
                 )
                 db.session.add(ruta_parada)
-            db.session.commit()
 
+        db.session.commit()
         return ruta.to_dict()
 
     @staticmethod
@@ -93,27 +101,30 @@ class RutaServices:
                 raise ResourceNotFound("Línea no encontrada")
             ruta.id_linea = data["id_linea"]
 
-        if "paradas_ids" in data:
+        if "paradas" in data:
             from app.models.ruta_parada import RutaParada
+            from app.repositories.paradaRepository import ParadaRepository
 
             RutaParada.query.filter_by(id_ruta=id_ruta).delete()
 
-            paradas_ids = data.get("paradas_ids", [])
-            from app.repositories.paradaRepository import ParadaRepository
+            for p_data in data["paradas"]:
+                id_parada = p_data.get("id")
+                orden = p_data.get("orden")
+                tiempo = p_data.get("tiempo_siguiente") or 0
 
-            for i, id_parada in enumerate(paradas_ids, start=1):
                 parada = ParadaRepository.get_by_id(id_parada)
                 if not parada:
                     raise ResourceNotValid("Parada", f"La parada {id_parada} no existe")
 
                 ruta_parada = RutaParada(
-                    id_ruta=ruta.id, id_parada=id_parada, orden_parada=i
+                    id_ruta = ruta.id,
+                    id_parada = id_parada,
+                    orden_parada = orden,
+                    tiempo_estimado_min = tiempo
                 )
                 db.session.add(ruta_parada)
-            db.session.commit()
 
         RutaRepository.save(ruta)
-        print(ruta_parada.to_dict)
         return ruta_parada.to_dict()
 
     @staticmethod
@@ -131,3 +142,4 @@ class RutaServices:
         RutaParada.query.filter_by(id_ruta=id_ruta).delete()
         db.session.commit()
         return RutaRepository.delete(ruta)
+    
