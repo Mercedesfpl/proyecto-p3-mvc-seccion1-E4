@@ -15,6 +15,7 @@ from ..controllers import (
 # Esto es para el calculo de los tiempos
 from ..services.etaService import calcular_etas
 from app.decorators.role_decorator import role_required
+from ..extensions import socketio
 
 admin_scope = Blueprint("admin", __name__)
 #
@@ -212,7 +213,7 @@ def delete_persona(id):
 
 @admin_scope.route("/paradas", methods=["GET"])
 # Se eleimino por estan deben de ser publicas se debe de crear public.py y colocar rutas publicas
-# @jwt_required()
+@jwt_required()
 # @role_required("admin")
 def get_paradas():
     from app.controllers.paradaControllers import get_all_paradas
@@ -328,7 +329,7 @@ def delete_bus(id_vehiculo):
 @admin_scope.route(
     "/rutas/get", methods=["GET"]
 )  # Usamos /rutas/api para no chocar con la vista <--- esto ya no se usa, si un get lo usa un usurio normal se le debe de quitar el role decorador tambien se deben de crear la rutas publicas donde seobtengan las paradas y las rutas
-# @jwt_required()
+@jwt_required()
 # @role_required("admin")
 def get_rutas_api():
     from app.controllers.rutaControllers import get_all_rutas
@@ -353,7 +354,9 @@ def create_ruta():
     from app.controllers.rutaControllers import create_ruta
 
     data = request.get_json()
-    return create_ruta(data)
+    response = create_ruta(data)
+    socketio.emit("rutas_actualizadas")
+    return response
 
 
 @admin_scope.route("/rutas/<int:id_ruta>", methods=["PUT"])
@@ -364,7 +367,9 @@ def update_ruta(id_ruta):
     from app.controllers.rutaControllers import update_ruta
 
     data = request.get_json()
-    return update_ruta(id_ruta, data)
+    response = update_ruta(id_ruta, data)
+    socketio.emit("rutas_actualizadas")
+    return response
 
 
 @admin_scope.route("/rutas/<int:id_ruta>", methods=["DELETE"])

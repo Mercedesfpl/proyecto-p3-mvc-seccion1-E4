@@ -67,7 +67,7 @@ class Config:
     STATIC_FOLDER = "frontend/static"
     # --- Configuración de JWT y Cookies ---
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
-    JWT_TOKEN_LOCATION = ["cookies", "headers"]
+    JWT_TOKEN_LOCATION = ["headers", "cookies"]
     # 2. Hacer que la cookie sea HttpOnly
     JWT_COOKIE_SECURE = False
     JWT_COOKIE_CSRF_PROTECT = True
@@ -78,7 +78,7 @@ class Config:
     JWT_CSRF_METHODS = ["POST", "PUT", "PATCH", "DELETE"]
     JWT_CSRF_CHECK_FORM_DATA = False
 
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)  # Tokens de acceso expiran en 1 hora
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=1)  # Tokens de acceso expiran en 1 hora
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)  # Refresh token válido por 30 días
 
     # 3. Seguridad de las cookies para el sitio Web

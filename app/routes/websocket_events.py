@@ -25,3 +25,9 @@ def handle_ubicacion_bus(data):
         'latitud': lat,
         'longitud': lng
     }, broadcast=True)
+
+@socketio.on('nueva_ubicacion')
+def handle_nueva_ubicacion(data):
+    print(f"📥 Datos recibidos del simulador: {data}")
+    # Retransmitimos el evento a todos los clientes (la App Móvil)
+    emit('nueva_ubicacion', data, broadcast=True)
